@@ -1,34 +1,53 @@
-from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
+from typing import Literal
 
-from app.core.config import FONT_PATH, INPUT_IMAGE_PATH
+from PIL import Image, ImageDraw, ImageFont
+from PIL.ImageFile import ImageFile
+
+from app.core.config import FONT_PATH, IMAGE_PATH
 
 
 async def create_text_image(
-    text: str
+    text: str,
 ) -> BytesIO:
-    image = Image.open(INPUT_IMAGE_PATH)
-    draw = ImageDraw.Draw(image)
+    """
+    Создает изображение с текстом поверх фонового изображения.
 
-    # Подбор размера шрифта
+    Args:
+        text (str): Текст, который будет добавлен на изображение.
+
+    Returns:
+        BytesIO: Буфер с PNG-изображением.
+    """
+    # Открываем фоновое изображение
+    image: ImageFile = Image.open(IMAGE_PATH)
+    draw: ImageDraw.ImageDraw = ImageDraw.Draw(image)
+
+    # Подбираем размер шрифта относительно высоты изображения
     font_size = int(image.height * 0.5)
-    font = ImageFont.truetype(FONT_PATH, size=font_size)
+    font: ImageFont.FreeTypeFont = ImageFont.truetype(
+        FONT_PATH,
+        size=font_size
+    )
 
-    # Центрирование текста
-    bbox = draw.textbbox((0, 0), text, font=font)
-    text_x = (image.width - (bbox[2] - bbox[0])) / 2
-    text_y = (image.height - (bbox[3] - bbox[1])) * 0.4
+    # Вычисляем координаты для центрирования текста
+    bbox: tuple[float, float, float, float] = draw.textbbox(
+        (0, 0), text, font=font
+    )
+    text_x: float = (image.width - (bbox[2] - bbox[0])) / 2
+    text_y: float = (image.height - (bbox[3] - bbox[1])) * 0.4
 
-    font_color = (255, 255, 255)
+    # Цвет текста (белый)
+    font_color: tuple[Literal[255], Literal[255], Literal[255]] = (
+        255, 255, 255
+    )
     draw.text((text_x, text_y), text, font=font, fill=font_color)
 
-    # Сохраняем в буфер
+    # Сохраняем изображение в буфер
     buffer = BytesIO()
     image.save(buffer, format='PNG')
     buffer.seek(0)
     return buffer
-
-
 
 
 # async def create_text_image(
