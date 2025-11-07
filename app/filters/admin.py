@@ -3,7 +3,7 @@ from typing import Any, List, Optional, Union
 from aiogram.filters import BaseFilter
 from aiogram.types import CallbackQuery, Message
 
-from config import MAIN_ADMINS
+from app.core.config import MAIN_ADMINS
 
 
 class AdminFilter(BaseFilter):

@@ -13,13 +13,13 @@ load_dotenv()
 # ------------------------------------------------------------
 
 # Токен Telegram-бота
-BOT_TOKEN: str | None = os.getenv("BOT_TOKEN")
+BOT_TOKEN: str = os.getenv("BOT_TOKEN", "")
 
 # URL подключения к базе данных
-DB_URL: str | None = os.getenv("DB_URL")
+DB_URL: str = os.getenv("DB_URL", "")
 
 # Путь к файлу логов
-LOG_FILE: str | None = os.getenv("LOG_FILE")
+LOG_FILE: str = os.getenv("LOG_FILE", "")
 
 # ------------------------------------------------------------
 # Дополнительные параметры окружения

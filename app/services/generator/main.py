@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 
-from config import FONT_PATH, INPUT_IMAGE_PATH
+from app.core.config import FONT_PATH, INPUT_IMAGE_PATH
 
 
 async def create_text_image(

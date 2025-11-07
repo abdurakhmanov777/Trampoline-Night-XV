@@ -7,7 +7,7 @@ from pathlib import Path
 from aiogram import types
 from loguru import logger
 
-from config import LOG_FILE
+from app.core.config import LOG_FILE
 
 # Добавляем логирование с использованием Loguru
 logger.add(sink=LOG_FILE, format='{time} {level} {message}')

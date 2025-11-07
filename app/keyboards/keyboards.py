@@ -1,7 +1,7 @@
 from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
                            WebAppInfo)
 
-from config import SYMB
+from app.core.config import SYMB
 
 none = InlineKeyboardMarkup(inline_keyboard=[])
 

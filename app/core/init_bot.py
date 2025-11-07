@@ -6,7 +6,7 @@ from loguru import logger
 
 from app.keyboards.commands import bot_commands
 from app.routers import init_routers
-from config import BOT_TOKEN
+from app.core.config import BOT_TOKEN
 
 # Отключаем шумные внутренние логи aiogram и aiohttp
 logging.getLogger("aiogram").setLevel(logging.WARNING)

@@ -9,7 +9,7 @@ from app.filters.admin import AdminFilter
 from app.filters.chat_type import ChatTypeFilter
 from app.keyboards.keyboards import keyboard_dynamic
 from app.utils.logger import log
-from config import COMMAND_MAIN
+from app.core.config import COMMAND_MAIN
 
 router = Router()
 

@@ -9,7 +9,7 @@ from app.filters.chat_type import ChatTypeFilter
 from app.localization.localization import Localization, load_localization_main
 from app.utils.logger import log
 # from app.utils.user_actions import user_action_wrapper
-from config import CALLBACK_MAIN, CALLBACK_SELECT
+from app.core.config import CALLBACK_MAIN, CALLBACK_SELECT
 
 router = Router()
 
