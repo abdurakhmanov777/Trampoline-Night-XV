@@ -5,10 +5,10 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, Message
 
-from app.filters.chat_type import ChatTypeFilter
+from app.core.config import COMMAND_MAIN
+from app.filters import ChatTypeFilter
 from app.keyboards.keyboards import keyboard_dynamic
 from app.utils.logger import log
-from app.core.config import COMMAND_MAIN
 
 router = Router()
 
