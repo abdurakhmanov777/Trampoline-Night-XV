@@ -37,7 +37,11 @@ def admin_command(
 
 
 @admin_command("admin")
-async def user_id(message: Message, state: FSMContext) -> None:
+async def admin_start(
+    message: Message,
+    state: FSMContext,
+    admin_role: str
+) -> None:
     """
     Отправляет ID текущего группового чата с шаблоном текста
         и динамической клавиатурой.
