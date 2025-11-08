@@ -5,8 +5,8 @@ from aiogram import Bot, Dispatcher
 from loguru import logger
 
 from app.core.config import BOT_TOKEN
-from app.services.keyboards.commands import bot_commands
 from app.routers import init_routers
+from app.services.keyboards.commands import bot_commands
 
 # Отключаем шумные внутренние логи aiogram и aiohttp
 logging.getLogger("aiogram").setLevel(logging.WARNING)
