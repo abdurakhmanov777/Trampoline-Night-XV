@@ -1,11 +1,10 @@
-from typing import Any, Callable, Dict
+from typing import Any, Callable
 
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, Message
 
-from app.core.config import COMMAND_MAIN
 from app.filters import AdminFilter, ChatTypeFilter
 from app.services.keyboards import keyboard_dynamic
 from app.utils.logger import log
@@ -18,21 +17,25 @@ def admin_command(
 ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
     Декоратор для регистрации команд, доступных только
-        в группах и супергруппах.
+    администраторам в приватных чатах.
 
     Args:
-        *commands (str): Названия команд для
-        фильтрации (например, "start", "help").
+        *filters (Any): Дополнительные фильтры для обработки
+        сообщений.
 
     Returns:
-        Callable: Декоратор для функции-обработчика.
+        Callable[[Callable[..., Any]], Callable[..., Any]]:
+        Декоратор для функции-обработчика.
     """
-    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+    def decorator(
+        func: Callable[..., Any]
+    ) -> Callable[..., Any]:
         return router.message(
             ChatTypeFilter(chat_type=["private"]),
             AdminFilter(),
             *filters
         )(func)
+
     return decorator
 
 
@@ -40,64 +43,37 @@ def admin_command(
 async def admin_start(
     message: Message,
     state: FSMContext,
-    role: dict
+    role: str
 ) -> None:
     """
-    Отправляет ID текущего группового чата с шаблоном текста
-        и динамической клавиатурой.
+    Отправляет текст и динамическую клавиатуру из локализации
+    для администратора.
 
     Args:
         message (Message): Объект входящего сообщения Telegram.
-        state (FSMContext): Объект контекста состояний FSM.
+        state (FSMContext): Контекст FSM для хранения данных.
+        role (str): Роль пользователя для логирования или
+        фильтрации.
     """
-    # print(role)
-    loc: Any | None = (await state.get_data()).get("loc_admin")
+
+    # Получаем данные локализации из состояния
+    data: dict = await state.get_data()
+    loc: Any | None = data.get("loc_admin")
     if not loc:
         return
-    # print(loc.default)
 
     # Получаем текст и данные клавиатуры из локализации
-    text: Any = loc.default.admin.text
-    keyboard_data: Any = loc.default.admin.keyboard
+    text: str = loc.default.admin.text
+    keyboard_data: list = loc.default.admin.keyboard
 
-    # Создаём клавиатуру
+    # Создаём динамическую клавиатуру
     keyboard: InlineKeyboardMarkup = await keyboard_dynamic(keyboard_data)
-    await message.answer(text=text, parse_mode="HTML", reply_markup=keyboard)
+
+    # Отправляем сообщение с текстом и клавиатурой
+    await message.answer(
+        text=text,
+        parse_mode="HTML",
+        reply_markup=keyboard
+    )
+
     await log(message)
-
-
-# @admin_command(AdminCallbackFilter())
-# async def main(
-#     message: Message,
-#     state: FSMContext
-# ) -> None:
-#     """
-#     Обрабатывает основную команду пользователя.
-
-#     Получает текст и клавиатуру из локализации по ключу команды
-#     и отправляет сообщение с динамической клавиатурой.
-
-#     Args:
-#         message (Message): Входящее сообщение Telegram.
-#         state (FSMContext): Контекст FSM для хранения данных пользователя.
-#     """
-#     text_content: str | None = message.text
-#     if not text_content:
-#         return
-#     key: str = text_content.lstrip("/").split()[0]
-#     print(key)
-#     data: Dict[str, Any] = await state.get_data()
-#     loc: Any = data.get("loc_admin")
-#     if not loc:
-#         return
-
-#     # Получаем текст и данные клавиатуры через getattr
-#     text: str = getattr(loc.default, key).text
-#     keyboard_data: Any = getattr(loc.default, key).keyboard
-
-#     # Создаём клавиатуру
-#     keyboard: InlineKeyboardMarkup = await keyboard_dynamic(keyboard_data)
-
-#     # Отправляем сообщение
-#     await message.answer(text=text, parse_mode="HTML", reply_markup=keyboard)
-#     await log(message)

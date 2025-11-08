@@ -61,79 +61,79 @@
                         "delete_panel"
                     ]
                 ]
-            ]
-        },
-        "table": {
-            "text": "<b>Настройки таблицы</b>\n\n<i>Нажмите на кнопку, чтобы закрыть панель</i>",
-            "keyboard": [
-                [
+            ],
+            "table": {
+                "text": "<b>Настройки таблицы</b>\n\n<i>Нажмите на кнопку, чтобы закрыть панель</i>",
+                "keyboard": [
                     [
-                        "Таблица",
-                        "url",
-                        "https://docs.google.com/spreadsheets/d/1S89pSAypwTsWfQWfpCmEVu4DlYYq0xlKi70KoojzYSg/edit?usp=sharing"
+                        [
+                            "Таблица",
+                            "url",
+                            "https://docs.google.com/spreadsheets/d/1S89pSAypwTsWfQWfpCmEVu4DlYYq0xlKi70KoojzYSg/edit?usp=sharing"
+                        ]
+                    ],
+                    [
+                        [
+                            "Назад",
+                            "admin"
+                        ]
                     ]
-                ],
-                [
+                ]
+            },
+            "settings": {
+                "text": "<b>Выберите нужную настройку</b>\n\n<i>Нажмите на кнопку, чтобы перейти</i>",
+                "keyboard": [
+                    [
+                        [
+                            "Язык системы",
+                            "lang"
+                        ]
+                    ],
+                    [
+                        [
+                            "Назад",
+                            "admin"
+                        ]
+                    ]
+                ]
+            },
+            "info": {
+                "text": "<b>Бот учебно-методической комиссии</b>\n\n<i>Нажмите на кнопку, чтобы вернуться</i>",
+                "keyboard": [
+                    [
+                        [
+                            "Назад",
+                            "admin"
+                        ]
+                    ]
+                ]
+            },
+            "lang": {
+                "text": "<b>Выберите язык</b>\n\n<i>Нажмите на кнопку, чтобы изменить</i>",
+                "keyboard": [
+                    [
+                        "Русский",
+                        "select_lang_ru"
+                    ],
+                    [
+                        "English",
+                        "select_lang_en"
+                    ],
                     [
                         "Назад",
-                        "admin"
+                        "settings"
                     ]
                 ]
-            ]
-        },
-        "settings": {
-            "text": "<b>Выберите нужную настройку</b>\n\n<i>Нажмите на кнопку, чтобы перейти</i>",
-            "keyboard": [
-                [
+            },
+            "delete": {
+                "text": "",
+                "keyboard": [
                     [
-                        "Язык системы",
-                        "lang"
-                    ]
-                ],
-                [
-                    [
-                        "Назад",
-                        "admin"
+                        "Закрыть окно",
+                        "delete"
                     ]
                 ]
-            ]
-        },
-        "info": {
-            "text": "<b>Бот учебно-методической комиссии</b>\n\n<i>Нажмите на кнопку, чтобы вернуться</i>",
-            "keyboard": [
-                [
-                    [
-                        "Назад",
-                        "admin"
-                    ]
-                ]
-            ]
-        },
-        "lang": {
-            "text": "<b>Выберите язык</b>\n\n<i>Нажмите на кнопку, чтобы изменить</i>",
-            "keyboard": [
-                [
-                    "Русский",
-                    "select_lang_ru"
-                ],
-                [
-                    "English",
-                    "select_lang_en"
-                ],
-                [
-                    "Назад",
-                    "settings"
-                ]
-            ]
-        },
-        "delete": {
-            "text": "",
-            "keyboard": [
-                [
-                    "Закрыть окно",
-                    "delete"
-                ]
-            ]
+            }
         },
         "miniapp": {
             "text": "<b>Мини-приложение создано</b>\n\n<i>Нажмите на кнопку, чтобы его открыть</i>",
