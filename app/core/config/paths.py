@@ -21,33 +21,23 @@ FONTS_DIR: Path = ASSETS_DIR / "fonts"              # Шрифты
 FILES_DIR: Path = ASSETS_DIR / "files"              # Документы
 LOCALIZATION_DIR: Path = ASSETS_DIR / "localization"  # Локализация
 
-# ------------------------------------------------------------
-# Основные ресурсы
-# ------------------------------------------------------------
-IMAGE_PATH: Path = IMAGES_DIR / os.getenv(
-    "IMAGE_NAME", "background.png"
-)  # Фоновое изображение
 
-FONT_PATH: Path = FONTS_DIR / os.getenv(
-    "FONT_NAME", "ALS_Sector_Bold.ttf"
-)  # Шрифт для текста
+# Фоновое изображение
+IMAGE_PATH: Path = IMAGES_DIR / os.getenv("IMAGE_NAME", "background.png")
 
-# ------------------------------------------------------------
-# Документы для отправки через бота
-# ------------------------------------------------------------
-GUEST_PATH: Path = FILES_DIR / os.getenv(
-    "GUEST_PATH", "Анкета_гостя.pdf"
-)  # Анкета гостя
+# Шрифт для текста
+FONT_PATH: Path = FONTS_DIR / os.getenv("FONT_NAME", "ALS_Sector_Bold.ttf")
+
+# Анкета гостя
+GUEST_PATH: Path = FILES_DIR / os.getenv("GUEST_PATH", "Анкета_гостя.pdf")
+
+# Расписка участника
 PARTICIPANT_PATH: Path = FILES_DIR / os.getenv(
     "PARTICIPANT_PATH", "Расписка_участника.pdf"
-)  # Расписка участника
+)
 
-# ------------------------------------------------------------
 # Файл логирования
-# ------------------------------------------------------------
 LOG_FILE: Path = BASE_DIR / "logs" / "app.log"
 
-# ------------------------------------------------------------
 # Файл настроек googlsheets
-# ------------------------------------------------------------
 GSHEET_CREDS: Path = BASE_DIR / "credentials" / "creds.json"
