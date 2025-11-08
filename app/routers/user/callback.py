@@ -4,7 +4,7 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-import app.keyboards.keyboards as kb
+import app.services.keyboards as kb
 # from app.utils.user_actions import user_action_wrapper
 from app.core.config import CALLBACK_MAIN, CALLBACK_SELECT
 from app.filters import ChatTypeFilter

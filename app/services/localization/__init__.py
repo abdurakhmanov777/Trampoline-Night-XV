@@ -1,5 +1,5 @@
-from .model import Localization
 from .loader import load_localization_main
+from .model import Localization
 
 __all__: list[str] = [
     "Localization",

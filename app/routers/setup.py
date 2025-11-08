@@ -1,7 +1,7 @@
 from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import SimpleEventIsolation
 
-from app.middleware.middleware import MwCallback, MwCommand
+from app.core.middleware import MwCallback, MwCommand
 from app.routers.admin.callback import router as admin_callback
 from app.routers.admin.command import router as admin_command
 from app.routers.user.callback import router as user_callback

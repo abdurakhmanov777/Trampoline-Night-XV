@@ -7,7 +7,7 @@ from aiogram.types import InlineKeyboardMarkup, Message
 
 from app.core.config import COMMAND_MAIN
 from app.filters import ChatTypeFilter
-from app.keyboards.keyboards import keyboard_dynamic
+from app.services.keyboards import keyboard_dynamic
 from app.utils.logger import log
 
 router = Router()
