@@ -11,7 +11,7 @@ async def main() -> None:
     await async_main()
 
     # Запуск бота
-    # await run_bot()
+    await run_bot()
 
 
 if __name__ == "__main__":

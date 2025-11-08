@@ -3,7 +3,6 @@
 """
 
 import os
-from pathlib import Path
 from typing import List, Set
 
 from dotenv import load_dotenv
@@ -23,11 +22,6 @@ TIME_ZONE: int = int(os.getenv("TIME_ZONE", "0"))
 MAIN_ADMINS: List[int] = [
     int(x) for x in os.getenv("MAIN_ADMINS", "").split(",") if x
 ]
-
-# ------------------------------------------------------------
-# Файл логирования
-# ------------------------------------------------------------
-LOG_FILE: Path = Path(os.getenv("LOG_FILE", "logs/app.log"))
 
 # ------------------------------------------------------------
 # Символы и префиксы

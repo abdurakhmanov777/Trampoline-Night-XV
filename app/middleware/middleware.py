@@ -3,7 +3,7 @@ from typing import Any, Awaitable, Callable
 from aiogram import BaseMiddleware
 
 from app.database.models.user import User
-from app.localization.localization import load_localization_main
+from app.services.localization import load_localization_main
 from app.services.requests.requests import get_user_by_tg_id
 from app.utils.logger import log_error
 

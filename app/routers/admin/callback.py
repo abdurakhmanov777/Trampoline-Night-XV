@@ -8,7 +8,7 @@ import app.keyboards.keyboards as kb
 # from app.utils.user_actions import user_action_wrapper
 from app.core.config import CALLBACK_MAIN, CALLBACK_SELECT
 from app.filters import ChatTypeFilter
-from app.localization.localization import Localization, load_localization_main
+from app.services.localization import Localization, load_localization_main
 from app.utils.logger import log
 
 router = Router()
@@ -130,7 +130,7 @@ async def select(
 
 
 @admin_callback(lambda c: c.data and c.data.startswith('select_')
-               and len(c.data.split('_')) == 3)
+                and len(c.data.split('_')) == 3)
 async def option(
     callback: CallbackQuery,
     state: FSMContext
