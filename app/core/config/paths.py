@@ -9,9 +9,7 @@ from dotenv import load_dotenv
 
 BASE_DIR: Path = Path(__file__).parent.parent.parent.parent
 
-# ------------------------------------------------------------
 # Загрузка переменных окружения
-# ------------------------------------------------------------
 load_dotenv()
 
 # ------------------------------------------------------------
@@ -29,6 +27,7 @@ LOCALIZATION_DIR: Path = ASSETS_DIR / "localization"  # Локализация
 IMAGE_PATH: Path = IMAGES_DIR / os.getenv(
     "IMAGE_NAME", "background.png"
 )  # Фоновое изображение
+
 FONT_PATH: Path = FONTS_DIR / os.getenv(
     "FONT_NAME", "ALS_Sector_Bold.ttf"
 )  # Шрифт для текста
@@ -46,4 +45,9 @@ PARTICIPANT_PATH: Path = FILES_DIR / os.getenv(
 # ------------------------------------------------------------
 # Файл логирования
 # ------------------------------------------------------------
-LOG_FILE: Path = BASE_DIR / "logs" / "app.log"  # Лог файл приложения
+LOG_FILE: Path = BASE_DIR / "logs" / "app.log"
+
+# ------------------------------------------------------------
+# Файл настроек googlsheets
+# ------------------------------------------------------------
+GSHEET_CREDS: Path = BASE_DIR / "credentials" / "creds.json"

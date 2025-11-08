@@ -2,7 +2,7 @@ from typing import Any, List, Optional
 
 import gspread
 
-from app.core.config import GSHEET_CREDS, GSHEET_NAME, GSHEET_TAB
+from app.core.config import GSHEET_CREDS, GSHEET_NAME, GSHEET_PAGE
 
 
 class GoogleSheetsService:
@@ -38,12 +38,12 @@ class GoogleSheetsService:
             return
 
         try:
-            self.wks = self.gc.open(GSHEET_NAME).worksheet(GSHEET_TAB)
+            self.wks = self.gc.open(GSHEET_NAME).worksheet(GSHEET_PAGE)
         except gspread.SpreadsheetNotFound:
             print(f"Таблица '{GSHEET_NAME}' не найдена.")
             self.wks = None
         except Exception as e:
-            print(f"Ошибка при открытии листа '{GSHEET_TAB}': {e}")
+            print(f"Ошибка при открытии листа '{GSHEET_PAGE}': {e}")
             self.wks = None
 
     def get_worksheet(self) -> Optional[gspread.Worksheet]:
