@@ -1,17 +1,28 @@
+"""
+Инициализация базы данных — создание таблиц при их отсутствии.
+"""
+
 from loguru import logger
 from sqlalchemy.exc import SQLAlchemyError
 
 from .engine import engine
-from .models.base import Base
+from .models import Base
 
 
 async def async_main() -> None:
-    """Инициализация базы данных — создаёт таблицы при их отсутствии."""
+    """
+    Инициализация базы данных.
+
+    Создаёт все таблицы, если их ещё нет, используя
+    метаданные всех моделей, наследующих Base.
+    """
     try:
         async with engine.begin() as conn:
-            # Base уже знает все модели через наследование
+            # Base.metadata уже содержит информацию обо всех моделях
             await conn.run_sync(Base.metadata.create_all)
-        logger.debug("База данных инициализирована")
+        logger.debug("База данных успешно инициализирована")
     except SQLAlchemyError as error:
-        logger.error(f"Ошибка при инициализации базы данных: {error}")
+        logger.error(
+            f"Ошибка при инициализации базы данных: {error}"
+        )
         raise
