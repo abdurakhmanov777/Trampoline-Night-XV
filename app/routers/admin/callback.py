@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message
 
 import app.services.keyboards as kb
 from app.filters import AdminFilter, ChatTypeFilter
-from app.utils.logger import log
+from app.services.logger import log
 
 router = Router()
 
