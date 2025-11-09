@@ -2,8 +2,8 @@ import asyncio
 
 from loguru import logger
 
-from app.core.init_bot import run_bot
-from app.database.init_db import async_main
+from app.core.bot.runner import run_bot
+from app.database import async_main
 
 
 async def main() -> None:

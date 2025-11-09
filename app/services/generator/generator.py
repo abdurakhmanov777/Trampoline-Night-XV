@@ -4,7 +4,7 @@ from typing import Literal
 from PIL import Image, ImageDraw, ImageFont
 from PIL.ImageFile import ImageFile
 
-from app.core.config import FONT_PATH, IMAGE_PATH
+from app.config import FONT_PATH, IMAGE_PATH
 
 
 async def create_text_image(

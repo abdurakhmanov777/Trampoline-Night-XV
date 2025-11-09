@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Union
 from aiogram.filters import BaseFilter
 from aiogram.types import CallbackQuery, Message
 
-from app.core.config import MAIN_ADMINS
+from app.config import MAIN_ADMINS
 
 # Временный список администраторов для демонстрации
 ADMINS: List[int] = [111111111, 1645736584]

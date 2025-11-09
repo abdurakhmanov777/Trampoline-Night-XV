@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
                                     create_async_engine)
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 
-from app.core.config import DB_URL
+from app.config import DB_URL
 
 if not DB_URL:
     raise ValueError(

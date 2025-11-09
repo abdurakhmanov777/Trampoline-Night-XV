@@ -7,14 +7,15 @@ from pathlib import Path
 from aiogram import types
 from loguru import logger
 
-from app.core.config import LOG_FILE
+from app.config import LOG_FILE
 
 # Добавляем логирование с использованием Loguru
 logger.add(sink=LOG_FILE, format='{time} {level} {message}')
 
 
 def get_status_phrase(code: int) -> str:
-    return HTTPStatus(code).phrase if code in HTTPStatus._value2member_map_ else 'Unknown'
+    return HTTPStatus(
+        code).phrase if code in HTTPStatus._value2member_map_ else 'Unknown'
 
 
 async def log(event, info=None):

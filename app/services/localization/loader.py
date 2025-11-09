@@ -4,7 +4,7 @@ from typing import Any, Literal
 
 from loguru import logger
 
-from app.core.config import LOCALIZATIONS_ADMIN_DIR, LOCALIZATIONS_USER_DIR
+from app.config import LOCALIZATIONS_ADMIN_DIR, LOCALIZATIONS_USER_DIR
 from app.services.localization.model import Localization
 
 

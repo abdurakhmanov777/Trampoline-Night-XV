@@ -2,7 +2,7 @@ from typing import Any, List, Optional
 
 import gspread
 
-from app.core.config import GSHEET_CREDS, GSHEET_NAME, GSHEET_PAGE
+from app.config import GSHEET_CREDS, GSHEET_NAME, GSHEET_PAGE
 
 
 class GoogleSheetsService:
