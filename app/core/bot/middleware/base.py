@@ -12,9 +12,8 @@ from typing import Any, Awaitable, Callable, Literal, Optional
 
 from aiogram import BaseMiddleware
 
+from app.services.localization import update_loc_data
 from app.utils.logger import log_error
-
-from .loc_data import update_loc_data
 
 
 class MwBase(BaseMiddleware):
