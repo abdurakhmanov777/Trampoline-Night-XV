@@ -3,12 +3,12 @@
 """
 
 from aiogram import Bot, Dispatcher
+from aiogram.types.user import User
 from loguru import logger
 
 from .commands import register_bot_commands
 from .dispatcher import setup_dispatcher
 from .factory import create_bot
-from .logging_config import configure_logging
 
 
 async def run_bot() -> None:
@@ -22,27 +22,31 @@ async def run_bot() -> None:
         4. Запуск polling с колбэком on_startup.
         5. Корректное завершение сессии бота.
     """
-    # Настройка логирования
-    configure_logging()
-
-    # Создание экземпляра бота
+    # Создание бота и получение информации о нём
     bot: Bot = await create_bot()
+    bot_info: User = await bot.get_me()
+    logger.debug(f"Бот @{bot_info.username} создан")
 
-    # Регистрация команд бота
+    # Регистрация команд
     await register_bot_commands(bot)
+    logger.debug("Команды бота зарегистрированы")
 
     # Настройка диспетчера
     dp: Dispatcher = await setup_dispatcher()
+    logger.debug("Диспетчер настроен")
 
-    # Колбэк, который срабатывает после подключения бота
-    async def on_startup(bot: Bot) -> None:
-        logger.debug("Бот подключён и polling стартовал")
+    async def on_startup(
+        bot: Bot
+    ) -> None:
+        """
+        Callback при запуске polling.
+        """
+        logger.debug("Polling бота запущен")
 
-    # Регистрация колбэка
     dp.startup.register(on_startup)
 
     # Запуск polling
     await dp.start_polling(bot)
 
-    # Корректное завершение сессии бота
+    # Закрытие сессии бота после завершения
     await bot.session.close()
