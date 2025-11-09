@@ -1,4 +1,6 @@
-"""Базовый класс для всех ORM-моделей."""
+"""
+Базовый класс для всех ORM-моделей.
+"""
 
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase

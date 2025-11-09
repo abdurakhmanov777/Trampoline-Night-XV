@@ -1,4 +1,6 @@
-"""Модель пользователя Telegram."""
+"""
+Модель пользователя Telegram.
+"""
 
 from __future__ import annotations
 
