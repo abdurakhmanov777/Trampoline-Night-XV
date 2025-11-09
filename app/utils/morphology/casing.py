@@ -1,49 +1,94 @@
 import re
-from typing import Any, Match
+from typing import List
 
-# Шаблон для поиска предлога "о" перед словами
-FIX_O_PATTERN: re.Pattern = re.compile(
-    r"\b([оО])\s+([«'“‘(]*)(\w)"
-)
+# Шаблон для поиска слов, пробелов и пунктуации
+WORD_PATTERN: re.Pattern = re.compile(r'\w+|\s+|[^\w\s]', re.UNICODE)
 
-# Множество гласных букв русского алфавита
-VOWELS: set[str] = set("аеёиоуыэюяАЕЁИОУЫЭЮЯ")
+# Шаблон для поиска конца предложения (., !, ?)
+SENTENCE_ENDINGS_PATTERN: re.Pattern = re.compile(r'([.!?])(\s+|$)')
 
 
-async def fix_preposition_o(
-        text: str
+async def lower_words(
+    text: str,
+    capitalize_first: bool = True
 ) -> str:
     """
-    Исправляет предлог 'о' на 'об' перед словами, начинающимися
-    с гласной буквы.
+    Преобразует текст в нижний регистр, кроме аббревиатур.
+    Опционально делает первую букву каждого предложения заглавной.
+
+    Args:
+        text: Исходный текст.
+        capitalize_first: Если True, первая буква предложения
+                          будет заглавной.
+
+    Returns:
+        Преобразованный текст.
+    """
+    def is_abbr(
+        word: str
+    ) -> bool:
+        """Проверяет, является ли слово аббревиатурой."""
+        return word.isupper() and len(word) > 1
+
+    def format_word(
+        word: str
+    ) -> str:
+        """Делает слово нижним регистром, если это не аббревиатура."""
+        return word if is_abbr(word) else word.lower()
+
+    # Разбиваем текст на предложения с сохранением разделителей
+    parts: List[str] = SENTENCE_ENDINGS_PATTERN.split(text)
+    sentences: List[str] = [
+        "".join(parts[i:i + 2]) for i in range(0, len(parts), 2)
+    ]
+
+    processed_sentences: List[str] = []
+
+    for sentence in sentences:
+        tokens: List[str] = WORD_PATTERN.findall(sentence)
+        result: List[str] = []
+        capitalize_next: bool = capitalize_first
+
+        for token in tokens:
+            if token.strip() and token.isalpha():
+                word: str = format_word(token)
+                if capitalize_next and not is_abbr(word):
+                    word = word.capitalize()
+                result.append(word)
+                capitalize_next = False
+            else:
+                result.append(token)
+                if token in '.!?':
+                    capitalize_next = capitalize_first
+
+        processed_sentences.append(''.join(result))
+
+    return ''.join(processed_sentences)
+
+
+def cap_words(
+    text: str
+) -> str:
+    """
+    Делает первую букву каждого слова заглавной, кроме аббревиатур.
 
     Args:
         text: Исходный текст.
 
     Returns:
-        Текст с исправленным предлогом 'о' на 'об' перед гласной.
+        Текст с заглавными буквами в словах, кроме аббревиатур.
     """
-    def replacer(match: Match[str]) -> str:
-        """
-        Заменяет предлог в найденном совпадении.
+    def is_abbr(word: str) -> bool:
+        """Проверяет, является ли слово аббревиатурой."""
+        return word.isupper() and len(word) > 1
 
-        Args:
-            match: Объект регулярного выражения с совпадением.
+    def process_token(token: str) -> str:
+        """Делает первую букву токена заглавной, если не аббревиатура."""
+        if token.isalpha():
+            return token if is_abbr(token) else token.capitalize()
+        return token
 
-        Returns:
-            Исправленный предлог с остальной частью слова.
-        """
-        preposition: str | Any
-        prefix: str | Any
-        first_letter: str | Any
-        preposition, prefix, first_letter = match.groups()
-        
-        if first_letter in VOWELS:
-            corrected: str = (
-                "Об" if preposition == "О" else "об"
-            ) + f" {prefix}{first_letter}"
-            return corrected
-        return match.group(0)
+    tokens: List[str] = WORD_PATTERN.findall(text)
+    processed: List[str] = [process_token(token) for token in tokens]
 
-    # Заменяем все случаи предлога "о" перед гласными
-    return FIX_O_PATTERN.sub(replacer, text)
+    return ''.join(processed)
