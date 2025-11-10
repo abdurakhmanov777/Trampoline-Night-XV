@@ -5,9 +5,8 @@
 инициализацию базы данных и все модели.
 """
 
-from .engine import async_session, engine
-from .init_db import init_db
 from .models import Admin, Base, Data, User
+from .runner import init_db
 
 __all__: list[str] = [
     "init_db",
