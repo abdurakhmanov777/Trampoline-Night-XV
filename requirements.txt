@@ -1,6 +1,5 @@
 aiogram
 aiosqlite
-asyncpg
 sqlalchemy
 loguru
 python-dotenv
