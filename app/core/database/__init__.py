@@ -5,8 +5,8 @@
 инициализацию базы данных и все модели.
 """
 
+from .main import init_db
 from .models import Admin, Base, Data, User
-from .runner import init_db
 
 __all__: list[str] = [
     "init_db",
