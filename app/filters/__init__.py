@@ -1,6 +1,18 @@
 """
-Импорт всех фильтров
+Инициализация модуля фильтров.
+
+Импортирует все доступные фильтры для упрощения их использования
+в роутерах и других модулях приложения.
 """
 
-from .admin import *
-from .chat_type import *
+# Импорт фильтров
+from .admin import AdminFilter
+from .chat_type import ChatTypeFilter
+from .system import SystemBlockFilter
+
+# Экспортируемые объекты модуля
+__all__: list[str] = [
+    "AdminFilter",
+    "ChatTypeFilter",
+    "SystemBlockFilter",
+]
