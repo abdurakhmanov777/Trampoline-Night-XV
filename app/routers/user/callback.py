@@ -11,7 +11,7 @@ from app.filters import ChatTypeFilter
 from app.services.localization import Localization, load_localization
 from app.services.logger import log
 
-router = Router()
+router: Router = Router()
 
 
 def user_callback(

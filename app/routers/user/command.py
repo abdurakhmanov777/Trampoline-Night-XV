@@ -10,7 +10,7 @@ from app.filters import ChatTypeFilter
 from app.services.keyboards import keyboard_dynamic
 from app.services.logger import log
 
-router = Router()
+router: Router = Router()
 
 
 def user_command(

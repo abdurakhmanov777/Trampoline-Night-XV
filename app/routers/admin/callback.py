@@ -8,7 +8,7 @@ import app.services.keyboards as kb
 from app.filters import AdminFilter, ChatTypeFilter
 from app.services.logger import log
 
-router = Router()
+router: Router = Router()
 
 
 def admin_callback(

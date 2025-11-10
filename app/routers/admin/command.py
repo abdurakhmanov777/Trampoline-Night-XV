@@ -9,7 +9,7 @@ from app.filters import AdminFilter, ChatTypeFilter
 from app.services.keyboards import keyboard_dynamic
 from app.services.logger import log
 
-router = Router()
+router: Router = Router()
 
 
 def admin_command(
