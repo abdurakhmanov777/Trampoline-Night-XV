@@ -8,11 +8,11 @@
 # Импорт фильтров
 from .admin import AdminFilter
 from .chat_type import ChatTypeFilter
-from .system import SystemBlockFilter
+from .intercept import InterceptFilter
 
 # Экспортируемые объекты модуля
 __all__: list[str] = [
     "AdminFilter",
     "ChatTypeFilter",
-    "SystemBlockFilter",
+    "InterceptFilter",
 ]

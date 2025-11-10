@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, Union
 from aiogram import Router
 from aiogram.types import CallbackQuery, Message
 
-from app.filters import SystemBlockFilter
+from app.filters import InterceptFilter
 
 router: Router = Router()
 
@@ -31,7 +31,7 @@ def intercept(
         func: Callable[[Union[CallbackQuery, Message], Dict[str, bool]], Any],
     ) -> Callable[[Union[CallbackQuery, Message]], Any]:
         """
-        Декоратор, регистрирующий обработчик с фильтром SystemBlockFilter.
+        Декоратор, регистрирующий обработчик с фильтром InterceptFilter.
 
         Args:
             func: Асинхронная функция-обработчик событий.
@@ -46,7 +46,7 @@ def intercept(
                 event: Событие CallbackQuery или Message.
             """
             # Получаем результат фильтра блокировки
-            block_info: Dict[str, bool] | bool = await SystemBlockFilter()(event)
+            block_info: Dict[str, bool] | bool = await InterceptFilter()(event)
 
             # Преобразуем в словарь, если блокировка активна
             info: Dict[str, bool] = block_info if isinstance(
@@ -56,10 +56,10 @@ def intercept(
             await func(event, info)
 
         # Регистрация callback-запросов с фильтром
-        router.callback_query(SystemBlockFilter(), *filters)(wrapper)
+        router.callback_query(InterceptFilter(), *filters)(wrapper)
 
         # Регистрация сообщений (ничего не делает, для совместимости)
-        router.message(SystemBlockFilter(), *filters)(lambda _: None)
+        router.message(InterceptFilter(), *filters)(lambda _: None)
 
         return wrapper
 

@@ -8,7 +8,7 @@ FLAG_BOT: bool = False
 FLAG_REG: bool = False
 
 
-class SystemBlockFilter(BaseFilter):
+class InterceptFilter(BaseFilter):
     """
     Фильтр для проверки активных блокировок бота.
 
