@@ -5,7 +5,7 @@
 """
 
 from .admin import AdminManager
-# from .data import DataManager
+from .data import DataManager
 from .flag import FlagManager
 from .user import UserManager
 
@@ -14,7 +14,7 @@ from .user import UserManager
 # Список публичных объектов модуля
 __all__: list[str] = [
     "AdminManager",
-    # "DataManager",
+    "DataManager",
     "FlagManager",
     "UserManager",
 ]
