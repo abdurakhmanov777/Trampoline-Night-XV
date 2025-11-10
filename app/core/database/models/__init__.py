@@ -8,12 +8,14 @@
 from .admin import Admin
 from .base import Base
 from .data import Data
+from .flag import Flag
 from .user import User
 
 # Список публичных объектов модуля
 __all__: list[str] = [
-    "Base",
     "Admin",
-    "User",
+    "Base",
     "Data",
+    "User",
+    "Flag",
 ]
