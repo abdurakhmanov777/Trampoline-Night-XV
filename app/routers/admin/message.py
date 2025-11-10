@@ -13,24 +13,28 @@ from app.services.logger import log
 router = Router()
 
 
-def admin_command(
-    *commands: str
+def admin_message(
+    *filters: Any
 ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """
-    Декоратор для регистрации команд, доступных только
-        в группах и супергруппах.
+    Декоратор для регистрации сообщений, доступных только
+    администраторам в приватных чатах.
 
     Args:
-        *commands (str): Названия команд для
-        фильтрации (например, "start", "help").
+        *filters (Any): Дополнительные фильтры для обработки
+        сообщений.
 
     Returns:
-        Callable: Декоратор для функции-обработчика.
+        Callable[[Callable[..., Any]], Callable[..., Any]]:
+        Декоратор для функции-обработчика.
     """
-    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+    def decorator(
+        func: Callable[..., Any]
+    ) -> Callable[..., Any]:
         return router.message(
             ChatTypeFilter(chat_type=["private"]),
             AdminFilter(),
-            Command(*commands)
+            *filters
         )(func)
+
     return decorator
