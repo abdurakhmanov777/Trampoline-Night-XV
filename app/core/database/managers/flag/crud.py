@@ -1,5 +1,8 @@
 """
 CRUD-операции для таблицы Flag.
+
+Содержит методы для создания, получения, обновления и
+удаления флагов.
 """
 
 from typing import Optional, Tuple
@@ -17,10 +20,17 @@ class FlagCRUD(FlagManagerBase):
 
     async def get(
         self,
-        name: str
+        name: str,
     ) -> Optional[Flag]:
         """
         Получить флаг по имени.
+
+        Args:
+            name (str): Имя флага.
+
+        Returns:
+            Optional[Flag]: Объект Flag или None, если флаг
+                не найден.
         """
         try:
             result: Result[Tuple[Flag]] = await self.session.execute(
@@ -28,18 +38,28 @@ class FlagCRUD(FlagManagerBase):
             )
             return result.scalar_one_or_none()
         except SQLAlchemyError as e:
+            # Выводим сообщение об ошибке при получении флага
             print(f"Ошибка при получении флага: {e}")
             return None
 
     async def create(
         self,
         name: str,
-        value: bool = False
+        value: bool = False,
     ) -> Flag:
         """
         Создать новый флаг.
+
+        Args:
+            name (str): Имя флага.
+            value (bool): Значение флага (по умолчанию False).
+
+        Returns:
+            Flag: Созданный объект флага.
         """
         flag = Flag(name=name, value=value)
+
+        # Добавляем флаг в сессию
         self.session.add(flag)
         await self.session.commit()
         await self.session.refresh(flag)
@@ -48,13 +68,21 @@ class FlagCRUD(FlagManagerBase):
     async def update(
         self,
         name: str,
-        value: bool
+        value: bool,
     ) -> bool:
         """
         Обновить значение флага.
+
+        Args:
+            name (str): Имя флага.
+            value (bool): Новое значение флага.
+
+        Returns:
+            bool: True, если обновление прошло успешно, иначе False.
         """
         flag: Optional[Flag] = await self.get(name)
         if not flag:
+            # Флаг не найден
             return False
 
         flag.value = value
@@ -63,13 +91,20 @@ class FlagCRUD(FlagManagerBase):
 
     async def delete(
         self,
-        name: str
+        name: str,
     ) -> bool:
         """
         Удалить флаг по имени.
+
+        Args:
+            name (str): Имя флага.
+
+        Returns:
+            bool: True, если удаление прошло успешно, иначе False.
         """
         flag: Optional[Flag] = await self.get(name)
         if not flag:
+            # Флаг не найден
             return False
 
         await self.session.delete(flag)

@@ -1,5 +1,8 @@
 """
 Базовый класс менеджера флагов.
+
+Содержит общую функциональность для работы с таблицей Flag
+через асинхронную сессию SQLAlchemy.
 """
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,12 +13,14 @@ class FlagManagerBase:
 
     def __init__(
         self,
-        session: AsyncSession
+        session: AsyncSession,
     ) -> None:
         """
         Инициализация менеджера флагов.
 
         Args:
-            session (AsyncSession): Асинхронная сессия SQLAlchemy.
+            session (AsyncSession): Асинхронная сессия для работы
+                с базой данных.
         """
+        # Сохраняем сессию для дальнейшей работы с БД
         self.session: AsyncSession = session
