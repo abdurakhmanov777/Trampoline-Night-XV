@@ -40,27 +40,6 @@ async def main(
     message: Message,
     state: FSMContext
 ) -> None:
-    print(await manage_user_state(
-        message.from_user.id,
-        "pop"
-    ))
-    print(await manage_user_state(
-        message.from_user.id,
-        "get_state"
-    ))
-    print(await manage_user_state(
-        message.from_user.id,
-        "push",
-        "2"
-    ))
-    print(await manage_user_state(
-        message.from_user.id,
-        "pop"
-    ))
-    print(await manage_user_state(
-        message.from_user.id,
-        "get_state"
-    ))
     """
     Обрабатывает основную команду пользователя.
 

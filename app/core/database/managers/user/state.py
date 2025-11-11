@@ -7,6 +7,8 @@
 
 from typing import List, Optional
 
+from sqlalchemy.orm.attributes import flag_modified
+
 from app.core.database.models import User
 
 from .crud import UserCRUD
@@ -36,7 +38,7 @@ class UserState(UserCRUD):
         stack.append(new_state)
         user.state = ",".join(stack)
 
-        # Сохраняем изменения в базе данных
+        flag_modified(user, "state")
         await self.session.commit()
 
         return True
@@ -64,6 +66,7 @@ class UserState(UserCRUD):
         last_state: str = stack.pop()
         user.state = ",".join(stack)
 
+        flag_modified(user, "state")
         await self.session.commit()
 
         return last_state
@@ -105,3 +108,25 @@ class UserState(UserCRUD):
         user: User = await self._get_or_create(tg_id)
 
         return user.state.split(",") if user.state else []
+
+    async def clear_state(
+        self,
+        tg_id: int
+    ) -> bool:
+        """
+        Полностью сбрасывает стек состояний пользователя и оставляет
+        базовое состояние "1".
+
+        Args:
+            tg_id (int): Telegram ID пользователя.
+
+        Returns:
+            bool: True после успешного сброса.
+        """
+        user: User = await self._get_or_create(tg_id)
+        user.state = "1"
+
+        flag_modified(user, "state")
+        await self.session.commit()
+
+        return True
