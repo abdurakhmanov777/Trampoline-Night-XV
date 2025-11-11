@@ -1,5 +1,8 @@
 """
-Модель пользователя Telegram.
+Модуль модели пользователя Telegram.
+
+Содержит ORM-модель пользователя с полями для идентификации,
+состояния, языка, группы, сообщений и связанных данных.
 """
 
 from __future__ import annotations
@@ -17,7 +20,7 @@ if TYPE_CHECKING:
 
 
 class User(Base):
-    """Модель пользователя Telegram."""
+    """ORM-модель пользователя Telegram."""
 
     __tablename__: Any = "user"
 
@@ -55,7 +58,7 @@ class User(Base):
         DateTime
     )
 
-    # Связь с таблицей Data
+    # Связь с таблицей Data для хранения ключ–значение пользователя
     data: Mapped[list[Data]] = relationship(
         "Data",
         back_populates="user",
@@ -63,5 +66,9 @@ class User(Base):
     )
 
     def __repr__(self) -> str:
-        """Строковое представление пользователя."""
+        """Возвращает строковое представление пользователя.
+
+        Returns:
+            str: Строка с идентификатором и tg_id пользователя.
+        """
         return f"<User id={self.id} tg_id={self.tg_id}>"

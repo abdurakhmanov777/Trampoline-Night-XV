@@ -1,5 +1,7 @@
 """
-Модель хранения ключ–значение для пользователя.
+Модуль модели данных пользователя.
+
+Содержит ORM-модель хранения ключ–значение для конкретного пользователя.
 """
 
 from __future__ import annotations
@@ -16,7 +18,7 @@ if TYPE_CHECKING:
 
 
 class Data(Base):
-    """Хранит пары ключ–значение для конкретного пользователя."""
+    """ORM-модель хранения ключ–значение для пользователя."""
 
     __tablename__: Any = "data"
 
@@ -34,7 +36,7 @@ class Data(Base):
         nullable=False
     )
 
-    # Связь с пользователем
+    # Связь с пользователем для удобного доступа к данным
     user: Mapped[User] = relationship(
         "User",
         back_populates="data",
@@ -42,5 +44,9 @@ class Data(Base):
     )
 
     def __repr__(self) -> str:
-        """Строковое представление объекта Data."""
+        """Возвращает строковое представление объекта Data.
+
+        Returns:
+            str: Строка с user_id и ключом записи.
+        """
         return f"<Data user_id={self.user_id} key={self.key}>"

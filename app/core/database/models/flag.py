@@ -1,5 +1,7 @@
 """
-Модель для хранения флагов в формате имя: значение.
+Модуль модели флагов.
+
+Содержит ORM-модель для хранения флагов в формате имя:значение.
 """
 
 from __future__ import annotations
@@ -13,13 +15,11 @@ from .base import Base
 
 
 class Flag(Base):
-    """Модель для хранения флагов."""
+    """ORM-модель для хранения флагов."""
 
     __tablename__: Any = "flag"
 
-    id: Mapped[int] = mapped_column(
-        primary_key=True
-    )
+    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(
         String(64),
         nullable=False,
@@ -32,4 +32,9 @@ class Flag(Base):
     )
 
     def __repr__(self) -> str:
+        """Возвращает строковое представление объекта Flag.
+
+        Returns:
+            str: Строка с именем и значением флага.
+        """
         return f"<Flag name={self.name} value={self.value}>"
