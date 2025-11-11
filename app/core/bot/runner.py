@@ -1,5 +1,8 @@
 """
 Модуль для инициализации и запуска Telegram-бота с polling.
+
+Предоставляет функции для создания бота, регистрации команд,
+настройки диспетчера и запуска polling с обработкой ошибок.
 """
 
 import asyncio
@@ -19,17 +22,17 @@ class FilterAiogramStderr:
     """
     Класс для подавления ненужных сообщений stderr от Aiogram.
 
-    Игнорирует:
-    - "Failed to fetch updates"
-    - "Sleep for ..."
+    Игнорирует следующие строки:
+        - "Failed to fetch updates"
+        - "Sleep for ..."
     """
 
     def write(
         self,
-        message: str
+        message: str,
     ) -> None:
         """
-        Обрабатывает строку сообщения.
+        Обрабатывает строку сообщения и фильтрует ненужные.
 
         Args:
             message (str): Сообщение для обработки.
@@ -38,10 +41,8 @@ class FilterAiogramStderr:
         if not msg or "Failed to fetch updates" in msg or "Sleep for" in msg:
             return
 
-    def flush(
-        self
-    ) -> None:
-        """Метод заглушка для интерфейса file-like объектов."""
+    def flush(self) -> None:
+        """Метод-заглушка для интерфейса file-like объектов."""
         pass
 
 
@@ -53,7 +54,7 @@ async def run_bot() -> None:
     """
     Асинхронная инициализация и запуск Telegram-бота.
 
-    Функция:
+    Функция выполняет следующие действия:
         - Создает экземпляр бота
         - Регистрирует команды
         - Настраивает диспетчер

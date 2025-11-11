@@ -1,9 +1,14 @@
 """
-Алиасы для создания middleware:
+Алиасы для создания middleware.
 
-- MwCommand для command,
-- MwMessage для message,
-- MwCallback для callback_query.
+Доступные алиасы:
+    - MwAdminCallback для admin callback query
+    - MwAdminCommand для admin команд
+    - MwAdminMessage для admin сообщений
+    - MwSystemBlock для системной блокировки
+    - MwUserCallback для пользовательских callback query
+    - MwUserCommand для пользовательских команд
+    - MwUserMessage для пользовательских сообщений
 """
 
 from typing import Any
@@ -18,10 +23,10 @@ def MwAdminCallback(
     Middleware для callback query админов.
 
     Args:
-        **extra_data: дополнительные параметры для MwBase.
+        **extra_data: Дополнительные параметры для MwBase.
 
     Returns:
-        MwBase: экземпляр middleware для админского callback.
+        MwBase: Экземпляр middleware для админского callback.
     """
     return MwBase(
         delete_event=False,
@@ -37,10 +42,10 @@ def MwAdminCommand(
     Middleware для команд админов с админской локализацией.
 
     Args:
-        **extra_data: дополнительные параметры для MwBase.
+        **extra_data: Дополнительные параметры для MwBase.
 
     Returns:
-        MwBase: экземпляр middleware для админской команды.
+        MwBase: Экземпляр middleware для админской команды.
     """
     return MwBase(
         delete_event=True,
@@ -56,10 +61,10 @@ def MwAdminMessage(
     Middleware для сообщений админов.
 
     Args:
-        **extra_data: дополнительные параметры для MwBase.
+        **extra_data: Дополнительные параметры для MwBase.
 
     Returns:
-        MwBase: экземпляр middleware для админского сообщения.
+        MwBase: Экземпляр middleware для админского сообщения.
     """
     return MwBase(
         delete_event=True,
@@ -72,14 +77,14 @@ def MwSystemBlock(
     **extra_data: Any,
 ) -> MwBase:
     """
-    Middleware для перехвата сообщений и callback'ов
-    при активной системной блокировке бота.
+    Middleware для перехвата сообщений и callback при системной
+    блокировке бота.
 
     Args:
-        **extra_data: дополнительные параметры для MwBase.
+        **extra_data: Дополнительные параметры для MwBase.
 
     Returns:
-        MwBase: экземпляр middleware для системной блокировки.
+        MwBase: Экземпляр middleware для системной блокировки.
     """
     return MwBase(
         delete_event=True,
@@ -95,10 +100,10 @@ def MwUserCallback(
     Middleware для callback query обычных пользователей.
 
     Args:
-        **extra_data: дополнительные параметры для MwBase.
+        **extra_data: Дополнительные параметры для MwBase.
 
     Returns:
-        MwBase: экземпляр middleware для пользовательского callback.
+        MwBase: Экземпляр middleware для пользовательского callback.
     """
     return MwBase(
         delete_event=False,
@@ -114,10 +119,10 @@ def MwUserCommand(
     Middleware для команд обычных пользователей.
 
     Args:
-        **extra_data: дополнительные параметры для MwBase.
+        **extra_data: Дополнительные параметры для MwBase.
 
     Returns:
-        MwBase: экземпляр middleware для пользовательской команды.
+        MwBase: Экземпляр middleware для пользовательской команды.
     """
     return MwBase(
         delete_event=True,
@@ -133,10 +138,10 @@ def MwUserMessage(
     Middleware для сообщений обычных пользователей.
 
     Args:
-        **extra_data: дополнительные параметры для MwBase.
+        **extra_data: Дополнительные параметры для MwBase.
 
     Returns:
-        MwBase: экземпляр middleware для пользовательского сообщения.
+        MwBase: Экземпляр middleware для пользовательского сообщения.
     """
     return MwBase(
         delete_event=True,

@@ -1,6 +1,6 @@
 """
-Модуль для настройки диспетчера Telegram-бота и подключения
-роутеров с соответствующими middleware.
+Модуль для настройки диспетчера Telegram-бота и подключения роутеров
+с соответствующими middleware.
 """
 
 from typing import Any, Dict
@@ -9,12 +9,19 @@ from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import SimpleEventIsolation
 
 from app.core.bot.middleware import mw
-from app.routers import (admin_callback, admin_command, admin_message,
-                         intercept, user_callback, user_command, user_message)
+from app.routers import (
+    admin_callback,
+    admin_command,
+    admin_message,
+    intercept,
+    user_callback,
+    user_command,
+    user_message,
+)
 
 
 async def _apply_middlewares(
-    router_middleware_map: Dict[Any, Any]
+    router_middleware_map: Dict[Any, Any],
 ) -> None:
     """
     Применяет middleware к соответствующим объектам роутеров.
@@ -34,8 +41,8 @@ async def setup_dispatcher() -> Dispatcher:
     с middleware.
 
     Returns:
-        Dispatcher: Экземпляр диспетчера с подключенными
-        роутерами и middleware.
+        Dispatcher: Экземпляр диспетчера с подключенными роутерами
+        и middleware.
     """
     # Создаем диспетчер с изоляцией событий в памяти
     dp: Dispatcher = Dispatcher(events_isolation=SimpleEventIsolation())

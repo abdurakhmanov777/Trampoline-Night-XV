@@ -1,5 +1,8 @@
 """
 Модуль для регистрации команд Telegram-бота в приватных чатах.
+
+Предоставляет функцию для установки набора команд бота, доступных
+только в личных сообщениях.
 """
 
 from typing import Sequence
@@ -9,7 +12,7 @@ from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 
 
 async def register_bot_commands(
-    bot: Bot
+    bot: Bot,
 ) -> None:
     """
     Регистрирует команды Telegram-бота только для приватных чатов.
@@ -22,19 +25,19 @@ async def register_bot_commands(
     Args:
         bot (Bot): Экземпляр Telegram-бота.
     """
-    # Список команд для регистрации
+    # Определяем список команд для регистрации
     commands: Sequence[BotCommand] = [
         BotCommand(
             command="start",
-            description="Запуск/перезапуск бота"
+            description="Запуск/перезапуск бота",
         ),
         BotCommand(
             command="help",
-            description="Техническая поддержка"
+            description="Техническая поддержка",
         ),
         BotCommand(
             command="id",
-            description="Узнать ID чата"
+            description="Узнать ID чата",
         ),
     ]
 

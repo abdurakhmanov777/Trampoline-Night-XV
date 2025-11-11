@@ -2,12 +2,12 @@
 Базовый middleware для Aiogram.
 
 Поддерживает:
-- подсчёт вызовов хэндлера,
-- удаление события после обработки,
-- передачу доп. параметров в data,
-- проверку роли администратора,
-- удаление сообщений с неподдерж. типами,
-- динамическое управление разрешёнными типами.
+    - подсчёт вызовов хэндлера,
+    - удаление события после обработки,
+    - передачу доп. параметров в data,
+    - проверку роли администратора,
+    - удаление сообщений с неподдерж. типами,
+    - динамическое управление разрешёнными типами.
 """
 
 from typing import Any, Awaitable, Callable, Literal, Optional, Set
@@ -48,7 +48,7 @@ class MwBase(BaseMiddleware):
 
     async def __call__(
         self,
-        handler: Callable[[Any, dict], Awaitable[Any]],
+        handler: Callable[[Any, dict[str, Any]], Awaitable[Any]],
         event: Optional[Any] = None,
         data: Optional[dict[str, Any]] = None,
     ) -> Any:
@@ -56,10 +56,11 @@ class MwBase(BaseMiddleware):
         Основной метод middleware.
 
         Загружает локализацию, обновляет данные и проверяет роль.
-        Удаляет сообщения с неподдерж. типами.
+        Удаляет сообщения с неподдерживаемыми типами.
 
         Args:
-            handler (Callable[[Any, dict], Awaitable[Any]]): Хэндлер.
+            handler (Callable[[Any, dict[str, Any]], Awaitable[Any]]):
+                Хэндлер для обработки события.
             event (Optional[Any]): Событие Message или CallbackQuery.
             data (Optional[dict[str, Any]]): Данные между middleware
                 и хэндлером.
@@ -72,9 +73,8 @@ class MwBase(BaseMiddleware):
 
         # Фильтруем сообщения по разрешённым типам
         if isinstance(
-            event,
-            Message
-        ) and event.content_type not in self.allowed_types:
+                event,
+                Message) and event.content_type not in self.allowed_types:
             try:
                 await event.delete()
             except Exception:
