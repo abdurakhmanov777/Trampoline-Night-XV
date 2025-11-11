@@ -7,6 +7,7 @@ CRUD-операции для работы с таблицей Data.
 
 from typing import Optional, Tuple
 
+from loguru import logger
 from sqlalchemy import Result, select
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -44,7 +45,7 @@ class DataCRUD(DataManagerBase):
             return result.scalar_one_or_none()
         except SQLAlchemyError as e:
             # Логируем ошибку при получении данных
-            print(f"Ошибка при получении данных: {e}")
+            logger.error(f"Ошибка при получении данных: {e}")
             return None
 
     async def create(

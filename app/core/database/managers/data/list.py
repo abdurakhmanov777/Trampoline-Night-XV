@@ -7,6 +7,7 @@
 
 from typing import Sequence, Tuple
 
+from loguru import logger
 from sqlalchemy import Result, select
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -39,5 +40,5 @@ class DataList(DataManagerBase):
             return result.scalars().all()
         except SQLAlchemyError as e:
             # Логируем ошибку при получении списка данных
-            print(f"Ошибка при получении списка данных: {e}")
+            logger.error(f"Ошибка при получении списка данных: {e}")
             return []

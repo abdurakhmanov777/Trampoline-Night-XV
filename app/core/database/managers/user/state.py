@@ -38,6 +38,7 @@ class UserState(UserCRUD):
 
         # Сохраняем изменения в базе данных
         await self.session.commit()
+
         return True
 
     async def pop_state(
@@ -62,7 +63,9 @@ class UserState(UserCRUD):
 
         last_state: str = stack.pop()
         user.state = ",".join(stack)
+
         await self.session.commit()
+
         return last_state
 
     async def peek_state(
@@ -82,6 +85,7 @@ class UserState(UserCRUD):
         user: User = await self._get_or_create(tg_id)
 
         stack: List[str] = user.state.split(",") if user.state else []
+
         return stack[-1] if stack else None
 
     async def get_state(
@@ -99,4 +103,5 @@ class UserState(UserCRUD):
                 если пользователь не найден или стек пустой.
         """
         user: User = await self._get_or_create(tg_id)
+
         return user.state.split(",") if user.state else []

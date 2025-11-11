@@ -7,6 +7,7 @@ CRUD-операции для работы с таблицей администр
 
 from typing import Optional, Tuple
 
+from loguru import logger
 from sqlalchemy import Result, select
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -38,7 +39,7 @@ class AdminCRUD(AdminManagerBase):
             return result.scalar_one_or_none()
         except SQLAlchemyError as e:
             # Логируем ошибку при получении администратора
-            print(f"Ошибка при получении администратора: {e}")
+            logger.error(f"Ошибка при получении администратора: {e}")
             return None
 
     async def create(

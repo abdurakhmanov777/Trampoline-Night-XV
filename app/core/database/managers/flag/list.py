@@ -6,6 +6,7 @@
 
 from typing import Sequence, Tuple
 
+from loguru import logger
 from sqlalchemy import Result, select
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -32,5 +33,5 @@ class FlagList(FlagManagerBase):
             return result.scalars().all()
         except SQLAlchemyError as e:
             # Выводим сообщение об ошибке при получении списка
-            print(f"Ошибка при получении списка флагов: {e}")
+            logger.error(f"Ошибка при получении списка флагов: {e}")
             return []

@@ -6,6 +6,7 @@ CRUD-операции для таблицы User.
 
 from typing import Optional, Tuple
 
+from loguru import logger
 from sqlalchemy import Result, select
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -62,7 +63,7 @@ class UserCRUD(UserManagerBase):
             return result.scalar_one_or_none()
         except SQLAlchemyError as e:
             # Выводим сообщение об ошибке при получении пользователя
-            print(f"Ошибка при получении пользователя: {e}")
+            logger.error(f"Ошибка при получении пользователя: {e}")
             return None
 
     async def create(
