@@ -3,10 +3,10 @@ import re
 from aiogram.enums import ChatAction
 from aiogram.types import BufferedInputFile, CallbackQuery, Message
 
-from app.keyboards import keyboards as kb
 from app.services.generator import generate_text_image
+from app.services.keyboards import keyboards as kb
 # from app.services.requests import user_action_wrapper
-from app.utils.morphology import process_text
+from app.utils.morphology import inflect_text
 
 
 async def create_msg(
@@ -49,7 +49,7 @@ async def create_msg(
             keyboard = await kb.multi_next(current.keyboard)
         else:
             start = loc.template.input.start
-            formatted_text = await process_text(text, 'винительный', False)
+            formatted_text = await inflect_text(text, 'винительный', False)
             text_msg = f'{
                 start[0]}{formatted_text}{
                 start[1]}{
