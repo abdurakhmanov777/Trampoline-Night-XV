@@ -8,6 +8,7 @@ from aiogram.types import InlineKeyboardMarkup, Message
 from app.config import COMMAND_MAIN
 from app.filters import ChatTypeFilter
 from app.services.keyboards import help, kb_delete
+from app.services.keyboards.keyboards import kb_start
 from app.services.logger import log
 from app.services.requests.user.state import manage_user_state
 
@@ -35,10 +36,10 @@ def user_command(
     return decorator
 
 
-
 # @router.message(Command('start'))
 # async def multi_cmd(message: Message, state: FSMContext):
-#     tg_id, bot_id, loc, state_db, old_msg_id = await update_state(message, state)
+# tg_id, bot_id, loc, state_db, old_msg_id = await update_state(message,
+# state)
 
 #     if state_db == '100':
 #         await data_sending(tg_id, bot_id, message)
@@ -47,7 +48,8 @@ def user_command(
 #         await message.answer(text=text_msg, parse_mode='HTML', reply_markup=keyboard)
 #     else:
 #         text_msg, keyboard = await create_msg(loc, state_db, tg_id, bot_id)
-#         await message.answer(text=text_msg, parse_mode='HTML', reply_markup=keyboard)
+# await message.answer(text=text_msg, parse_mode='HTML',
+# reply_markup=keyboard)
 
 #     if old_msg_id:
 #         try:
@@ -56,7 +58,7 @@ def user_command(
 #             pass
 
 @user_command("start")
-async def main(
+async def start(
     message: Message,
     state: FSMContext
 ) -> None:
@@ -73,14 +75,15 @@ async def main(
     text_content: str | None = message.text
     if not text_content:
         return
-    key: str = text_content.lstrip("/").split()[0]
+    # key: str = text_content.lstrip("/").split()[0]
 
     user_data: Dict[str, Any] = await state.get_data()
     loc: Any = user_data.get("loc_user")
     if not loc:
         return
 
-    text = loc.user_1.text
+    text = loc.userstate_1.text
+    keyboard = await kb_start('Даю согласие')
     # # Получаем текст и данные клавиатуры через getattr
     # text: str = getattr(getattr(loc, "default").text, key)
     # keyboard_data: Any = getattr(getattr(loc, "default").keyboard, key)
@@ -89,7 +92,10 @@ async def main(
     # keyboard: InlineKeyboardMarkup = await keyboard_dynamic(keyboard_data)
 
     # Отправляем сообщение
-    await message.answer(text=text)
+    await message.answer(
+        text=text,
+        reply_markup=keyboard
+    )
     await log(message)
 
 

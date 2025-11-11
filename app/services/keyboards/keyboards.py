@@ -121,3 +121,14 @@ async def multi_select(data: list[list[str]]) -> InlineKeyboardMarkup:
         text='Назад', callback_data='userback')])
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+
+async def kb_start(
+    text: str
+) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(
+            text=text,
+            callback_data=f'userstate_2'
+        )]]
+    )
