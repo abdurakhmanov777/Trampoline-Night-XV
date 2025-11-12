@@ -24,7 +24,10 @@ class User(Base):
 
     __tablename__: Any = "user"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True
+    )
     tg_id: Mapped[int] = mapped_column(
         BigInteger,
         nullable=False,
