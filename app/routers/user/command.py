@@ -10,6 +10,7 @@ from app.filters import ChatTypeFilter
 from app.services.keyboards import help, kb_delete
 from app.services.keyboards.keyboards import kb_start
 from app.services.logger import log
+from app.services.multi import multi
 from app.services.requests.user.state import manage_user_state
 
 router: Router = Router()
@@ -82,20 +83,19 @@ async def start(
     if not loc:
         return
 
-    text = loc.userstate_1.text
-    keyboard = await kb_start('Даю согласие')
-    # # Получаем текст и данные клавиатуры через getattr
-    # text: str = getattr(getattr(loc, "default").text, key)
-    # keyboard_data: Any = getattr(getattr(loc, "default").keyboard, key)
+        # Формируем текст сообщения
+    text_message: str
+    keyboard_message: InlineKeyboardMarkup
+    value = '1'
+    text_message, keyboard_message = await multi(loc, value)
 
-    # # Создаём клавиатуру
-    # keyboard: InlineKeyboardMarkup = await keyboard_dynamic(keyboard_data)
-
-    # Отправляем сообщение
+    # Отправляем сообщение пользователю (короткий вариант)
     await message.answer(
-        text=text,
-        reply_markup=keyboard
+        text=text_message,
+        reply_markup=keyboard_message
     )
+
+    # Логируем событие
     await log(message)
 
 

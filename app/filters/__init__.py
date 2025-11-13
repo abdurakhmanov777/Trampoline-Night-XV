@@ -9,12 +9,13 @@
 from .admin import AdminFilter
 from .chat_type import ChatTypeFilter
 from .intercept import InterceptFilter
-from .user import UserCallbackFilter
+from .user import CallbackFilterBack, CallbackFilterNext
 
 # Экспортируемые объекты модуля
 __all__: list[str] = [
     "AdminFilter",
     "ChatTypeFilter",
     "InterceptFilter",
-    "UserCallbackFilter",
+    "CallbackFilterNext",
+    "CallbackFilterBack",
 ]

@@ -2,14 +2,15 @@ from typing import Any, Callable, Dict, Optional
 
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
 import app.services.keyboards as kb
 # from app.utils.user_actions import user_action_wrapper
 from app.config import CALLBACK_MAIN, CALLBACK_SELECT
-from app.filters import ChatTypeFilter, UserCallbackFilter
+from app.filters import CallbackFilterBack, CallbackFilterNext, ChatTypeFilter
 from app.services.localization import Localization, load_localization
 from app.services.logger import log
+from app.services.multi import multi
 
 router: Router = Router()
 
@@ -46,8 +47,8 @@ async def delete(callback: CallbackQuery) -> None:
     await log(callback)
 
 
-@user_callback(UserCallbackFilter())
-async def main(
+@user_callback(CallbackFilterNext())
+async def next(
     callback: CallbackQuery,
     state: FSMContext,
     value: str
@@ -60,7 +61,60 @@ async def main(
     if not loc:
         return
 
-    await callback.answer(value, show_alert=True)
+    # Формируем текст сообщения
+    text_message: str
+    keyboard_message: InlineKeyboardMarkup
+
+    text_message, keyboard_message = await multi(loc, value)
+
+    await callback.answer(value)
+
+    # Отправляем сообщение пользователю (короткий вариант)
+    try:
+        await callback.message.edit_text(
+            text=text_message,
+            reply_markup=keyboard_message
+        )
+    except Exception as e:
+        # print(e)
+        pass
+
+    # Логируем событие
+    await log(callback)
+
+@user_callback(CallbackFilterBack())
+async def back(
+    callback: CallbackQuery,
+    state: FSMContext,
+    value: str
+) -> None:
+    if not isinstance(callback.message, Message):
+        return
+
+    user_data: Dict[str, Any] = await state.get_data()
+    loc: Optional[Localization] = user_data.get("loc_user")
+    if not loc:
+        return
+
+    # Формируем текст сообщения
+    text_message: str
+    keyboard_message: InlineKeyboardMarkup
+
+    text_message, keyboard_message = await multi(loc, value)
+
+    await callback.answer(value)
+
+    # Отправляем сообщение пользователю (короткий вариант)
+    try:
+        await callback.message.edit_text(
+            text=text_message,
+            reply_markup=keyboard_message
+        )
+    except Exception as e:
+        # print(e)
+        pass
+
+    # Логируем событие
     await log(callback)
 
 

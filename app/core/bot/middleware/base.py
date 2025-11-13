@@ -73,8 +73,9 @@ class MwBase(BaseMiddleware):
 
         # Фильтруем сообщения по разрешённым типам
         if isinstance(
-                event,
-                Message) and event.content_type not in self.allowed_types:
+            event,
+            Message
+        ) and event.content_type not in self.allowed_types:
             try:
                 await event.delete()
             except Exception:
