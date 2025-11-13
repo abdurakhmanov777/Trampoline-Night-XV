@@ -7,7 +7,7 @@ from typing import Any, Tuple
 
 from aiogram.types import InlineKeyboardMarkup
 
-from app.services.keyboards.user import kb_text_or_input
+from app.services.keyboards.user import kb_input, kb_select, kb_text
 
 
 async def multi(
@@ -31,7 +31,7 @@ async def multi(
 
     if type_message == "text":
         text_message: str = base_text
-        keyboard_message: InlineKeyboardMarkup = kb_text_or_input(
+        keyboard_message: InlineKeyboardMarkup = kb_text(
             state=keyboard,
             backstate=value
         )
@@ -42,7 +42,7 @@ async def multi(
 
         error: bool = False
         data: str | None = "Абдурахманов Далгат Шамильевич"
-        # data = None
+        data = None
 
         if error:
             error_parts: Tuple[str, str] = template.error
@@ -62,17 +62,17 @@ async def multi(
                 f"{data}{saved_parts[2]}"
             )
 
-        keyboard_message: InlineKeyboardMarkup = kb_text_or_input(
+        keyboard_message: InlineKeyboardMarkup = kb_input(
             state=keyboard,
-            backstate=value
+            backstate=value,
+            show_next=data is not None
         )
 
     else:
         select_parts: Tuple[str, str] = loc.template.select
         text_message: str = f"{select_parts[0]}{base_text}{select_parts[1]}"
-        keyboard_message: InlineKeyboardMarkup = kb_text_or_input(
-            state=keyboard,
-            backstate=value
+        keyboard_message: InlineKeyboardMarkup = kb_select(
+            data=keyboard
         )
 
     return text_message, keyboard_message

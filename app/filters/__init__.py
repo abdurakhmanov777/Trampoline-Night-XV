@@ -9,7 +9,7 @@
 from .admin import AdminFilter
 from .chat_type import ChatTypeFilter
 from .intercept import InterceptFilter
-from .user import CallbackFilterBack, CallbackFilterNext
+from .user import CallbackFilterNext
 
 # Экспортируемые объекты модуля
 __all__: list[str] = [
@@ -17,5 +17,4 @@ __all__: list[str] = [
     "ChatTypeFilter",
     "InterceptFilter",
     "CallbackFilterNext",
-    "CallbackFilterBack",
 ]

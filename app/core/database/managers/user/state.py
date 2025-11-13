@@ -34,7 +34,7 @@ class UserState(UserCRUD):
         """
         user: User = await self.get_or_create(tg_id)
 
-        stack: List[str] = user.state.split(",") if user.state else []
+        stack: List[str] = user.state.split(",") if user.state else ["1"]
         stack.append(new_state)
         user.state = ",".join(stack)
 
@@ -59,7 +59,7 @@ class UserState(UserCRUD):
         """
         user: User = await self.get_or_create(tg_id)
 
-        stack: List[str] = user.state.split(",") if user.state else []
+        stack: List[str] = user.state.split(",") if user.state else ["1"]
         if not stack:
             return None
 
@@ -87,7 +87,7 @@ class UserState(UserCRUD):
         """
         user: User = await self.get_or_create(tg_id)
 
-        stack: List[str] = user.state.split(",") if user.state else []
+        stack: List[str] = user.state.split(",") if user.state else ["1"]
 
         return stack[-1] if stack else None
 
@@ -107,7 +107,7 @@ class UserState(UserCRUD):
         """
         user: User = await self.get_or_create(tg_id)
 
-        return user.state.split(",") if user.state else []
+        return user.state.split(",") if user.state else ["1"]
 
     async def clear_state(
         self,

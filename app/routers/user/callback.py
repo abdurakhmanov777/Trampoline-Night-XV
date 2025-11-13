@@ -4,13 +4,11 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
-import app.services.keyboards as kb
-# from app.utils.user_actions import user_action_wrapper
-from app.config import CALLBACK_MAIN, CALLBACK_SELECT
-from app.filters import CallbackFilterBack, CallbackFilterNext, ChatTypeFilter
-from app.services.localization import Localization, load_localization
+from app.filters import CallbackFilterNext, ChatTypeFilter
+from app.services.localization import Localization
 from app.services.logger import log
 from app.services.multi import multi
+from app.services.requests.user import manage_user_state
 
 router: Router = Router()
 
@@ -65,9 +63,9 @@ async def next(
     text_message: str
     keyboard_message: InlineKeyboardMarkup
 
-    text_message, keyboard_message = await multi(loc, value)
+    text_message, keyboard_message = await multi(loc, value[0])
 
-    await callback.answer(value)
+    await callback.answer(value[0])
 
     # Отправляем сообщение пользователю (короткий вариант)
     try:
@@ -75,18 +73,22 @@ async def next(
             text=text_message,
             reply_markup=keyboard_message
         )
-    except Exception as e:
-        # print(e)
+        await manage_user_state(
+            callback.from_user.id,
+            "push",
+            value[0]
+        )
+    except:
         pass
 
     # Логируем событие
     await log(callback)
 
-@user_callback(CallbackFilterBack())
+
+@user_callback(F.data == "userback")
 async def back(
     callback: CallbackQuery,
     state: FSMContext,
-    value: str
 ) -> None:
     if not isinstance(callback.message, Message):
         return
@@ -100,9 +102,16 @@ async def back(
     text_message: str
     keyboard_message: InlineKeyboardMarkup
 
-    text_message, keyboard_message = await multi(loc, value)
+    backstate: bool | str | list[str] | None = await manage_user_state(
+        callback.from_user.id,
+        "popeek"
+    )
+    if not isinstance(backstate, str):
+        return
 
-    await callback.answer(value)
+    text_message, keyboard_message = await multi(loc, backstate)
+
+    await callback.answer()
 
     # Отправляем сообщение пользователю (короткий вариант)
     try:
@@ -110,8 +119,7 @@ async def back(
             text=text_message,
             reply_markup=keyboard_message
         )
-    except Exception as e:
-        # print(e)
+    except:
         pass
 
     # Логируем событие
