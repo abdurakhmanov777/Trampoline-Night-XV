@@ -51,16 +51,19 @@ async def manage_user_state(
     async with async_session() as session:
         manager = UserManager(session)
 
-        if action in ("push", "peekpush") and new_state is None:
-            raise ValueError(
-                f"Для действия '{action}' необходимо указать new_state."
-            )
-
-        elif action == "push":
+        if action == "push":
+            if new_state is None:
+                raise ValueError(
+                    f"Для действия '{action}' необходимо указать new_state."
+                )
             assert new_state is not None
             return await manager.push_state(tg_id, new_state)
 
         elif action == "peekpush":
+            if new_state is None:
+                raise ValueError(
+                    f"Для действия '{action}' необходимо указать new_state."
+                )
             assert new_state is not None
             current_state: Optional[str] = await manager.peek_state(tg_id)
             await manager.push_state(tg_id, new_state)

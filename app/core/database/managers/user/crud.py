@@ -1,10 +1,10 @@
 """
 CRUD-операции для таблицы User.
 
-Содержит методы для создания, получения и удаления пользователей.
+Содержит методы для создания, получения, обновления и удаления пользователей.
 """
 
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 from loguru import logger
 from sqlalchemy import Result, select
@@ -21,31 +21,30 @@ class UserCRUD(UserManagerBase):
     async def get_or_create(
         self,
         tg_id: int,
-        fullname: Optional[str] = None,
-        group: Optional[str] = None,
         lang: str = "ru",
         msg_id: int = 0,
-        column: Optional[int] = None,
     ) -> User:
         """
         Получить пользователя или создать нового, если его нет.
+
+        Args:
+            tg_id (int): Telegram ID пользователя.
+            lang (str): Язык пользователя (по умолчанию "ru").
+            msg_id (int): ID последнего сообщения (по умолчанию 0).
+
+        Returns:
+            User: Существующий или созданный объект пользователя.
         """
-        user: User | None = await self.get(tg_id)
+        user: Optional[User] = await self.get(tg_id)
         if user is None:
             user = await self.create(
                 tg_id=tg_id,
-                fullname=fullname,
-                group=group,
                 lang=lang,
                 msg_id=msg_id,
-                column=column,
             )
         return user
 
-    async def get(
-        self,
-        tg_id: int,
-    ) -> Optional[User]:
+    async def get(self, tg_id: int) -> Optional[User]:
         """
         Получить пользователя по Telegram ID.
 
@@ -62,52 +61,40 @@ class UserCRUD(UserManagerBase):
             )
             return result.scalar_one_or_none()
         except SQLAlchemyError as e:
-            # Выводим сообщение об ошибке при получении пользователя
+            # Логируем ошибку при получении пользователя
             logger.error(f"Ошибка при получении пользователя: {e}")
             return None
 
     async def create(
         self,
         tg_id: int,
-        fullname: Optional[str] = None,
-        group: Optional[str] = None,
         lang: str = "ru",
         msg_id: int = 0,
-        column: Optional[int] = None,
     ) -> User:
         """
         Создать нового пользователя.
 
         Args:
             tg_id (int): Telegram ID пользователя.
-            fullname (Optional[str]): Полное имя пользователя.
-            group (Optional[str]): Группа пользователя.
             lang (str): Язык пользователя (по умолчанию "ru").
             msg_id (int): ID последнего сообщения (по умолчанию 0).
-            column (Optional[int]): Дополнительный параметр column.
 
         Returns:
             User: Созданный объект пользователя.
         """
         user = User(
             tg_id=tg_id,
-            fullname=fullname,
-            group=group,
             lang=lang,
             msg_id=msg_id,
-            column=column,
             state="1",
         )
-        # Добавляем пользователя в сессию
+        # Добавляем пользователя в сессию и сохраняем изменения
         self.session.add(user)
         await self.session.commit()
         await self.session.refresh(user)
         return user
 
-    async def delete(
-        self,
-        tg_id: int,
-    ) -> bool:
+    async def delete(self, tg_id: int) -> bool:
         """
         Удалить пользователя из базы данных.
 
@@ -119,9 +106,36 @@ class UserCRUD(UserManagerBase):
         """
         user: Optional[User] = await self.get(tg_id)
         if not user:
-            # Пользователь не найден
             return False
 
+        # Удаляем пользователя и фиксируем изменения
         await self.session.delete(user)
         await self.session.commit()
         return True
+
+    async def update(self, tg_id: int, **fields: Any) -> Optional[User]:
+        """
+        Обновить поля существующего пользователя через kwargs.
+
+        Args:
+            tg_id (int): Telegram ID пользователя.
+            **fields: Поля для обновления (lang, msg_id, state и др.).
+
+        Returns:
+            Optional[User]: Обновлённый объект User или None, если
+            пользователь не найден.
+        """
+        user: Optional[User] = await self.get(tg_id)
+        if not user:
+            return None
+
+        # Обновляем только переданные атрибуты, если они существуют
+        for key, value in fields.items():
+            if hasattr(user, key) and value is not None:
+                setattr(user, key, value)
+
+        # Сохраняем изменения и обновляем объект
+        self.session.add(user)
+        await self.session.commit()
+        await self.session.refresh(user)
+        return user

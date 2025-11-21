@@ -6,10 +6,10 @@
     - Универсальные асинхронные обёртки для основных операций.
 """
 
-from .crud import manage_data_crud
+from .crud import manage_data
 from .dlist import manage_data_list
 
 __all__: list[str] = [
-    "manage_data_crud",
+    "manage_data",
     "manage_data_list",
 ]

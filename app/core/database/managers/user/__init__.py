@@ -8,11 +8,9 @@
 
 from .crud import UserCRUD
 from .state import UserState
-from .update import UserUpdate
 
 
 class UserManager(
-    UserUpdate,
     UserState,
     UserCRUD,
 ):

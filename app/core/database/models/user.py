@@ -38,12 +38,6 @@ class User(Base):
         nullable=False,
         default="1"
     )
-    fullname: Mapped[Optional[str]] = mapped_column(
-        String(255)
-    )
-    group: Mapped[Optional[str]] = mapped_column(
-        String(255)
-    )
     lang: Mapped[str] = mapped_column(
         String(8),
         nullable=False,
@@ -53,7 +47,6 @@ class User(Base):
         Integer,
         nullable=False
     )
-    column: Mapped[Optional[int]] = mapped_column(Integer)
     date_registration: Mapped[Optional[datetime]] = mapped_column(
         DateTime
     )

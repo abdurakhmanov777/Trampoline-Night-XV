@@ -8,10 +8,9 @@ from aiogram.types import InlineKeyboardMarkup, Message
 from app.config import COMMAND_MAIN
 from app.filters import ChatTypeFilter
 from app.services.keyboards import help, kb_delete
-from app.services.keyboards.keyboards import kb_start
 from app.services.logger import log
 from app.services.multi import multi
-from app.services.requests.user.state import manage_user_state
+from app.services.requests.user import manage_user_state
 
 router: Router = Router()
 
@@ -90,6 +89,7 @@ async def start(
         message.from_user.id,
         "peek"
     )
+
     if not isinstance(value, str):
         return
 

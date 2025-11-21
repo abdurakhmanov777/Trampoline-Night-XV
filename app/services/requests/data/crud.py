@@ -1,7 +1,7 @@
 """
 Универсальная обёртка для работы с таблицей Data.
 
-Содержит функцию manage_data_crud для выполнения CRUD-операций:
+Содержит функцию manage_data для выполнения CRUD-операций:
 создание, получение, обновление и удаление пользовательских данных.
 """
 
@@ -12,7 +12,7 @@ from app.core.database.managers import DataManager
 from app.core.database.models.data import Data
 
 
-async def manage_data_crud(
+async def manage_data(
     user_id: int,
     action: Literal["get", "create_or_update", "delete"],
     key: str,

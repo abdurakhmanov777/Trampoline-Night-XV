@@ -8,7 +8,7 @@ from app.filters import CallbackFilterNext, ChatTypeFilter
 from app.services.localization import Localization
 from app.services.logger import log
 from app.services.multi import multi
-from app.services.requests.data import manage_data_crud
+from app.services.requests.data import manage_data
 from app.services.requests.user import manage_user_state
 
 router: Router = Router()

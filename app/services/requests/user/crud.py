@@ -2,10 +2,10 @@
 Универсальная обёртка для работы с таблицей пользователей.
 
 Содержит функцию manage_user для выполнения основных операций:
-создание, получение и удаление пользователя.
+создание, получение, обновление и удаление пользователя.
 """
 
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 from app.core.database.engine import async_session
 from app.core.database.managers import UserManager
@@ -14,31 +14,40 @@ from app.core.database.models import User
 
 async def manage_user(
     tg_id: int,
-    action: Literal["get", "create", "delete"] = "get",
-    fullname: Optional[str] = None,
-    group: Optional[str] = None,
+    action: Literal[
+        "get", "get_or_create", "create", "update", "delete"
+    ] = "get",
     lang: str = "ru",
     msg_id: int = 0,
-    column: Optional[int] = None,
+    state: Optional[str] = None,
+    **fields: Any,
 ) -> Union[User, bool, None]:
     """
     Управляет CRUD-операциями пользователя.
+
+    Выполняет создание, получение, обновление или удаление пользователя
+    в базе данных через менеджер UserManager.
 
     Args:
         tg_id (int): Telegram ID пользователя.
         action (Literal): Действие для выполнения.
             - "get": получить пользователя;
-            - "create": создать пользователя (если не существует);
+            - "get_or_create": получить или создать пользователя;
+            - "create": создать пользователя;
+            - "update": обновить поля пользователя;
             - "delete": удалить пользователя.
-        fullname (Optional[str]): Полное имя пользователя (для create).
-        group (Optional[str]): Группа пользователя (для create).
-        lang (str): Язык пользователя (для create, по умолчанию "ru").
-        msg_id (int): ID последнего сообщения (для create, по умолчанию 0).
-        column (Optional[int]): Дополнительный параметр column (для create).
+        lang (str):
+            Язык пользователя (для create/update, по умолчанию "ru").
+        msg_id (int):
+            ID последнего сообщения (для create/update, по умолчанию 0).
+        state (Optional[str]):
+            Статус пользователя (для update).
+        **fields (Any):
+            Дополнительные поля для обновления (для update).
 
     Returns:
         Union[User, bool, None]:
-            - User: объект пользователя для get/create;
+            - User: объект пользователя для get, get_or_create, create или update;
             - bool: результат удаления для delete;
             - None: если get не нашёл пользователя.
     """
@@ -49,17 +58,33 @@ async def manage_user(
             return await manager.get(tg_id)
 
         elif action == "get_or_create":
-            return await manager.get_or_create(tg_id)
+            return await manager.get_or_create(
+                tg_id,
+                lang=lang,
+                msg_id=msg_id,
+            )
 
         elif action == "create":
             return await manager.create(
                 tg_id=tg_id,
-                fullname=fullname,
-                group=group,
                 lang=lang,
                 msg_id=msg_id,
-                column=column,
             )
+
+        elif action == "update":
+            update_fields = {
+                "lang": lang,
+                "msg_id": msg_id,
+                "state": state,
+            }
+            # Добавляем дополнительные поля из kwargs
+            update_fields.update(fields)
+            # Исключаем поля с None, чтобы не перезаписывать их пустыми
+            # значениями
+            update_fields: dict[str, Any] = {
+                k: v for k, v in update_fields.items() if v is not None
+            }
+            return await manager.update(tg_id, **update_fields)
 
         elif action == "delete":
             return await manager.delete(tg_id)

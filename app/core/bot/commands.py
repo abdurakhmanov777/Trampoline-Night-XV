@@ -1,48 +1,79 @@
 """
 Модуль для регистрации команд Telegram-бота в приватных чатах.
 
-Предоставляет функцию для установки набора команд бота, доступных
-только в личных сообщениях.
+Добавляет команды, доступные в личных сообщениях. Для администраторов
+дополнительно устанавливается команда /admin.
 """
 
 from typing import Sequence
 
-from aiogram import Bot
-from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
+from aiogram import Bot, types
+from aiogram.exceptions import TelegramBadRequest
+from aiogram.types import BotCommandScopeAllPrivateChats, BotCommandScopeChat
+from loguru import logger
+
+from app.config.settings import MAIN_ADMINS
 
 
 async def register_bot_commands(
     bot: Bot,
 ) -> None:
-    """
-    Регистрирует команды Telegram-бота только для приватных чатов.
+    """Регистрирует команды Telegram-бота.
 
-    Функция добавляет набор команд:
-        - /start — запуск или перезапуск бота
-        - /help — техническая поддержка
-        - /id — узнать ID чата
+    Команды для всех пользователей регистрируются только в приватных чатах.
+    Для администраторов устанавливается расширенный набор команд.
 
     Args:
         bot (Bot): Экземпляр Telegram-бота.
+
+    Returns:
+        None: Функция не возвращает значения.
     """
-    # Определяем список команд для регистрации
-    commands: Sequence[BotCommand] = [
-        BotCommand(
+    user_commands: Sequence[types.BotCommand] = [
+        types.BotCommand(
             command="start",
-            description="Запуск/перезапуск бота",
+            description="Запуск или перезапуск бота",
         ),
-        BotCommand(
+        types.BotCommand(
+            command="cancel",
+            description="Отмена регистрации",
+        ),
+        types.BotCommand(
             command="help",
             description="Техническая поддержка",
         ),
-        BotCommand(
+        types.BotCommand(
             command="id",
             description="Узнать ID чата",
         ),
     ]
 
-    # Регистрируем команды только для приватных чатов
+    # Регистрация команд, доступных всем пользователям
     await bot.set_my_commands(
-        commands=commands,
+        commands=user_commands,
         scope=BotCommandScopeAllPrivateChats(),
     )
+
+    admin_commands: Sequence[types.BotCommand] = [
+        *user_commands,
+        types.BotCommand(
+            command="admin",
+            description="Админ-панель",
+        ),
+    ]
+
+    # Попытка зарегистрировать расширенные команды для администраторов
+    for admin_id in MAIN_ADMINS:
+        try:
+            await bot.set_my_commands(
+                commands=admin_commands,
+                scope=BotCommandScopeChat(
+                    chat_id=admin_id,
+                ),
+            )
+        except TelegramBadRequest:
+            # Логируем, если чат администратора ещё не существует
+            logger.warning(
+                f"Невозможно установить команды для admin_id={admin_id}: "
+                "чат не найден"
+            )

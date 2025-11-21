@@ -8,13 +8,14 @@ from typing import Any, Tuple
 from aiogram.types import InlineKeyboardMarkup
 
 from app.services.keyboards.user import kb_input, kb_select, kb_text
-from app.services.requests.data.crud import manage_data_crud
+from app.services.requests.data.crud import manage_data
 
 
 async def multi(
     loc: Any,
     value: str,
-    user_id: int
+    user_id: int,
+    error: bool = False
 ) -> Tuple[str, InlineKeyboardMarkup]:
     """
     Формирует текст сообщения и соответствующую клавиатуру для пользователя.
@@ -41,21 +42,12 @@ async def multi(
     elif type_message == "input":
         format_: str = loc_state.format
         template: Any = loc.template.input
-
-        error: bool = False
-        # data: str | None = "Абдурахманов Далгат Шамильевич"
-        data: Any = await manage_data_crud(
-            user_id=user_id,
-            action="create_or_update",
-            key=base_text,
-            value="Абдурахманов Далгат Шамильевич"
-        )
-        data: Any = await manage_data_crud(
+        data: Any = await manage_data(
             user_id=user_id,
             action="get",
             key=base_text
         )
-        print(data)
+        # print(data)
         if error:
             error_parts: Tuple[str, str] = template.error
             text_message = f"{error_parts[0]}{format_}{error_parts[1]}"
