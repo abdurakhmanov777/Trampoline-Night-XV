@@ -34,11 +34,11 @@ async def log(
             Дополнительные данные для логирования.
     """
     from_user: Optional[types.User] = getattr(event, "from_user", None)
-    user_id: Optional[int] = getattr(from_user, "id", None)
+    tg_id: Optional[int] = getattr(from_user, "id", None)
 
     # Fallback для неизвестного пользователя
-    if user_id is None:
-        user_id = -1
+    if tg_id is None:
+        tg_id = -1
 
     # Получаем фрейм вызова для определения контекста
     frame: FrameType = sys._getframe(1)
@@ -54,7 +54,7 @@ async def log(
     # Итоговое сообщение
     message: str = (
         f"[{module}/{filename}:{lineno}] {func_name} "
-        f"({extra_info + ', ' if extra_info else ''}{user_id})"
+        f"({extra_info + ', ' if extra_info else ''}{tg_id})"
     )
     logger.info(message)
 
@@ -81,7 +81,7 @@ async def log_error(
     from_user: Optional[types.User] = (
         getattr(event, "from_user", None) if event else None
     )
-    user_id: int = getattr(from_user, "id", -1)
+    tg_id: int = getattr(from_user, "id", -1)
     username: Optional[str] = getattr(from_user, "username", None)
 
     # Формируем строку дополнительных аргументов
@@ -136,7 +136,7 @@ async def log_error(
     message: str = (
         f"[{module}/{filename}:{lineno}] {func_name} — "
         f"{error_type}: {error} "
-        f"({extra_info + ', ' if extra_info else ''}{user_id}"
+        f"({extra_info + ', ' if extra_info else ''}{tg_id}"
         f"{', ' + username if username else ''})"
     )
 

@@ -21,14 +21,14 @@ class DataCRUD(DataManagerBase):
 
     async def get(
         self,
-        user_id: int,
+        tg_id: int,
         key: str,
     ) -> Optional[Data]:
         """
         Получить запись по ключу для конкретного пользователя.
 
         Args:
-            user_id (int): ID пользователя.
+            tg_id (int): ID пользователя.
             key (str): Ключ данных.
 
         Returns:
@@ -37,7 +37,7 @@ class DataCRUD(DataManagerBase):
         try:
             result: Result[Tuple[Data]] = await self.session.execute(
                 select(Data).where(
-                    Data.user_id == user_id,
+                    Data.tg_id == tg_id,
                     Data.key == key,
                 )
             )
@@ -49,7 +49,7 @@ class DataCRUD(DataManagerBase):
 
     async def create_or_update(
         self,
-        user_id: int,
+        tg_id: int,
         key: str,
         value: str,
     ) -> Data:
@@ -57,14 +57,14 @@ class DataCRUD(DataManagerBase):
         Создать новую пару ключ–значение или обновить существующую.
 
         Args:
-            user_id (int): ID пользователя.
+            tg_id (int): ID пользователя.
             key (str): Ключ данных.
             value (str): Значение данных.
 
         Returns:
             Data: Созданный или обновлённый объект Data.
         """
-        data: Optional[Data] = await self.get(user_id, key)
+        data: Optional[Data] = await self.get(tg_id, key)
         if data:
             # Если запись существует, обновляем значение
             data.value = value
@@ -73,7 +73,7 @@ class DataCRUD(DataManagerBase):
             return data
 
         # Если записи нет, создаём новую
-        data = Data(user_id=user_id, key=key, value=value)
+        data = Data(tg_id=tg_id, key=key, value=value)
         self.session.add(data)
         await self.session.commit()
         await self.session.refresh(data)
@@ -81,20 +81,20 @@ class DataCRUD(DataManagerBase):
 
     async def delete(
         self,
-        user_id: int,
+        tg_id: int,
         key: str,
     ) -> bool:
         """
         Удалить пару ключ–значение пользователя.
 
         Args:
-            user_id (int): ID пользователя.
+            tg_id (int): ID пользователя.
             key (str): Ключ данных.
 
         Returns:
             bool: True, если удаление прошло успешно, иначе False.
         """
-        data: Optional[Data] = await self.get(user_id, key)
+        data: Optional[Data] = await self.get(tg_id, key)
         if not data:
             # Запись не найдена
             return False

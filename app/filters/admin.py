@@ -56,7 +56,7 @@ class AdminFilter(BaseFilter):
         if not from_user:
             return False
 
-        user_id: int = from_user.id
+        tg_id: int = from_user.id
         chat_id: Optional[int] = None
         bot: Optional[Any] = getattr(event, "bot", None)
 
@@ -71,14 +71,14 @@ class AdminFilter(BaseFilter):
             return False
 
         # Проверяем локальные роли
-        for role, user_ids in self.roles.items():
-            if user_id in user_ids:
+        for role, tg_ids in self.roles.items():
+            if tg_id in tg_ids:
                 return {"role": role}
 
         # Проверка через Telegram API
         if bot and chat_id is not None:
             try:
-                member: Any = await bot.get_chat_member(chat_id, user_id)
+                member: Any = await bot.get_chat_member(chat_id, tg_id)
                 if member.status in {"administrator", "creator"}:
                     return {"role": "moderator"}
             except Exception:

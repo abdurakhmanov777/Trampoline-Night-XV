@@ -26,7 +26,7 @@ class Data(Base):
         Integer,
         primary_key=True
     )
-    user_id: Mapped[int] = mapped_column(
+    tg_id: Mapped[int] = mapped_column(
         ForeignKey("user.id", ondelete="CASCADE"),
         nullable=False
     )
@@ -50,6 +50,6 @@ class Data(Base):
         """Возвращает строковое представление объекта Data.
 
         Returns:
-            str: Строка с user_id и ключом записи.
+            str: Строка с tg_id и ключом записи.
         """
-        return f"<Data user_id={self.user_id} key={self.key}>"
+        return f"<Data tg_id={self.tg_id} key={self.key}>"

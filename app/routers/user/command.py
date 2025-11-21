@@ -17,6 +17,7 @@ from app.filters import ChatTypeFilter
 from app.services.keyboards import help, kb_delete
 from app.services.logger import log
 from app.services.multi import multi
+from app.services.requests.data import manage_data_clear
 from app.services.requests.user import manage_user, manage_user_state
 
 router: Router = Router()
@@ -94,7 +95,7 @@ async def cmd_start(
     text_message, keyboard_message = await multi(
         loc=loc,
         value=value,
-        user_id=message.from_user.id
+        tg_id=message.from_user.id
     )
 
     await message.answer(
@@ -129,13 +130,13 @@ async def cmd_cancel(
         message.from_user.id,
         "clear"
     )
-
+    await manage_data_clear(tg_id=message.from_user.id)
     text_message: str
     keyboard_message: InlineKeyboardMarkup
     text_message, keyboard_message = await multi(
         loc=loc,
         value='1',
-        user_id=message.from_user.id
+        tg_id=message.from_user.id
     )
 
     await message.answer(

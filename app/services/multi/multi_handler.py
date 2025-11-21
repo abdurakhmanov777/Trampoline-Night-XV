@@ -3,6 +3,7 @@
 локализации пользователя и типа состояния.
 """
 
+import re
 from typing import Any, Tuple
 
 from aiogram.types import InlineKeyboardMarkup
@@ -14,8 +15,8 @@ from app.services.requests.data.crud import manage_data
 async def multi(
     loc: Any,
     value: str,
-    user_id: int,
-    error: bool = False
+    tg_id: int,
+    data: str | None = None
 ) -> Tuple[str, InlineKeyboardMarkup]:
     """
     Формирует текст сообщения и соответствующую клавиатуру для пользователя.
@@ -41,13 +42,27 @@ async def multi(
 
     elif type_message == "input":
         format_: str = loc_state.format
+        pattern: Any = loc_state.pattern
         template: Any = loc.template.input
-        data: Any = await manage_data(
-            user_id=user_id,
-            action="get",
-            key=base_text
-        )
-        # print(data)
+        error = False
+        if data is not None:
+            regex: re.Pattern[Any] = re.compile(pattern)
+            if regex.fullmatch(data):
+                data = await manage_data(
+                    tg_id=tg_id,
+                    action="create_or_update",
+                    key=base_text,
+                    value=data
+                )
+            else:
+                error = True
+        else:
+            data = await manage_data(
+                tg_id=tg_id,
+                action="get",
+                key=base_text
+            )
+
         if error:
             error_parts: Tuple[str, str] = template.error
             text_message = f"{error_parts[0]}{format_}{error_parts[1]}"

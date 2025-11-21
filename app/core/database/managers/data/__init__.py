@@ -6,7 +6,7 @@
 """
 
 from .crud import DataCRUD
-from .list import DataList
+from .dlist import DataList
 
 
 class DataManager(

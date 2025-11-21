@@ -1,8 +1,8 @@
 """
-Универсальная обёртка для получения всех записей пользователя из таблицы Data.
+Универсальная обёртка для работы с данными пользователя из таблицы Data.
 
-Содержит функцию manage_data_list для извлечения всех пар ключ–значение
-конкретного пользователя.
+Содержит функции manage_data_list для извлечения всех пар ключ–значение
+и manage_data_clear для удаления всех записей конкретного пользователя.
 """
 
 from typing import Sequence
@@ -13,13 +13,13 @@ from app.core.database.models import Data
 
 
 async def manage_data_list(
-    user_id: int,
+    tg_id: int,
 ) -> Sequence[Data]:
     """
     Получает все записи (ключ–значение) для конкретного пользователя.
 
     Args:
-        user_id (int): ID пользователя.
+        tg_id (int): ID пользователя.
 
     Returns:
         Sequence[Data]: Список объектов Data, принадлежащих пользователю.
@@ -27,4 +27,21 @@ async def manage_data_list(
     """
     async with async_session() as session:
         data_manager = DataManager(session)
-        return await data_manager.list_all(user_id)
+        return await data_manager.list_all(tg_id)
+
+
+async def manage_data_clear(
+    tg_id: int,
+) -> bool:
+    """
+    Удаляет все записи пользователя.
+
+    Args:
+        tg_id (int): ID пользователя.
+
+    Returns:
+        bool: True, если удаление прошло успешно, иначе False.
+    """
+    async with async_session() as session:
+        data_manager = DataManager(session)
+        return await data_manager.clear_all(tg_id)

@@ -62,33 +62,33 @@ async def msg_user(
     if not loc or not message.from_user or not message.bot:
         return
 
-    print(message.text)
-    # value: bool | str | list[str] | None = await manage_user_state(
-    #     message.from_user.id,
-    #     "peek"
-    # )
+    value: bool | str | list[str] | None = await manage_user_state(
+        message.from_user.id,
+        "peek"
+    )
 
-    # msg_id: User | bool | None | int = await manage_user(
-    #     tg_id=message.from_user.id,
-    #     action="get",
-    # )
+    db_user: User | bool | None | int = await manage_user(
+        tg_id=message.from_user.id,
+        action="get",
+    )
 
-    # if not isinstance(value, str) or not isinstance(msg_id, int):
-    #     return
+    if not isinstance(value, str) or not isinstance(db_user, User):
+        return
 
-    # text_message: str
-    # keyboard_message: InlineKeyboardMarkup
-    # text_message, keyboard_message = await multi(
-    #     loc=loc,
-    #     value=value,
-    #     user_id=message.from_user.id
-    # )
+    text_message: str
+    keyboard_message: InlineKeyboardMarkup
+    text_message, keyboard_message = await multi(
+        loc=loc,
+        value=value,
+        tg_id=message.from_user.id,
+        data=message.text
+    )
 
-    # await message.bot.edit_message_text(
-    #     chat_id=message.chat.id,
-    #     message_id=msg_id,
-    #     text=text_message,
-    #     reply_markup=keyboard_message  # если нужна клавиатура
-    # )
+    await message.bot.edit_message_text(
+        chat_id=message.chat.id,
+        message_id=db_user.msg_id,
+        text=text_message,
+        reply_markup=keyboard_message  # если нужна клавиатура
+    )
 
     await log(message)

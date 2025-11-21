@@ -13,7 +13,7 @@ from app.core.database.models.data import Data
 
 
 async def manage_data(
-    user_id: int,
+    tg_id: int,
     action: Literal["get", "create_or_update", "delete"],
     key: str,
     value: Optional[str] = None,
@@ -23,7 +23,7 @@ async def manage_data(
     в виде строки.
 
     Args:
-        user_id (int): ID пользователя.
+        tg_id (int): ID пользователя.
         action (Literal["get", "create_or_update", "delete"]): Действие:
             - "get": получить запись по ключу;
             - "create_or_update": создать новую запись или обновить существующую;
@@ -43,7 +43,7 @@ async def manage_data(
         data_manager = DataManager(session)
 
         if action == "get":
-            data: Data | None = await data_manager.get(user_id, key)
+            data: Data | None = await data_manager.get(tg_id, key)
             return data.value if data else None
 
         elif action == "create_or_update":
@@ -51,11 +51,11 @@ async def manage_data(
                 raise ValueError(
                     'Для create_or_update необходимо передать значение value.'
                 )
-            data = await data_manager.create_or_update(user_id, key, value)
+            data = await data_manager.create_or_update(tg_id, key, value)
             return data.value
 
         elif action == "delete":
-            result: bool = await data_manager.delete(user_id, key)
+            result: bool = await data_manager.delete(tg_id, key)
             return str(result)
 
         raise ValueError(f"Неизвестное действие: {action!r}")

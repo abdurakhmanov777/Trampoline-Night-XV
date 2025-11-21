@@ -65,7 +65,7 @@ async def clbk_next(
     text_message, keyboard_message = await multi(
         loc=loc,
         value=value[0],
-        user_id=callback.from_user.id
+        tg_id=callback.from_user.id
     )
 
     await callback.answer(value[0])
@@ -115,7 +115,7 @@ async def clbk_back(
     text_message, keyboard_message = await multi(
         loc=loc,
         value=backstate,
-        user_id=callback.from_user.id
+        tg_id=callback.from_user.id
     )
 
     await callback.answer()
