@@ -44,7 +44,7 @@ def user_command(
 
 
 @user_command("start")
-async def start(
+async def cmd_start(
     message: Message,
     state: FSMContext
 ) -> None:
@@ -106,7 +106,7 @@ async def start(
 
 
 @user_command("cancel")
-async def cancel(
+async def cmd_cancel(
     message: Message,
     state: FSMContext
 ) -> None:
@@ -158,7 +158,7 @@ async def cancel(
 
 
 @user_command("id")
-async def user_id(
+async def cmd_id(
     message: Message,
     state: FSMContext
 ) -> None:

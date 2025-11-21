@@ -1,40 +1,94 @@
-from typing import Any, Callable
+"""
+Модуль регистрации команд Telegram-бота для приватных чатов.
+
+Содержит обработчики команд /start, /cancel, /id и /help
+с динамическими клавиатурами и локализацией.
+"""
+
+from typing import Any, Callable, Dict
 
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, Message
 
-from app.config import COMMAND_MAIN
+from app.core.database.models.user import User
 from app.filters import ChatTypeFilter
-from app.services.keyboards import keyboard_dynamic
+from app.services.keyboards import help, kb_delete
 from app.services.logger import log
+from app.services.multi import multi
+from app.services.requests.user import manage_user, manage_user_state
 
 router: Router = Router()
 
 
-def user_message() -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+def user_message() -> Callable[
+    [Callable[..., Any]], Callable[..., Any]
+]:
     """
-    Декоратор для регистрации команд, доступных только
-        в группах и супергруппах.
+    Декоратор для регистрации сообщений, доступных только в приватных чатах.
 
     Args:
-        *commands (str): Названия команд для
-        фильтрации (например, "start", "help").
+        *commands (str): Названия команд для фильтрации.
 
     Returns:
         Callable: Декоратор для функции-обработчика.
     """
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
         return router.message(
-            ChatTypeFilter(chat_type=["private"]),
+            ChatTypeFilter(chat_type=["private"])
         )(func)
+
     return decorator
 
 
 @user_message()
-async def user_id(
+async def msg_user(
     message: Message,
     state: FSMContext
 ) -> None:
-    pass
+    """
+    Обрабатывает команду /start.
+
+    Получает текст и клавиатуру из локализации по ключу команды
+    и отправляет сообщение с динамической клавиатурой.
+
+    Args:
+        message (Message): Входящее сообщение Telegram.
+        state (FSMContext): Контекст FSM для хранения данных пользователя.
+    """
+    user_data: Dict[str, Any] = await state.get_data()
+    loc: Any = user_data.get("loc_user")
+    if not loc or not message.from_user or not message.bot:
+        return
+
+    print(message.text)
+    # value: bool | str | list[str] | None = await manage_user_state(
+    #     message.from_user.id,
+    #     "peek"
+    # )
+
+    # msg_id: User | bool | None | int = await manage_user(
+    #     tg_id=message.from_user.id,
+    #     action="get",
+    # )
+
+    # if not isinstance(value, str) or not isinstance(msg_id, int):
+    #     return
+
+    # text_message: str
+    # keyboard_message: InlineKeyboardMarkup
+    # text_message, keyboard_message = await multi(
+    #     loc=loc,
+    #     value=value,
+    #     user_id=message.from_user.id
+    # )
+
+    # await message.bot.edit_message_text(
+    #     chat_id=message.chat.id,
+    #     message_id=msg_id,
+    #     text=text_message,
+    #     reply_markup=keyboard_message  # если нужна клавиатура
+    # )
+
+    await log(message)
