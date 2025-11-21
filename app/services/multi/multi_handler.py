@@ -10,6 +10,8 @@ from aiogram.types import InlineKeyboardMarkup
 
 from app.services.keyboards.user import kb_input, kb_select, kb_text
 from app.services.requests.data.crud import manage_data
+from app.utils.morphology.casing import lower_words
+from app.utils.morphology.inflection import inflect_text
 
 
 async def multi(
@@ -63,18 +65,27 @@ async def multi(
                 key=base_text
             )
 
+        flag = False
         if error:
             error_parts: Tuple[str, str] = template.error
             text_message = f"{error_parts[0]}{format_}{error_parts[1]}"
 
         elif not data:
             start_parts: Tuple[str, str, str] = template.start
+            edit_base_text: str = await inflect_text(
+                text=await lower_words(
+                    text=base_text,
+                    capitalize_first=False
+                ),
+                case='винительный'
+            )
             text_message = (
-                f"{start_parts[0]}{base_text}{start_parts[1]}"
+                f"{start_parts[0]}{edit_base_text}{start_parts[1]}"
                 f"{format_}{start_parts[2]}"
             )
 
         else:
+            flag = True
             saved_parts: Tuple[str, str, str] = template.saved
             text_message = (
                 f"{saved_parts[0]}{base_text}{saved_parts[1]}"
@@ -84,7 +95,7 @@ async def multi(
         keyboard_message: InlineKeyboardMarkup = await kb_input(
             state=keyboard,
             backstate=value,
-            show_next=data is not None
+            show_next=flag
         )
 
     else:

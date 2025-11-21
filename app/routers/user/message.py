@@ -84,11 +84,14 @@ async def msg_user(
         data=message.text
     )
 
-    await message.bot.edit_message_text(
-        chat_id=message.chat.id,
-        message_id=db_user.msg_id,
-        text=text_message,
-        reply_markup=keyboard_message  # если нужна клавиатура
-    )
+    try:
+        await message.bot.edit_message_text(
+            chat_id=message.chat.id,
+            message_id=db_user.msg_id,
+            text=text_message,
+            reply_markup=keyboard_message
+        )
+    except:
+        pass
 
     await log(message)

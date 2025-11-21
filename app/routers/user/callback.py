@@ -68,8 +68,6 @@ async def clbk_next(
         tg_id=callback.from_user.id
     )
 
-    await callback.answer(value[0])
-
     # Отправляем сообщение пользователю (короткий вариант)
     try:
         await callback.message.edit_text(
