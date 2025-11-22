@@ -36,11 +36,11 @@ FONT_PATH: Path = FONTS_DIR / os.getenv(
 )  # Шрифт для текста
 
 GUEST_PATH: Path = DOCUMENTS_DIR / os.getenv(
-    "GUEST_PATH", "Анкета_гостя.pdf"
+    "GUEST_PATH", "Анкета гостя.pdf"
 )  # Анкета гостя
 
 PARTICIPANT_PATH: Path = DOCUMENTS_DIR / os.getenv(
-    "PARTICIPANT_PATH", "Расписка_участника.pdf"
+    "PARTICIPANT_PATH", "Расписка участника.pdf"
 )  # Расписка участника
 
 # Файлы логирования
