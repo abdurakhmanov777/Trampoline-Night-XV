@@ -85,7 +85,8 @@ async def handle_input(
     keyboard_message: InlineKeyboardMarkup = kb_input(
         state=loc_state.keyboard,
         backstate=value,
-        show_next=flag
+        show_next=flag,
+        buttons=loc.button
     )
 
     return text_message, keyboard_message

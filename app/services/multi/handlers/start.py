@@ -39,6 +39,8 @@ async def handle_start(
     text_message: str = f"{p1}{loc_state.text}{p2}"
 
     # Создаём стартовую клавиатуру
-    keyboard_message: InlineKeyboardMarkup = kb_start()
+    keyboard_message: InlineKeyboardMarkup = kb_start(
+        buttons=loc.button
+    )
 
     return text_message, keyboard_message

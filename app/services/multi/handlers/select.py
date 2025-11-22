@@ -40,7 +40,8 @@ async def handle_select(
 
     # Создаём клавиатуру выбора на основе данных состояния
     keyboard_message: InlineKeyboardMarkup = kb_select(
-        data=loc_state.keyboard
+        data=loc_state.keyboard,
+        buttons=loc.button
     )
 
     return text_message, keyboard_message

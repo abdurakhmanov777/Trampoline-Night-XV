@@ -38,7 +38,8 @@ async def handle_text(
     # Создаём клавиатуру для текстового состояния
     keyboard_message: InlineKeyboardMarkup = kb_text(
         state=loc_state.keyboard,
-        backstate=value
+        backstate=value,
+        buttons=loc.button
     )
 
     return text_message, keyboard_message

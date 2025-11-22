@@ -7,7 +7,6 @@ from typing import Any, Dict, Tuple
 
 from aiogram.types import InlineKeyboardMarkup
 
-from app.core.database.models.data import Data
 from app.services.keyboards.user import kb_end
 from app.services.requests.data.dlist import manage_data_list
 
@@ -52,6 +51,8 @@ async def handle_end(
     text_message: str = f"{p1}{items}{p2}"
 
     # Создаем клавиатуру завершения
-    keyboard_message: InlineKeyboardMarkup = kb_end()
+    keyboard_message: InlineKeyboardMarkup = kb_end(
+        buttons=loc.button
+    )
 
     return text_message, keyboard_message
