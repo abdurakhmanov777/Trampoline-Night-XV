@@ -1,4 +1,4 @@
-from .multi_handler import multi
+from .multi import multi
 
 __all__: list[str] = [
     "multi",

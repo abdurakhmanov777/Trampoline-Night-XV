@@ -10,7 +10,33 @@ from typing import List, Tuple
 from aiogram import types
 
 
-async def kb_text(
+def kb_start(
+) -> types.InlineKeyboardMarkup:
+    """Создаёт клавиатуру с кнопками "Далее" и "Назад".
+
+    Если `backstate` равно "1", заменяет текст кнопки "Далее" на
+    "Соглашаюсь".
+
+    Args:
+        state (str): Текущее состояние пользователя.
+        backstate (str): Предыдущее состояние пользователя.
+
+    Returns:
+        types.InlineKeyboardMarkup: Сформированная клавиатура.
+    """
+    keyboard_buttons: List[List[types.InlineKeyboardButton]] = [
+        [
+            types.InlineKeyboardButton(
+                text="Соглашаюсь",
+                callback_data="userstate_2",
+            )
+        ]
+    ]
+
+    return types.InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
+
+
+def kb_text(
     state: str,
     backstate: str,
 ) -> types.InlineKeyboardMarkup:
@@ -29,13 +55,13 @@ async def kb_text(
     keyboard_buttons: List[List[types.InlineKeyboardButton]] = [
         [
             types.InlineKeyboardButton(
-                text="Далее" if backstate != "1" else "Соглашаюсь",
+                text="Далее",
                 callback_data=f"userstate_{state}",
             )
         ]
     ]
 
-    if backstate not in ["1", "2"]:
+    if backstate != "2":
         keyboard_buttons.append(
             [
                 types.InlineKeyboardButton(
@@ -48,7 +74,7 @@ async def kb_text(
     return types.InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
 
 
-async def kb_input(
+def kb_input(
     state: str,
     backstate: str,
     show_next: bool,
@@ -93,7 +119,7 @@ async def kb_input(
     return types.InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-async def kb_select(
+def kb_select(
     data: List[Tuple[str, str, str]],
 ) -> types.InlineKeyboardMarkup:
     """Формирует клавиатуру с длинными и короткими кнопками.
