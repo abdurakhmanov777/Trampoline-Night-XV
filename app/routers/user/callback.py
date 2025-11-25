@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
 from app.core.database.models import User
-from app.filters import CallbackFilterNext, ChatTypeFilter
+from app.routers.filters import CallbackFilterNext, ChatTypeFilter
 from app.services.localization import Localization
 from app.services.logger import log
 from app.services.multi import handle_send, multi

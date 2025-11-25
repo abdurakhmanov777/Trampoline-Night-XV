@@ -13,7 +13,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, Message
 
 from app.core.database.models.user import User
-from app.filters import ChatTypeFilter
+from app.routers.filters import ChatTypeFilter
 from app.services.keyboards import help, kb_delete
 from app.services.logger import log
 from app.services.multi import multi
@@ -91,7 +91,7 @@ async def msg_user(
             text=text_message,
             reply_markup=keyboard_message
         )
-    except:
+    except BaseException:
         pass
 
     await log(message)

@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, Message
 
 from app.config import COMMAND_MAIN
-from app.filters import AdminFilter, ChatTypeFilter
+from app.routers.filters import AdminFilter, ChatTypeFilter
 from app.services.keyboards import keyboard_dynamic
 from app.services.logger import log
 

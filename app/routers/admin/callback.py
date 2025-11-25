@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 import app.services.keyboards as kb
-from app.filters import AdminFilter, ChatTypeFilter
+from app.routers.filters import AdminFilter, ChatTypeFilter
 from app.services.logger import log
 
 router: Router = Router()

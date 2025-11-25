@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, Union
 from aiogram import Router
 from aiogram.types import CallbackQuery, Message
 
-from app.filters import InterceptFilter
+from app.routers.filters import InterceptFilter
 
 router: Router = Router()
 
