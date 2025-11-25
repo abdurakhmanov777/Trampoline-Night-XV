@@ -81,11 +81,6 @@ async def cmd_start(
         action="msg_update",
         msg_id=message.message_id + 1
     )
-    if isinstance(msg_id, int) and msg_id != 0 and message.bot:
-        try:
-            await message.bot.delete_message(message.chat.id, msg_id)
-        except Exception:
-            pass
 
     if not isinstance(value, str):
         return
@@ -102,6 +97,12 @@ async def cmd_start(
         text=text_message,
         reply_markup=keyboard_message
     )
+
+    if isinstance(msg_id, int) and msg_id != 0 and message.bot:
+        try:
+            await message.bot.delete_message(message.chat.id, msg_id)
+        except Exception as e:
+            print(e)
 
     await log(message)
 
@@ -152,8 +153,8 @@ async def cmd_cancel(
     if isinstance(msg_id, int) and msg_id != 0 and message.bot:
         try:
             await message.bot.delete_message(message.chat.id, msg_id)
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
 
     await log(message)
 

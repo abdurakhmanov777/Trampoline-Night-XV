@@ -74,7 +74,7 @@ def kb_end(
     back_text: str = getattr(buttons, "back")
 
     return _make_keyboard([
-        [_make_button(send_text, "userstate_100")],
+        [_make_button(send_text, "sending_data")],
         [_make_button(back_text, "userback")]
     ])
 

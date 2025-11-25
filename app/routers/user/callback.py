@@ -4,11 +4,13 @@ from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
+from app.core.database.models import User
 from app.filters import CallbackFilterNext, ChatTypeFilter
 from app.services.localization import Localization
 from app.services.logger import log
-from app.services.multi import multi
-from app.services.requests.user import manage_user_state
+from app.services.multi import handle_send, multi
+from app.services.requests.user.crud import manage_user
+from app.services.requests.user.state import manage_user_state
 
 router: Router = Router()
 
@@ -83,6 +85,45 @@ async def clbk_next(
         pass
 
     # Логируем событие
+    await log(callback)
+
+
+@user_callback(F.data == "sending_data")
+async def clbk_send(
+    callback: CallbackQuery,
+    state: FSMContext
+) -> None:
+    if not isinstance(callback.message, Message):
+        return
+
+    user_data: Dict[str, Any] = await state.get_data()
+    loc: Optional[Localization] = user_data.get("loc_user")
+    if not loc:
+        return
+
+    msg_id: int | None = await handle_send(
+        loc=loc,
+        tg_id=callback.from_user.id,
+        event=callback
+    )
+    if not isinstance(msg_id, int) or not callback.message.bot:
+        await log(callback)
+        return
+
+    try:
+        msg_id_old: User | bool | None | int = await manage_user(
+            tg_id=callback.from_user.id,
+            action="msg_update",
+            msg_id=msg_id
+        )
+        if isinstance(msg_id_old, int):
+            await callback.message.bot.delete_message(
+                callback.message.chat.id,
+                msg_id_old
+            )
+    except Exception as e:
+        print(e)
+
     await log(callback)
 
 
