@@ -21,7 +21,10 @@ from .base import DataManagerBase
 class DataCRUD(DataManagerBase):
     """Менеджер для выполнения CRUD-операций с данными пользователей."""
 
-    async def _get_user(self, tg_id: int) -> Optional[User]:
+    async def _get_user(
+        self,
+        tg_id: int
+    ) -> Optional[User]:
         """Получает пользователя по его Telegram ID.
 
         Args:

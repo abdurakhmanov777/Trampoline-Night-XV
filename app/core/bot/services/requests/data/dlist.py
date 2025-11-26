@@ -31,16 +31,27 @@ async def manage_data_list(
 
 async def manage_data_clear(
     tg_id: int,
+    keep_keys: list[str] | None = None,
 ) -> bool:
     """
-    Удаляет все записи пользователя.
+    Удаляет записи пользователя.
+
+    Если keep_keys передан, удаляет все записи, ключей которых нет в списке.
 
     Args:
         tg_id (int): ID пользователя.
+        keep_keys (list[str] | None): Список ключей, которые не удаляются.
+            Если None, удаляются все записи.
 
     Returns:
         bool: True, если удаление прошло успешно, иначе False.
     """
     async with async_session() as session:
         data_manager = DataManager(session)
-        return await data_manager.clear_all(tg_id)
+
+        if keep_keys is None:
+            # Удаляем все записи
+            return await data_manager.clear_all(tg_id)
+        else:
+            # Оптимизированное удаление всех ключей, которых нет в списке
+            return await data_manager.clear_except_keys(tg_id, keep_keys)

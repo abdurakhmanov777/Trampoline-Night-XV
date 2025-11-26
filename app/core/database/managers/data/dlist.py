@@ -20,7 +20,10 @@ from .base import DataManagerBase
 class DataList(DataManagerBase):
     """Класс для получения списка пар ключ–значение пользователя."""
 
-    async def _get_user(self, tg_id: int) -> Optional[User]:
+    async def _get_user(
+        self,
+        tg_id: int
+    ) -> Optional[User]:
         """Получает объект пользователя по его Telegram ID.
 
         Args:
@@ -38,7 +41,10 @@ class DataList(DataManagerBase):
             logger.error(f"Ошибка при получении пользователя: {error}")
             return None
 
-    async def dict_all(self, tg_id: int) -> Dict[str, Any]:
+    async def dict_all(
+        self,
+        tg_id: int
+    ) -> Dict[str, Any]:
         """Получает все пары ключ–значение пользователя в виде словаря.
 
         Args:
@@ -60,7 +66,10 @@ class DataList(DataManagerBase):
             logger.error(f"Ошибка при получении данных пользователя: {error}")
             return {}
 
-    async def clear_all(self, tg_id: int) -> bool:
+    async def clear_all(
+        self,
+        tg_id: int
+    ) -> bool:
         """Удаляет все записи пользователя.
 
         Args:
@@ -81,5 +90,40 @@ class DataList(DataManagerBase):
             return True
         except SQLAlchemyError as error:
             logger.error(f"Ошибка при удалении данных пользователя: {error}")
+            await self.session.rollback()
+            return False
+
+    async def clear_except_keys(
+        self,
+        tg_id: int,
+        keep_keys: list[str]
+    ) -> bool:
+        """
+        Удаляет все записи пользователя, кроме ключей из keep_keys.
+
+        Args:
+            tg_id (int): Telegram ID пользователя.
+            keep_keys (list[str]): Список ключей, которые не удаляются.
+
+        Returns:
+            bool: True, если удаление прошло успешно, иначе False.
+        """
+        user: Optional[User] = await self._get_user(tg_id)
+        if not user:
+            return False
+
+        try:
+            await self.session.execute(
+                delete(Data).where(
+                    Data.user_id == user.id,
+                    ~Data.key.in_(keep_keys)
+                )
+            )
+            await self.session.commit()
+            return True
+        except SQLAlchemyError as error:
+            logger.error(
+                f"Ошибка при выборочном удалении данных пользователя: {error}"
+            )
             await self.session.rollback()
             return False
