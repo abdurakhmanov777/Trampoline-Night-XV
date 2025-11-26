@@ -31,7 +31,7 @@ async def generate_text_image(
     draw: ImageDraw.ImageDraw = ImageDraw.Draw(image)
 
     # Подбираем размер шрифта относительно высоты изображения
-    font_size = int(image.height * 0.5)
+    font_size = int(image.height * 0.4)
     font: ImageFont.FreeTypeFont = ImageFont.truetype(
         FONT_PATH,
         size=font_size

@@ -8,8 +8,8 @@ from app.core.bot.routers.filters import CallbackNextFilter, ChatTypeFilter
 from app.core.bot.services.localization import Localization
 from app.core.bot.services.logger import log
 from app.core.bot.services.multi import handle_send, multi
-from app.core.bot.services.requests.user.crud import manage_user
-from app.core.bot.services.requests.user.state import manage_user_state
+from app.core.bot.services.requests.data import manage_data_clear
+from app.core.bot.services.requests.user import manage_user, manage_user_state
 from app.core.database.models import User
 
 router: Router = Router()
@@ -167,4 +167,65 @@ async def clbk_back(
         pass
 
     # Логируем событие
+    await log(callback)
+
+
+@router.callback_query(
+    ChatTypeFilter(chat_type=["private"]),
+    F.data == "cancel_reg"
+)
+async def clbk_cancel(
+    callback: CallbackQuery,
+    state: FSMContext,
+) -> None:
+    """
+    Обрабатывает команду /cancel.
+
+    Очищает состояние пользователя и отправляет сообщение
+    с клавиатурой по умолчанию.
+
+    Args:
+        message (Message): Входящее сообщение Telegram.
+        state (FSMContext): Контекст FSM для хранения данных пользователя.
+    """
+    user_data: Dict[str, Any] = await state.get_data()
+    loc: Any = user_data.get("loc_user")
+    if not loc or not callback.from_user or not callback.message:
+        return
+
+    await manage_user_state(
+        callback.from_user.id,
+        "clear"
+    )
+    await manage_data_clear(tg_id=callback.from_user.id)
+    text_message: str
+    keyboard_message: InlineKeyboardMarkup
+    text_message, keyboard_message = await multi(
+        loc=loc,
+        value='1',
+        tg_id=callback.from_user.id
+    )
+
+    await callback.message.answer(
+        text=text_message,
+        reply_markup=keyboard_message
+    )
+
+    msg_id: User | bool | None | int = await manage_user(
+        tg_id=callback.from_user.id,
+        action="msg_update",
+        msg_id=callback.message.message_id + 1
+    )
+    if isinstance(msg_id, int) and msg_id != 0 and callback.message.bot:
+        try:
+            await callback.message.bot.delete_message(
+                callback.message.chat.id,
+                msg_id
+            )
+        except BaseException:
+            pass
+
+    if isinstance(callback.message, Message):
+        await callback.message.delete()
+        
     await log(callback)

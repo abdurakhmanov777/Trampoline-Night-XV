@@ -9,6 +9,9 @@ from aiogram import types
 from aiogram.enums import ChatAction
 
 from app.core.bot.services.generator import generate_text_image
+from app.core.bot.services.generator.generator_code import generate_code
+from app.core.bot.services.requests.user import manage_user, manage_user_state
+from app.core.database.models.user import User
 
 
 async def handle_send(
@@ -38,7 +41,16 @@ async def handle_send(
         return None
 
     # Генерация кода (временно)
-    code: int = 1
+    user: User | bool | None | int = await manage_user(
+        tg_id=tg_id,
+        action="get"
+    )
+    if not isinstance(user, User):
+        return
+    code: int | None = generate_code(
+        user_id=user.id,
+        num_digits=3
+    )
 
     # Анимация загрузки
     await message.bot.send_chat_action(
