@@ -7,11 +7,13 @@ from typing import Any, Callable, Tuple
 
 from aiogram.types import InlineKeyboardMarkup
 
+from app.core.bot.services.requests.data import manage_data
+
 from .context import MultiContext
 from .handlers.end import handle_end
 from .handlers.input import handle_input
 from .handlers.select import handle_select
-from .handlers.sending import handle_send
+from .handlers.send import handle_send
 from .handlers.start import handle_start
 from .handlers.text import handle_text
 
@@ -21,6 +23,7 @@ async def multi(
     value: str,
     tg_id: int,
     data: str | None = None,
+    data_select: list[str] | None = None,
     **extra: Any
 ) -> Tuple[str, InlineKeyboardMarkup]:
     """
@@ -59,6 +62,17 @@ async def multi(
         "send": handle_send,
     }
 
-    handler = handler_map.get(type_message, handle_start)
+    handler: Callable[[MultiContext], Any] = handler_map.get(
+        type_message,
+        handle_start
+    )
+
+    if data_select:
+        await manage_data(
+            tg_id=tg_id,
+            action="create_or_update",
+            key=data_select[0],
+            value=data_select[1]
+        )
 
     return await handler(context)

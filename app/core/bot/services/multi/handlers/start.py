@@ -15,23 +15,26 @@ async def handle_start(
     ctx: MultiContext,
 ) -> Tuple[str, InlineKeyboardMarkup]:
     """
-    Обрабатывает стартовое состояние пользователя и формирует сообщение
-    и клавиатуру на основе локализации.
+    Обрабатывает состояние пользователя и формирует сообщение.
+
+    Формирует текст на основе шаблона локализации и списка данных,
+    собранных от пользователя.
 
     Args:
-        ctx (MultiContext): Контекст мульти-обработчика, содержащий update/event,
-                            loc, loc_state, value, tg_id, data и extra.
+        ctx (MultiContext): Контекст с параметрами обработки.
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup]: Текст сообщения и объект клавиатуры.
+        Tuple[str, InlineKeyboardMarkup]: Сообщение и клавиатура.
     """
 
-    loc = ctx.loc
-    loc_state = ctx.loc_state
+    loc: Any = ctx.loc
+    loc_state: Any = ctx.loc_state
 
     # Формируем текст сообщения
-    prefix, suffix = loc.template.start
-    text_message: str = f"{prefix}{loc_state.text}{suffix}"
+    p1: str
+    p2: str
+    p1, p2 = loc.template.start
+    text_message: str = f"{p1}{loc_state.text}{p2}"
 
     # Формируем клавиатуру
     keyboard: InlineKeyboardMarkup = kb_start(buttons=loc.button)

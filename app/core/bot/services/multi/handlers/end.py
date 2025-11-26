@@ -13,10 +13,10 @@ from app.core.bot.services.requests.data.dlist import manage_data_list
 
 
 async def handle_end(
-    ctx: MultiContext
+    ctx: MultiContext,
 ) -> Tuple[str, InlineKeyboardMarkup]:
     """
-    Обрабатывает финальное состояние пользователя и формирует сообщение.
+    Обрабатывает состояние пользователя и формирует сообщение.
 
     Формирует текст на основе шаблона локализации и списка данных,
     собранных от пользователя.
@@ -25,25 +25,25 @@ async def handle_end(
         ctx (MultiContext): Контекст с параметрами обработки.
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup]: Итоговое сообщение и клавиатура.
+        Tuple[str, InlineKeyboardMarkup]: Сообщение и клавиатура.
     """
 
     # Получаем список всех данных пользователя
     data_list: Dict[str, Any] = await manage_data_list(tg_id=ctx.tg_id)
 
     # Формируем текст блоков данных
-    items: str = "\n\n".join(
-        f"🔹️ {key}: {val}" for key, val in data_list.items()
+    items_text: str = "\n\n".join(
+        f"🔹️ {key}: {value}" for key, value in data_list.items()
     )
 
-    # Шаблон локализации (начало и конец)
-    prefix, suffix = ctx.loc.template.end
+    # Получаем шаблон локализации для начала и конца сообщения
+    p1: str
+    p2: str
+    p1, p2 = ctx.loc.template.end
 
-    text_message: str = f"{prefix}{items}{suffix}"
+    text_message: str = f"{p1}{items_text}{p2}"
 
-    # Клавиатура завершения
-    keyboard_message: InlineKeyboardMarkup = kb_end(
-        buttons=ctx.loc.button
-    )
+    # Формируем клавиатуру завершения
+    keyboard: InlineKeyboardMarkup = kb_end(buttons=ctx.loc.button)
 
-    return text_message, keyboard_message
+    return text_message, keyboard

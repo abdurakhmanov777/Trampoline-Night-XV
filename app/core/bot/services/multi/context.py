@@ -4,7 +4,9 @@
 """
 
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+
+from aiogram import types
 
 
 @dataclass
@@ -18,4 +20,5 @@ class MultiContext:
     value: str
     tg_id: int
     data: str | None = None
+    event: Optional[types.MaybeInaccessibleMessageUnion] = None
     extra: Dict[str, Any] | None = None

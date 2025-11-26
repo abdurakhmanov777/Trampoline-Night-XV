@@ -5,7 +5,7 @@
 и выбора из списка опций различной длины.
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from aiogram import types
 
@@ -141,39 +141,52 @@ def kb_input(
 
 
 def kb_select(
-    data: List[Tuple[str, str, str]],
+    name: str,
+    data: List[Tuple[str, str, bool]],
     buttons: Localization
 ) -> types.InlineKeyboardMarkup:
-    """Формирует клавиатуру с длинными и короткими кнопками.
+    """Создает клавиатуру с длинными и короткими кнопками.
 
-    Длинные кнопки занимают отдельную строку, короткие группируются
-    по две в ряд. Внизу всегда добавляется кнопка 'Назад'.
+    Длинные кнопки занимают отдельную строку, короткие кнопки
+    группируются по 2 или 3 в ряд. Внизу всегда добавляется кнопка
+    "Назад".
 
     Args:
-        data (List[Tuple[str, str, str]]): Список кортежей вида
-            (текст кнопки, состояние, флаг записи в БД).
+        data (List[Tuple[str, str, bool]]):
+            Список кортежей с кнопками. Каждый кортеж содержит:
+                - text (str): Текст кнопки.
+                - state (str): Состояние для callback.
+                - flag (bool): Флаг для записи в БД.
         buttons (Localization): Объект локализации с текстами кнопок.
 
     Returns:
-        types.InlineKeyboardMarkup: Сформированная клавиатура.
+        types.InlineKeyboardMarkup: Сформированная инлайн-клавиатура.
     """
     back_text: str = getattr(buttons, "back")
     long_buttons: List[List[types.InlineKeyboardButton]] = []
     short_buttons: List[types.InlineKeyboardButton] = []
-
-    for text, state, flag_db in data:
-        button: types.InlineKeyboardButton = _make_button(
-            text,
-            f"userstate_{state}_{text}_{flag_db}"
+    text: str
+    state: str
+    flag: bool
+    for text, state, flag in data:
+        callback_data: str = (
+            f"userstate_{state}_{text}_{name}"
+            if flag else f"userstate_{state}"
         )
+        button: types.InlineKeyboardButton = _make_button(text, callback_data)
+
         if len(text) > 13:
             long_buttons.append([button])
         else:
             short_buttons.append(button)
 
-    short_rows: List[List[types.InlineKeyboardButton]] = [
-        short_buttons[i:i + 2] for i in range(0, len(short_buttons), 2)
-    ]
+    # Формируем ряды для коротких кнопок
+    short_rows: List[List[types.InlineKeyboardButton]] = []
+    if 1 <= len(short_buttons) <= 3:
+        short_rows.append(short_buttons)
+    else:
+        for i in range(0, len(short_buttons), 2):
+            short_rows.append(short_buttons[i:i + 2])
 
     keyboard_rows: List[List[types.InlineKeyboardButton]] = (
         long_buttons + short_rows + [[_make_button(back_text, "userback")]]

@@ -5,11 +5,10 @@
 и manage_data_clear для удаления всех записей конкретного пользователя.
 """
 
-from typing import Any, Dict, Sequence
+from typing import Any, Dict
 
 from app.core.database.engine import async_session
 from app.core.database.managers import DataManager
-from app.core.database.models import Data
 
 
 async def manage_data_list(

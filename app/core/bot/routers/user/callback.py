@@ -64,10 +64,23 @@ async def clbk_next(
     # Формируем текст сообщения
     text_message: str
     keyboard_message: InlineKeyboardMarkup
+    backstate: bool | str | list[str] | None = await manage_user_state(
+        callback.from_user.id,
+        "peekpush",
+        value[0]
+    )
+    if not isinstance(backstate, str):
+        return
+
+    data_select: list[str] | None = None
+    if len(value) == 3:
+        data_select = [value[2], value[1]]
+
     text_message, keyboard_message = await multi(
         loc=loc,
         value=value[0],
-        tg_id=callback.from_user.id
+        tg_id=callback.from_user.id,
+        data_select=data_select
     )
 
     # Отправляем сообщение пользователю (короткий вариант)
@@ -75,11 +88,6 @@ async def clbk_next(
         await callback.message.edit_text(
             text=text_message,
             reply_markup=keyboard_message
-        )
-        await manage_user_state(
-            callback.from_user.id,
-            "push",
-            value[0]
         )
     except BaseException:
         pass

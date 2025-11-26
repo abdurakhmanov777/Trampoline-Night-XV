@@ -4,7 +4,7 @@
 """
 
 import re
-from typing import Any, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 from aiogram.types import InlineKeyboardMarkup
 
@@ -16,84 +16,85 @@ from app.core.bot.utils.morphology.inflection import inflect_text
 
 
 async def handle_input(
-    ctx: MultiContext
+    ctx: MultiContext,
 ) -> Tuple[str, InlineKeyboardMarkup]:
     """
-    Обрабатывает состояние ввода пользователя и формирует сообщение
-    и клавиатуру на основе шаблона локализации.
+    Обрабатывает состояние пользователя и формирует сообщение.
+
+    Формирует текст на основе шаблона локализации и списка данных,
+    собранных от пользователя.
 
     Args:
-        ctx (MultiContext): Контекст обработки шага.
+        ctx (MultiContext): Контекст с параметрами обработки.
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup]: Текст сообщения и клавиатура.
+        Tuple[str, InlineKeyboardMarkup]: Сообщение и клавиатура.
     """
 
-    loc = ctx.loc
-    loc_state = ctx.loc_state
-    tg_id = ctx.tg_id
-    data = ctx.data
+    loc: Any = ctx.loc
+    loc_state: Any = ctx.loc_state
+    tg_id: int = ctx.tg_id
+    user_input: Optional[str] = ctx.data
 
-    format_ = loc_state.format
-    pattern = loc_state.pattern
-    base_text = loc_state.text
-    template = loc.template.input
+    format_: str = loc_state.format
+    pattern: str = loc_state.pattern
+    base_text: str = loc_state.text
+    template: Any = loc.template.input
 
-    error = False
-
-    # Проверка пользовательского ввода по regex
-    if data is not None:
-        regex = re.compile(pattern)
-        if regex.fullmatch(data):
-            data = await manage_data(
+    error_occurred: bool = False
+    text_message: str
+    show_next: bool
+    p1: str
+    p2: str
+    p3: str
+    # Проверка пользовательского ввода по регулярному выражению
+    if user_input is not None:
+        if re.fullmatch(pattern, user_input):
+            await manage_data(
                 tg_id=tg_id,
                 action="create_or_update",
                 key=base_text,
-                value=data
+                value=user_input
             )
         else:
-            error = True
+            error_occurred = True
     else:
-        # Если пользователь ничего не ввёл — получить ранее сохранённые данные
-        data = await manage_data(
+        # Получаем ранее сохранённые данные, если пользователь ничего не ввёл
+        user_input = await manage_data(
             tg_id=tg_id,
             action="get",
             key=base_text
         )
 
     # Формирование текста сообщения
-    if error:
+    if error_occurred:
         p1, p2 = template.error
         text_message = f"{p1}{format_}{p2}"
-
         show_next = False
 
-    elif not data:
-        # пустое значение → склонение шаблона
+    elif not user_input:
+        # Пустое значение → склонение шаблона
         p1, p2, p3 = template.empty
 
-        processed_text = await inflect_text(
+        processed_text: str = await inflect_text(
             text=await lower_words(base_text, capitalize_first=False),
             case="винительный"
         )
-
         text_message = f"{p1}{processed_text}{p2}{format_}{p3}"
-
         show_next = False
 
     else:
-        # поле заполнено
+        # Поле заполнено
         p1, p2, p3 = template.filled
-        text_message = f"{p1}{base_text}{p2}{data}{p3}"
-
+        text_message = f"{p1}{base_text}{p2}{user_input}{p3}"
         show_next = True
 
-    # Клавиатура
-    keyboard_message: InlineKeyboardMarkup = kb_input(
+    # Формирование клавиатуры
+    keyboard: InlineKeyboardMarkup = kb_input(
         state=loc_state.keyboard,
         backstate=ctx.value,
         show_next=show_next,
         buttons=loc.button
     )
 
-    return text_message, keyboard_message
+    return text_message, keyboard

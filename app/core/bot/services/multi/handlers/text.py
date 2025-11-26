@@ -15,22 +15,23 @@ async def handle_text(
     ctx: MultiContext,
 ) -> Tuple[str, InlineKeyboardMarkup]:
     """
-    Обрабатывает текстовое состояние пользователя и формирует сообщение
-    и клавиатуру согласно шаблонам локализации.
+    Обрабатывает состояние пользователя и формирует сообщение.
+
+    Формирует текст на основе шаблона локализации и списка данных,
+    собранных от пользователя.
 
     Args:
-        ctx (MultiContext): Контекст мульти-обработчика, содержащий
-                            update/event, loc, loc_state, value, tg_id, data и extra.
+        ctx (MultiContext): Контекст с параметрами обработки.
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup]: Текст сообщения и объект клавиатуры.
+        Tuple[str, InlineKeyboardMarkup]: Сообщение и клавиатура.
     """
 
-    loc = ctx.loc
-    loc_state = ctx.loc_state
-    state_key = ctx.value  # текущий ключ состояния, используется как backstate
+    loc: Any = ctx.loc
+    loc_state: Any = ctx.loc_state
+    state_key: Any = ctx.value  # Текущий ключ состояния (backstate)
 
-    # Формируем текст сообщения (только текст из состояния)
+    # Формируем текст сообщения
     text_message: str = loc_state.text
 
     # Формируем клавиатуру
