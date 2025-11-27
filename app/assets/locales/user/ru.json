@@ -43,7 +43,7 @@
     "userstate_6": {
         "type": "input",
         "text": "ВУЗ",
-        "pattern": "\\w+",
+        "pattern": ".*",
         "format": "МИФИ",
         "keyboard": "99"
     },
