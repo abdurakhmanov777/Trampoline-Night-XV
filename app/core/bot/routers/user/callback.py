@@ -173,9 +173,9 @@ async def clbk_back(
 
 @router.callback_query(
     ChatTypeFilter(chat_type=["private"]),
-    F.data == "cancel_reg_confirm"
+    F.data == "cancel_reg"
 )
-async def clbk_cancel_confirm(
+async def clbk_cancel(
     callback: CallbackQuery,
     state: FSMContext,
 ) -> None:

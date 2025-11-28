@@ -225,5 +225,5 @@ def kb_cancel(
     yes_text: str = buttons.yes
     return _make_keyboard([[
         _make_button(no_text, "delete"),
-        _make_button(yes_text, "cancel_reg_confirm")
+        _make_button(yes_text, "cancel_reg")
     ]])
