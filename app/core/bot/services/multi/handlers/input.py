@@ -6,7 +6,7 @@
 import re
 from typing import Any, Dict, Optional, Tuple
 
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
 from app.core.bot.services.keyboards.user import kb_input
 from app.core.bot.services.multi.context import MultiContext
@@ -17,7 +17,7 @@ from app.core.bot.utils.morphology.inflection import inflect_text
 
 async def handle_input(
     ctx: MultiContext,
-) -> Tuple[str, InlineKeyboardMarkup]:
+) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
     Обрабатывает состояние пользователя и формирует сообщение.
 
@@ -97,4 +97,5 @@ async def handle_input(
         buttons=loc.button
     )
 
-    return text_message, keyboard
+    opts = LinkPreviewOptions(is_disabled=True)
+    return text_message, keyboard, opts

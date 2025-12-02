@@ -32,8 +32,14 @@ async def multi(
     data: Optional[str] = None,
     data_select: Optional[List[str]] = None,
     event: Optional[Union[types.CallbackQuery, types.Message]] = None,
-) -> Tuple[str, types.InlineKeyboardMarkup]:
-    """Формирует текст сообщения и клавиатуру на основе состояния пользователя."""
+) -> Tuple[
+    str,
+    types.InlineKeyboardMarkup,
+    types.LinkPreviewOptions
+]:
+    """
+    Формирует параметры сообщения на основе состояния пользователя.
+    """
 
     # Обработка специального состояния "1" без локализации
     if value == "1":

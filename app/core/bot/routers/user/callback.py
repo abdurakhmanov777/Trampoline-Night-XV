@@ -2,7 +2,8 @@ from typing import Any, Dict, Optional
 
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
+from aiogram.types import (CallbackQuery, InlineKeyboardMarkup,
+                           LinkPreviewOptions, Message)
 
 from app.core.bot.routers.filters import CallbackNextFilter, ChatTypeFilter
 from app.core.bot.services.keyboards.user import kb_cancel_confirm
@@ -47,12 +48,13 @@ async def clbk_next(
     # Формируем текст сообщения
     text_message: str
     keyboard_message: InlineKeyboardMarkup
+    link_opts: LinkPreviewOptions
 
     data_select: list[str] | None = None
     if len(value) == 3:
         data_select = [value[2], value[1]]
 
-    text_message, keyboard_message = await multi(
+    text_message, keyboard_message, link_opts = await multi(
         loc=loc,
         value=value[0],
         tg_id=callback.from_user.id,
@@ -63,7 +65,8 @@ async def clbk_next(
     try:
         await callback.message.edit_text(
             text=text_message,
-            reply_markup=keyboard_message
+            reply_markup=keyboard_message,
+            link_preview_options=link_opts
         )
         await manage_user_state(
             callback.from_user.id,
@@ -142,6 +145,7 @@ async def clbk_back(
     # Формируем текст сообщения
     text_message: str
     keyboard_message: InlineKeyboardMarkup
+    link_opts: LinkPreviewOptions
 
     backstate: bool | str | list[str] | None = await manage_user_state(
         callback.from_user.id,
@@ -150,7 +154,7 @@ async def clbk_back(
     if not isinstance(backstate, str):
         return
 
-    text_message, keyboard_message = await multi(
+    text_message, keyboard_message, link_opts = await multi(
         loc=loc,
         value=backstate,
         tg_id=callback.from_user.id
@@ -162,7 +166,8 @@ async def clbk_back(
     try:
         await callback.message.edit_text(
             text=text_message,
-            reply_markup=keyboard_message
+            reply_markup=keyboard_message,
+            link_preview_options=link_opts
         )
     except BaseException:
         pass
@@ -230,7 +235,9 @@ async def clbk_cancel_confirm(
     await manage_data_clear(tg_id=callback.from_user.id)
     text_message: str
     keyboard_message: InlineKeyboardMarkup
-    text_message, keyboard_message = await multi(
+    link_opts: LinkPreviewOptions
+
+    text_message, keyboard_message, link_opts = await multi(
         loc=loc,
         value="1",
         tg_id=callback.from_user.id
@@ -238,7 +245,8 @@ async def clbk_cancel_confirm(
 
     await callback.message.edit_text(
         text=text_message,
-        reply_markup=keyboard_message
+        reply_markup=keyboard_message,
+        link_preview_options=link_opts
     )
 
     msg_id: User | bool | None | int = await manage_user(

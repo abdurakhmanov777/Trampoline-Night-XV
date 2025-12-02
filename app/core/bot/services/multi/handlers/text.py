@@ -5,7 +5,7 @@
 
 from typing import Any, Tuple
 
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
 from app.core.bot.services.keyboards.user import kb_text
 from app.core.bot.services.multi.context import MultiContext
@@ -13,7 +13,7 @@ from app.core.bot.services.multi.context import MultiContext
 
 async def handle_text(
     ctx: MultiContext,
-) -> Tuple[str, InlineKeyboardMarkup]:
+) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
     Обрабатывает состояние пользователя и формирует сообщение.
 
@@ -40,5 +40,6 @@ async def handle_text(
         backstate=state_key,
         buttons=loc.button
     )
-
-    return text_message, keyboard
+    # print(loc_state.link_disabled)
+    opts = LinkPreviewOptions(is_disabled=not loc_state.link_preview)
+    return text_message, keyboard, opts

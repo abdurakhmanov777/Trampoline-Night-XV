@@ -3,9 +3,9 @@
 сообщения и клавиатуры на основе локализации.
 """
 
-from typing import Any, Optional, Tuple
+from typing import Any, Tuple
 
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
 from app.core.bot.services.keyboards.user import kb_select
 from app.core.bot.services.multi.context import MultiContext
@@ -14,7 +14,7 @@ from app.core.bot.services.requests.data.crud import manage_data
 
 async def handle_select(
     ctx: MultiContext,
-) -> Tuple[str, InlineKeyboardMarkup]:
+) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
     Обрабатывает состояние пользователя и формирует сообщение.
 
@@ -46,4 +46,5 @@ async def handle_select(
         buttons=loc.button
     )
 
-    return text_message, keyboard
+    opts = LinkPreviewOptions(is_disabled=True)
+    return text_message, keyboard, opts

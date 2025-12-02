@@ -5,7 +5,7 @@
 
 from typing import Any, Dict, List, Tuple
 
-from aiogram.types import InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
 from app.core.bot.services.keyboards.user import kb_end
 from app.core.bot.services.multi.context import MultiContext
@@ -15,7 +15,7 @@ from app.core.bot.services.requests.user import manage_user_state
 
 async def handle_end(
     ctx: MultiContext,
-) -> Tuple[str, InlineKeyboardMarkup]:
+) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
     Обрабатывает состояние пользователя и формирует итоговое сообщение.
 
@@ -68,5 +68,6 @@ async def handle_end(
 
     # Формируем клавиатуру завершения
     keyboard: InlineKeyboardMarkup = kb_end(buttons=ctx.loc.button)
-
-    return text_message, keyboard
+    
+    opts = LinkPreviewOptions(is_disabled=True)
+    return text_message, keyboard, opts

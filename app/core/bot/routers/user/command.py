@@ -7,10 +7,9 @@
 
 from typing import Any, Dict
 
-from aiogram import Router
+from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, Message
 
 from app.core.bot.routers.filters import ChatTypeFilter
 from app.core.bot.services.keyboards import kb_delete
@@ -29,7 +28,7 @@ router: Router = Router()
     Command("start")
 )
 async def cmd_start(
-    message: Message,
+    message: types.Message,
     state: FSMContext
 ) -> None:
     """
@@ -68,8 +67,10 @@ async def cmd_start(
 
     if not value == "100":
         text_message: str
-        keyboard_message: InlineKeyboardMarkup
-        text_message, keyboard_message = await multi(
+        keyboard_message: types.InlineKeyboardMarkup
+        link_opts: types.LinkPreviewOptions
+
+        text_message, keyboard_message, link_opts = await multi(
             loc=loc,
             value=value,
             tg_id=message.from_user.id
@@ -77,7 +78,8 @@ async def cmd_start(
 
         await message.answer(
             text=text_message,
-            reply_markup=keyboard_message
+            reply_markup=keyboard_message,
+            link_preview_options=link_opts
         )
     else:
         await handle_send(
@@ -100,7 +102,7 @@ async def cmd_start(
     Command("id")
 )
 async def cmd_id(
-    message: Message,
+    message: types.Message,
     state: FSMContext
 ) -> None:
     """
@@ -133,7 +135,7 @@ async def cmd_id(
     Command("help")
 )
 async def cmd_help(
-    message: Message,
+    message: types.Message,
     state: FSMContext
 ) -> None:
     """
@@ -161,7 +163,7 @@ async def cmd_help(
     Command("cancel")
 )
 async def clbk_cancel(
-    message: Message,
+    message: types.Message,
     state: FSMContext
 ) -> None:
     """

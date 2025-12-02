@@ -9,7 +9,7 @@ from typing import Any
 
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, Message
+from aiogram import types
 
 from app.core.bot.routers.filters import ChatTypeFilter
 from app.core.bot.services.logger import log
@@ -24,7 +24,7 @@ router: Router = Router()
     ChatTypeFilter(chat_type=["private"])
 )
 async def msg_user(
-    message: Message,
+    message: types.Message,
     state: FSMContext
 ) -> None:
     """
@@ -63,8 +63,10 @@ async def msg_user(
 
     # Генерация сообщения и клавиатуры
     text_message: str
-    keyboard_message: InlineKeyboardMarkup
-    text_message, keyboard_message = await multi(
+    keyboard_message: types.InlineKeyboardMarkup
+    link_opts: types.LinkPreviewOptions
+
+    text_message, keyboard_message, link_opts = await multi(
         loc=loc,
         value=value,
         tg_id=tg_id,
@@ -77,7 +79,8 @@ async def msg_user(
             chat_id=message.chat.id,
             message_id=db_user.msg_id,
             text=text_message,
-            reply_markup=keyboard_message
+            reply_markup=keyboard_message,
+            link_preview_options=link_opts
         )
     except BaseException:
         pass
