@@ -54,7 +54,8 @@ def kb_text(
     backstate: str,
     buttons: Any
 ) -> types.InlineKeyboardMarkup:
-    """Создаёт клавиатуру с кнопками 'Далее' и 'Назад'.
+    """
+    Создаёт клавиатуру с кнопками 'Далее' и 'Назад'.
 
     Если backstate не равен '2', добавляется кнопка 'Назад'.
 
@@ -84,7 +85,8 @@ def kb_input(
     show_next: bool,
     buttons: Any
 ) -> types.InlineKeyboardMarkup:
-    """Создаёт клавиатуру для ввода с опциональной кнопкой 'Далее'.
+    """
+    Создаёт клавиатуру для ввода с опциональной кнопкой 'Далее'.
 
     Если show_next = False, отображается только кнопка 'Назад'.
 
@@ -115,7 +117,8 @@ def kb_select(
     data: List[Tuple[str, str, bool]],
     buttons: Any
 ) -> types.InlineKeyboardMarkup:
-    """Создает клавиатуру с длинными и короткими кнопками.
+    """
+    Создает клавиатуру с длинными и короткими кнопками.
 
     Длинные кнопки занимают отдельную строку, короткие кнопки
     группируются по 2 или 3 в ряд. Внизу всегда добавляется кнопка
@@ -168,7 +171,8 @@ def kb_select(
 def kb_delete(
     buttons: Any
 ) -> types.InlineKeyboardMarkup:
-    """Создаёт клавиатуру с кнопкой 'Закрыть окно'.
+    """
+    Создаёт клавиатуру с кнопкой 'Закрыть окно'.
 
     Args:
         buttons (Any): Объект локализации с текстами кнопок.
@@ -178,6 +182,26 @@ def kb_delete(
     """
     delete_text: str = buttons.delete
     return make_keyboard([[make_button(delete_text, "delete")]])
+
+
+def kb_cancel_confirm(
+    buttons: Any
+) -> types.InlineKeyboardMarkup:
+    """
+    Создаёт клавиатуру с кнопкой подтверждения отмены регистрации.
+
+    Args:
+        buttons (Any): Объект локализации с текстами кнопок.
+
+    Returns:
+        types.InlineKeyboardMarkup: Сформированная клавиатура.
+    """
+    no_text: str = buttons.no
+    yes_text: str = buttons.yes
+    return make_keyboard([[
+        make_button(no_text, "delete"),
+        make_button(yes_text, "cancel_reg_confirm")
+    ]])
 
 
 def kb_cancel(
@@ -191,9 +215,7 @@ def kb_cancel(
     Returns:
         types.InlineKeyboardMarkup: Сформированная клавиатура.
     """
-    no_text: str = buttons.no
-    yes_text: str = buttons.yes
+    cancel_text: str = buttons.cancel_reg
     return make_keyboard([[
-        make_button(no_text, "delete"),
-        make_button(yes_text, "cancel_reg")
+        make_button(cancel_text, "cancel_reg"),
     ]])

@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
 from app.core.bot.routers.filters import CallbackNextFilter, ChatTypeFilter
+from app.core.bot.services.keyboards.user import kb_cancel_confirm
 from app.core.bot.services.localization import Localization
 from app.core.bot.services.logger import log
 from app.core.bot.services.multi import handle_send, multi
@@ -175,6 +176,35 @@ async def clbk_back(
     F.data == "cancel_reg"
 )
 async def clbk_cancel(
+    callback: CallbackQuery,
+    state: FSMContext
+) -> None:
+    """
+    Отправляет контакты админов с помощью кнопок.
+
+    Args:
+        message (Message): Входящее сообщение Telegram.
+        state (FSMContext): Контекст FSM для хранения данных пользователя.
+    """
+    await callback.answer()
+    user_data: Dict[str, Any] = await state.get_data()
+    loc: Any = user_data.get("loc_user")
+    if not loc or not callback.message:
+        return
+
+    await callback.message.answer(
+        text=loc.cancel,
+        reply_markup=kb_cancel_confirm(buttons=loc.button)
+    )
+
+    await log(callback)
+
+
+@router.callback_query(
+    ChatTypeFilter(chat_type=["private"]),
+    F.data == "cancel_reg_confirm"
+)
+async def clbk_cancel_confirm(
     callback: CallbackQuery,
     state: FSMContext,
 ) -> None:

@@ -36,10 +36,10 @@ async def register_bot_commands(
             command="start",
             description="Запуск или перезапуск бота",
         ),
-        BotCommand(
-            command="cancel",
-            description="Отмена регистрации",
-        ),
+        # BotCommand(
+        #     command="cancel",
+        #     description="Отмена регистрации",
+        # ),
         BotCommand(
             command="help",
             description="Техническая поддержка",
@@ -56,10 +56,10 @@ async def register_bot_commands(
             command="start",
             description="Запуск или перезапуск бота",
         ),
-        BotCommand(
-            command="cancel",
-            description="Отмена регистрации",
-        ),
+        # BotCommand(
+        #     command="cancel",
+        #     description="Отмена регистрации",
+        # ),
         BotCommand(
             command="help",
             description="Техническая поддержка",

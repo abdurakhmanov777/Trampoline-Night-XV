@@ -14,7 +14,7 @@ from aiogram.types import InlineKeyboardMarkup, Message
 
 from app.core.bot.routers.filters import ChatTypeFilter
 from app.core.bot.services.keyboards import kb_delete
-from app.core.bot.services.keyboards.user import kb_cancel
+from app.core.bot.services.keyboards.user import kb_cancel_confirm
 from app.core.bot.services.logger import log
 from app.core.bot.services.multi import multi
 from app.core.bot.services.multi.handlers.send import handle_send
@@ -178,7 +178,7 @@ async def clbk_cancel(
 
     await message.answer(
         text=loc.cancel,
-        reply_markup=kb_cancel(buttons=loc.button)
+        reply_markup=kb_cancel_confirm(buttons=loc.button)
     )
 
     await log(message)
