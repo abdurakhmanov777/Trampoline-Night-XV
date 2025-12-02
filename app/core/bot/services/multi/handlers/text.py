@@ -41,5 +41,7 @@ async def handle_text(
         buttons=loc.button
     )
     # print(loc_state.link_disabled)
-    opts = LinkPreviewOptions(is_disabled=not loc_state.link_preview)
+    opts = LinkPreviewOptions(
+        is_disabled=not loc_state.link_preview
+    )
     return text_message, keyboard, opts
