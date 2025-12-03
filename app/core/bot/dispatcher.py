@@ -8,10 +8,12 @@ from typing import Any, Dict
 from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import SimpleEventIsolation
 
+from app.core.bot import routers
 from app.core.bot.middleware import mw
-from app.core.bot.routers import (admin_callback, admin_command, admin_message,
-                                  intercept_handler, user_callback, user_command,
-                                  user_message)
+
+# from app.core.bot.routers import (admin_callback, admin_command, admin_message,
+#                                   intercept_handler, user_callback,
+#                                   user_command, user_message)
 
 
 async def _apply_middlewares(
@@ -43,13 +45,13 @@ async def setup_dispatcher() -> Dispatcher:
 
     # Применяем middleware к каждому роутеру
     await _apply_middlewares({
-        admin_callback.callback_query: mw.MwAdminCallback(),
-        admin_command.message: mw.MwAdminCommand(),
-        admin_message.message: mw.MwAdminMessage(),
-        intercept_handler.message: mw.MwSystemBlock(),
-        user_callback.callback_query: mw.MwUserCallback(),
-        user_command.message: mw.MwUserCommand(),
-        user_message.message: mw.MwUserMessage(),
+        routers.admin_callback.callback_query: mw.MwAdminCallback(),
+        routers.admin_command.message: mw.MwAdminCommand(),
+        routers.admin_message.message: mw.MwAdminMessage(),
+        routers.intercept_handler.message: mw.MwSystemBlock(),
+        routers.user_callback.callback_query: mw.MwUserCallback(),
+        routers.user_command.message: mw.MwUserCommand(),
+        routers.user_message.message: mw.MwUserMessage(),
     })
 
     # Подключаем все роутеры к диспетчеру
@@ -57,10 +59,10 @@ async def setup_dispatcher() -> Dispatcher:
         # admin_callback,
         # admin_command,
         # admin_message,
-        intercept_handler,
-        user_callback,
-        user_command,
-        user_message,
+        routers.intercept_handler,
+        routers.user_callback,
+        routers.user_command,
+        routers.user_message,
     )
 
     return dp

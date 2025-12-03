@@ -1,19 +1,21 @@
-from typing import Dict, Union
-
 from aiogram import Router
 from aiogram.types import CallbackQuery, Message
 
 from app.core.bot.routers.filters import InterceptFilter
+from app.core.bot.routers.filters.chat_type import ChatTypeFilter
+from app.core.bot.services.logger import log
 
 intercept_handler: Router = Router()
 
 
 @intercept_handler.callback_query(
+    ChatTypeFilter(chat_type=["private"]),
     InterceptFilter()
 )
-async def open_settings(
-    event: Union[CallbackQuery, Message],
-    block_info: Dict[str, bool],
+async def clbk_check_flag(
+    callback: CallbackQuery,
+    flag_bot: bool,
+    flag_reg: bool,
 ) -> None:
     """
     Обработчик открытия настроек администратора.
@@ -22,29 +24,19 @@ async def open_settings(
         event: Событие от пользователя (CallbackQuery или Message).
         block_info: Словарь активных флагов системного блока.
     """
-    # Словарь флагов и соответствующих сообщений
-    flag_messages: Dict[str, str] = {
-        "flag_bot": (
-            "Технические шоколадки\n\nПопробуйте зайти через 10 минут"
-        ),
-        "flag_reg": (
-            "К сожалению, регистрация закрыта"
-        ),
-    }
 
     # Получаем первое сообщение для активного флага
-    text: str | None = next(
-        (
-            message
-            for flag, message in flag_messages.items()
-            if block_info.get(flag)
-        ),
-        None,  # Если ни один флаг не сработал, text будет None
-    )
+    if flag_bot:
+        text = "Технические шоколадки\n\nПопробуйте зайти через 10 минут"
+    elif flag_reg:
+        text = "К сожалению, регистрация закрыта"
+    else:
+        text = None
 
     # Если есть сообщение, показываем его пользователю
     if text is not None:
-        await event.answer(
+        await callback.answer(
             text=text,
             show_alert=True,
         )
+    await log(callback)
