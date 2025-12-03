@@ -1,8 +1,8 @@
 """
 Модуль регистрации команд Telegram-бота для приватных чатов.
 
-Содержит обработчики команд /start, /cancel, /id и /help
-с динамическими клавиатурами и локализацией.
+Содержит обработчики команд /start, /id и /help с динамическими
+клавиатурами и локализацией.
 """
 
 from typing import Any, Dict
@@ -13,7 +13,6 @@ from aiogram.fsm.context import FSMContext
 
 from app.core.bot.routers.filters import ChatTypeFilter
 from app.core.bot.services.keyboards import kb_delete
-from app.core.bot.services.keyboards.user import kb_cancel_confirm
 from app.core.bot.services.logger import log
 from app.core.bot.services.multi import multi
 from app.core.bot.services.multi.handlers.send import handle_send
@@ -31,14 +30,14 @@ async def cmd_start(
     message: types.Message,
     state: FSMContext
 ) -> None:
-    """
-    Обрабатывает команду /start.
+    """Обрабатывает команду /start.
 
     Получает текст и клавиатуру из локализации по ключу команды
-    и отправляет сообщение с динамической клавиатурой.
+    и отправляет сообщение с динамической клавиатурой или вызывает
+    handle_send при специальном состоянии.
 
     Args:
-        message (Message): Входящее сообщение Telegram.
+        message (types.Message): Входящее сообщение Telegram.
         state (FSMContext): Контекст FSM для хранения данных пользователя.
     """
     user_data: Dict[str, Any] = await state.get_data()
@@ -46,17 +45,17 @@ async def cmd_start(
     if not loc or not message.from_user:
         return
 
-    value: bool | str | list[str] | None = await manage_user_state(
+    user_state: bool | str | list[str] | None = await manage_user_state(
         message.from_user.id,
         "peek"
     )
 
     db_user: User | bool | None | int = await manage_user(
         tg_id=message.from_user.id,
-        action="get",
+        action="get"
     )
 
-    if not isinstance(db_user, User) or not isinstance(value, str):
+    if not isinstance(db_user, User) or not isinstance(user_state, str):
         return
 
     msg_id: User | bool | None | int = await manage_user(
@@ -65,14 +64,14 @@ async def cmd_start(
         msg_id=message.message_id + 1
     )
 
-    if not value == "100":
+    if user_state != "100":
         text_message: str
         keyboard_message: types.InlineKeyboardMarkup
         link_opts: types.LinkPreviewOptions
 
         text_message, keyboard_message, link_opts = await multi(
             loc=loc,
-            value=value,
+            value=user_state,
             tg_id=message.from_user.id
         )
 
@@ -105,11 +104,10 @@ async def cmd_id(
     message: types.Message,
     state: FSMContext
 ) -> None:
-    """
-    Отправляет ID текущего чата с шаблоном текста и кнопкой удаления.
+    """Отправляет ID текущего чата с шаблоном текста и кнопкой удаления.
 
     Args:
-        message (Message): Входящее сообщение Telegram.
+        message (types.Message): Входящее сообщение Telegram.
         state (FSMContext): Контекст FSM для хранения данных пользователя.
     """
     user_data: Dict[str, Any] = await state.get_data()
@@ -138,11 +136,10 @@ async def cmd_help(
     message: types.Message,
     state: FSMContext
 ) -> None:
-    """
-    Отправляет контакты админов с помощью кнопок.
+    """Отправляет пользователю контакты админов с помощью кнопок.
 
     Args:
-        message (Message): Входящее сообщение Telegram.
+        message (types.Message): Входящее сообщение Telegram.
         state (FSMContext): Контекст FSM для хранения данных пользователя.
     """
     user_data: Dict[str, Any] = await state.get_data()

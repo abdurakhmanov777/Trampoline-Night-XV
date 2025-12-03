@@ -1,8 +1,8 @@
 """
-Модуль регистрации команд Telegram-бота для приватных чатов.
+Модуль обработки пользовательских сообщений Telegram-бота для приватных чатов.
 
-Содержит обработчики команд /start, /cancel, /id и /help
-с динамическими клавиатурами и локализацией.
+Содержит обработчик пользовательских сообщений с динамическими
+клавиатурами и локализацией.
 """
 
 from typing import Any
@@ -26,53 +26,57 @@ async def msg_user(
     message: types.Message,
     state: FSMContext
 ) -> None:
-    """
-    Обрабатывает команду /start.
+    """Обрабатывает входящие сообщения пользователя.
 
-    Получает текст и клавиатуру из локализации по ключу команды
-    и отправляет сообщение с динамической клавиатурой.
+    Получает текст и клавиатуру из локализации по текущему шагу
+    пользователя и обновляет сообщение с динамической клавиатурой.
+
+    Args:
+        message (types.Message): Входящее сообщение Telegram.
+        state (FSMContext): Контекст FSM для хранения данных пользователя.
     """
     if not message.from_user or not message.bot:
         return
 
-    # Локализация
-    loc: Any | None = (await state.get_data()).get("loc_user")
+    # Получаем локализацию пользователя
+    user_data: dict[str, Any] = await state.get_data()
+    loc: Any | None = user_data.get("loc_user")
     if not loc:
         return
 
     tg_id: int = message.from_user.id
 
-    # Получаем состояние и данные пользователя
+    # Получаем состояние и данные пользователя из базы
     db_user: User | bool | None | int = await manage_user(
         tg_id=tg_id,
         action="get"
     )
-    value: bool | str | list[str] | None = await manage_user_state(
+    user_state: bool | str | list[str] | None = await manage_user_state(
         tg_id,
         "peek"
     )
 
-    if not isinstance(db_user, User) or not isinstance(value, str):
+    if not isinstance(db_user, User) or not isinstance(user_state, str):
         return
 
-    # Проверяем, что состояние соответствует "value"
-    state_obj: Any | None = getattr(loc.steps, value, None)
+    # Проверяем, что шаг пользователя ожидает ввод текста
+    state_obj: Any | None = getattr(loc.steps, user_state, None)
     if not state_obj or state_obj.type != "input":
         return
 
-    # Генерация сообщения и клавиатуры
+    # Генерация текста сообщения, клавиатуры и параметров предпросмотра
     text_message: str
     keyboard_message: types.InlineKeyboardMarkup
     link_opts: types.LinkPreviewOptions
 
     text_message, keyboard_message, link_opts = await multi(
         loc=loc,
-        value=value,
+        value=user_state,
         tg_id=tg_id,
         data=message.text
     )
 
-    # Пробуем обновить сообщение
+    # Обновляем предыдущее сообщение с новым текстом и клавиатурой
     try:
         await message.bot.edit_message_text(
             chat_id=message.chat.id,
