@@ -1,9 +1,12 @@
 """
 Модуль маршрутизации генерации сообщений и клавиатур для пользователя
 на основе локализации и текущего состояния.
+
+Предоставляет функцию `multi`, которая определяет обработчик шага,
+создаёт контекст выполнения и возвращает параметры сообщения для Telegram.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from aiogram import types
 
@@ -16,12 +19,17 @@ from .handlers.select import handle_select
 from .handlers.start import handle_start
 from .handlers.text import handle_text
 
+#: Таблица стандартных обработчиков по типу состояния.
 HANDLERS: Dict[str, Callable[[MultiContext], Any]] = {
-    "start": handle_start,
     "input": handle_input,
     "select": handle_select,
     "text": handle_text,
-    "end": handle_end,
+}
+
+#: Таблица обработчиков для специальных состояний.
+SPECIAL_HANDLERS: Dict[str, Callable[[MultiContext], Any]] = {
+    "1": handle_start,
+    "99": handle_end,
 }
 
 
@@ -31,29 +39,53 @@ async def multi(
     tg_id: int,
     data: Optional[str] = None,
     data_select: Optional[List[str]] = None,
-    event: Optional[Union[types.CallbackQuery, types.Message]] = None,
+    event: Optional[
+        Union[types.CallbackQuery, types.Message]
+    ] = None,
 ) -> Tuple[
     str,
     types.InlineKeyboardMarkup,
-    types.LinkPreviewOptions
+    types.LinkPreviewOptions,
 ]:
     """
-    Формирует параметры сообщения на основе состояния пользователя.
+    Формирует параметры ответа Telegram на основе состояния пользователя.
+
+    Функция определяет, какой обработчик шага вызвать, подготавливает
+    контекст и возвращает сообщение, клавиатуру и параметры предпросмотра.
+
+    Args:
+        loc (Any):
+            Объект локализации, содержащий состояние пользователя.
+        value (str):
+            Текущее значение состояния пользователя.
+        tg_id (int):
+            Telegram ID пользователя.
+        data (Optional[str]):
+            Дополнительные данные, переданные пользователем.
+        data_select (Optional[List[str]]):
+            Пара ключ–значение для сохранения в хранилище данных.
+        event (Optional[Union[CallbackQuery, Message]]):
+            Telegram событие (сообщение или callback).
+
+    Returns:
+        Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+            Текст сообщения, клавиатура и параметры предпросмотра ссылок.
     """
 
-    # Обработка специального состояния "1" без локализации
-    if value == "1":
-        loc_state: Optional[Any] = None
-        handler: Callable[[MultiContext], Any] = handle_start
+    # Пытаемся получить обработчик для специальных состояний.
+    handler: Optional[Callable[[MultiContext], Any]] = (
+        SPECIAL_HANDLERS.get(value)
+    )
+    loc_state: Optional[Any] = None
 
-    else:
+    if handler is None:
+        # Получаем состояние локализации и определяем обработчик.
         loc_state = getattr(loc, f"userstate_{value}")
-
-        # Pylance теперь знает, что loc_state точно не None
-        loc_state_typed: Any = cast(Any, loc_state)
-
-        handler_type: str = loc_state_typed.type
-        handler = HANDLERS.get(handler_type, handle_start)
+        assert loc_state is not None
+        handler = HANDLERS.get(
+            loc_state.type,
+            handle_start,
+        )
 
     context: MultiContext = MultiContext(
         loc=loc,
@@ -64,6 +96,7 @@ async def multi(
         event=event,
     )
 
+    # Сохраняем выбранные данные, если они переданы.
     if data_select:
         key: str = data_select[0]
         value_to_store: str = data_select[1]
