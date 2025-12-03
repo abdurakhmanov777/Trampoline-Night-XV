@@ -7,7 +7,7 @@
 """
 
 import re
-from datetime import date, datetime
+from datetime import datetime
 from typing import Any, Dict, Optional, Tuple, Union
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions

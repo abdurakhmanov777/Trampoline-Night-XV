@@ -5,6 +5,7 @@
 сообщения пользователю с закреплением в чате.
 """
 
+from datetime import datetime
 from io import BytesIO
 from typing import Any, Optional, Union
 
@@ -13,7 +14,7 @@ from aiogram.enums import ChatAction
 
 from app.core.bot.services.generator import generate_image
 from app.core.bot.services.generator.generator_code import generate_code
-from app.core.bot.services.keyboards.user import kb_cancel
+from app.core.bot.services.keyboards.user import kb_send
 from app.core.bot.services.requests.user import manage_user
 from app.core.database.models.user import User
 
@@ -76,8 +77,19 @@ async def handle_send(
         buffer: BytesIO = await generate_image(str(code))
 
         # Формирование подписи к изображению
-        intro, outro = loc.messages.template.send
-        caption: str = f"{intro}{code}{outro}"
+        part1: str
+        part2: str
+        part3: str
+        part1, part2, part3 = loc.messages.template.send
+        dt: datetime = datetime.strptime(
+            f"{loc.event.date} {loc.event.time}", "%Y-%m-%d %H:%M:%S"
+        )
+        date_str: str = (
+            f"{dt.day} {getattr(loc.months, str(dt.month - 1))} "
+            f"{dt.year}, {dt.hour:02d}:{dt.minute:02d}"
+        )
+
+        caption: str = f"{part1}{code}{part2}{date_str}{part3}"
 
         # Отправка изображения пользователю
         msg: types.Message = await message.answer_photo(
@@ -87,7 +99,7 @@ async def handle_send(
             ),
             caption=caption,
             parse_mode="HTML",
-            reply_markup=kb_cancel(loc.buttons),
+            reply_markup=kb_send(loc.buttons),
         )
 
         # Закрепление отправленного сообщения

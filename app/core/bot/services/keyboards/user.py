@@ -178,7 +178,7 @@ def kb_cancel_confirm(
     return build_keyboard(rows)
 
 
-def kb_cancel(
+def kb_send(
     buttons: Any
 ) -> types.InlineKeyboardMarkup:
     """Создаёт клавиатуру с кнопкой 'Закрыть окно'.
@@ -189,7 +189,8 @@ def kb_cancel(
     Returns:
         types.InlineKeyboardMarkup: Клавиатура с кнопкой отмены.
     """
-    rows: List[List[Tuple[str, str]]] = [[
-        (buttons.cancel_reg, "cancel_reg")
-    ]]
+    rows: List[List[Tuple[str, str]]] = [
+        [(buttons.time_event, "time_event")],
+        [(buttons.cancel_reg, "cancel_reg")]
+    ]
     return build_keyboard(rows)

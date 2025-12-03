@@ -6,6 +6,7 @@
 и отмены регистрации.
 """
 
+from datetime import datetime, timedelta
 from typing import Any, Dict
 
 from aiogram import F, Router, types
@@ -66,6 +67,10 @@ async def clbk_next(
     data_select: list[str] | None = None
     if len(value) == 3:
         data_select = [value[2], value[1]]
+
+    text_message: str
+    keyboard_message: types.InlineKeyboardMarkup
+    link_opts: types.LinkPreviewOptions
 
     text_message, keyboard_message, link_opts = await multi(
         loc=loc,
@@ -174,6 +179,10 @@ async def clbk_back(
     if not isinstance(backstate, str):
         return
 
+    text_message: str
+    keyboard_message: types.InlineKeyboardMarkup
+    link_opts: types.LinkPreviewOptions
+
     text_message, keyboard_message, link_opts = await multi(
         loc=loc,
         value=backstate,
@@ -250,6 +259,9 @@ async def clbk_cancel_confirm(
     )
     await manage_data_clear(tg_id=callback.from_user.id)
 
+    text_message: str
+    keyboard_message: types.InlineKeyboardMarkup
+    link_opts: types.LinkPreviewOptions
     text_message, keyboard_message, link_opts = await multi(
         loc=loc,
         value="1",
@@ -276,4 +288,44 @@ async def clbk_cancel_confirm(
         except BaseException:
             pass
 
+    await log(callback)
+
+
+@user_callback.callback_query(
+    ChatTypeFilter(chat_type=["private"]),
+    F.data == "time_event"
+)
+async def clbk_time_event(
+    callback: types.CallbackQuery,
+    state: FSMContext,
+) -> None:
+    """Выведит информацию о мероприятии.
+
+    Очищает состояние пользователя и данные, отправляет
+    начальное сообщение с клавиатурой по умолчанию.
+
+    Args:
+        callback (types.CallbackQuery): Callback-запрос от Telegram.
+        state (FSMContext): Контекст FSM для хранения данных пользователя.
+    """
+    user_data: Dict[str, Any] = await state.get_data()
+    loc: Any = user_data.get("loc_user")
+
+    dt: datetime = datetime.strptime(
+        f"{loc.event.date} {loc.event.time}", "%Y-%m-%d %H:%M:%S"
+    )
+    now: datetime = datetime.now()
+    time_left: timedelta = dt - now
+
+    if time_left.total_seconds() > 0:
+        days: int = time_left.days
+        hours, remainder = divmod(time_left.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        clbk_text: str = (
+            f"Состоится через: {days}д {hours}ч {minutes}м {seconds}с"
+        )
+    else:
+        clbk_text: str = "Мероприятие уже прошло."
+
+    await callback.answer(clbk_text, show_alert=True)
     await log(callback)
