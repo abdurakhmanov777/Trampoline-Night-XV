@@ -1,6 +1,9 @@
 """
 Модуль обработки текстового состояния пользователя и формирования
 сообщения с клавиатурой на основе локализации.
+
+Подготавливает текст сообщения и генерирует подходящую клавиатуру
+в зависимости от текущего состояния локализации.
 """
 
 from typing import Any, Tuple
@@ -15,33 +18,42 @@ async def handle_text(
     ctx: MultiContext,
 ) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
-    Обрабатывает состояние пользователя и формирует сообщение.
+    Обрабатывает текстовое состояние пользователя.
 
-    Формирует текст на основе шаблона локализации и списка данных,
-    собранных от пользователя.
+    Формирует текст сообщения и инлайн-клавиатуру на основе текущего
+    локализованного состояния, а также параметры предпросмотра ссылок.
 
-    Args:
-        ctx (MultiContext): Контекст с параметрами обработки.
+    Parameters
+    ----------
+    ctx : MultiContext
+        Контекст, содержащий данные пользователя, локализацию и
+        состояние текущего шага.
 
-    Returns:
-        Tuple[str, InlineKeyboardMarkup]: Сообщение и клавиатура.
+    Returns
+    -------
+    Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]
+        Кортеж, содержащий текст сообщения, клавиатуру и параметры
+        предпросмотра ссылок.
     """
-
     loc: Any = ctx.loc
     loc_state: Any = ctx.loc_state
-    state_key: Any = loc_state.id  # Текущий ключ состояния (backstate)
 
-    # Формируем текст сообщения
+    # Ключ состояния используется для формирования кнопки "Назад"
+    state_key: Any = loc_state.id
+
+    # Текст сообщения полностью определяется локалью состояния
     text_message: str = loc_state.text
 
-    # Формируем клавиатуру
+    # Формирование клавиатуры на основе следующего состояния
     keyboard: InlineKeyboardMarkup = kb_text(
         state=loc_state.next,
         backstate=state_key,
-        buttons=loc.buttons
+        buttons=loc.buttons,
     )
-    # print(loc_state.link_disabled)
-    opts = LinkPreviewOptions(
+
+    # Управление предпросмотром ссылок в сообщении
+    preview_options = LinkPreviewOptions(
         is_disabled=not loc_state.link_preview
     )
-    return text_message, keyboard, opts
+
+    return text_message, keyboard, preview_options

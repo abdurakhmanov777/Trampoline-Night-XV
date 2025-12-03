@@ -1,6 +1,8 @@
 """
-Модуль обработки состояния выбора пользователя и формирования
-сообщения и клавиатуры на основе локализации.
+Модуль обработки состояния выбора пользователя.
+
+Предоставляет функцию `handle_select`, формирующую сообщение и клавиатуру
+для выбора пользователя на основе текущей локализации.
 """
 
 from typing import Any, Tuple
@@ -16,35 +18,38 @@ async def handle_select(
     ctx: MultiContext,
 ) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
-    Обрабатывает состояние пользователя и формирует сообщение.
+    Обрабатывает состояние выбора и формирует сообщение и клавиатуру.
 
-    Формирует текст на основе шаблона локализации и списка данных,
-    собранных от пользователя.
+    Создаёт текст сообщения на основе шаблона локализации и генерирует
+    клавиатуру выбора для пользователя.
 
     Args:
-        ctx (MultiContext): Контекст с параметрами обработки.
+        ctx (MultiContext): Контекст шага сценария, содержащий локализацию,
+            состояние шага, идентификатор пользователя и другие параметры.
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup]: Сообщение и клавиатура.
+        Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+            Сформированное сообщение, клавиатура выбора и параметры
+            предпросмотра ссылок.
     """
-
     loc: Any = ctx.loc
     loc_state: Any = ctx.loc_state
+    part1: str
+    part2: str
 
     base_text: str = loc_state.text
-    p1: str
-    p2: str
-    p1, p2 = loc.messages.template.select
+    part1, part2 = loc.messages.template.select
 
-    # Формирование сообщения
-    text_message: str = f"{p1}{base_text}{p2}"
+    # Формируем сообщение на основе шаблона
+    text_message: str = f"{part1}{base_text}{part2}"
 
-    # Формирование клавиатуры выбора
+    # Генерируем клавиатуру выбора
     keyboard: InlineKeyboardMarkup = kb_select(
         name=base_text,
         options=loc_state.options,
-        buttons=loc.buttons
+        buttons=loc.buttons,
     )
 
-    opts = LinkPreviewOptions(is_disabled=True)
+    opts: LinkPreviewOptions = LinkPreviewOptions(is_disabled=True)
+
     return text_message, keyboard, opts

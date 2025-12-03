@@ -1,6 +1,9 @@
 """
-Модуль обработки состояния ввода пользователя и формирования
-сообщения и клавиатуры на основе локализации.
+Модуль обработки состояния ввода пользователя.
+
+Предоставляет функцию `handle_input`, которая валидирует введённые данные,
+загружает или сохраняет их при необходимости и формирует итоговое сообщение
+и клавиатуру для следующего шага.
 """
 
 import re
@@ -19,18 +22,20 @@ async def handle_input(
     ctx: MultiContext,
 ) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
-    Обрабатывает состояние пользователя и формирует сообщение.
+    Обрабатывает состояние ввода пользователя и формирует сообщение.
 
-    Формирует текст на основе шаблона локализации и списка данных,
-    собранных от пользователя.
+    Выполняет валидацию пользовательского ввода, сохраняет данные при
+    успешной проверке, извлекает данные при их отсутствии и формирует
+    корректное текстовое сообщение на основе шаблонов локализации.
 
     Args:
-        ctx (MultiContext): Контекст с параметрами обработки.
+        ctx (MultiContext): Контекст шага сценария, содержащий
+            локализацию, состояние шага, ID пользователя и данные.
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup]: Сообщение и клавиатура.
+        Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+            Сообщение, клавиатура и настройки предпросмотра ссылок.
     """
-
     loc: Any = ctx.loc
     loc_state: Any = ctx.loc_state
     tg_id: int = ctx.tg_id
@@ -42,60 +47,68 @@ async def handle_input(
     template: Any = loc.messages.template.input
 
     error_occurred: bool = False
-    text_message: str
     show_next: bool = loc_state.required
-    p1: str
-    p2: str
-    p3: str
-    # Проверка пользовательского ввода по регулярному выражению
+    part1: str
+    part2: str
+    part3: str
+
+    # Проверяем пользовательский ввод через регулярное выражение
     if user_input is not None:
         if re.fullmatch(pattern, user_input):
             await manage_data(
                 tg_id=tg_id,
                 action="create_or_update",
                 key=base_text,
-                value=user_input
+                value=user_input,
             )
         else:
             error_occurred = True
     else:
-        # Получаем ранее сохранённые данные, если пользователь ничего не ввёл
+        # Если пользователь ничего не ввёл, пробуем взять сохранённые данные
         user_input = await manage_data(
             tg_id=tg_id,
             action="get",
-            key=base_text
+            key=base_text,
         )
 
-    # Формирование текста сообщения
+    # Формируем текст сообщения в зависимости от результата проверки
     if error_occurred:
-        p1, p2 = template.error
-        text_message = f"{p1}{format_}{p2}"
-        show_next = not show_next or False
+        part1, part2 = template.error
+        text_message: str = f"{part1}{format_}{part2}"
+        show_next = False
 
     elif not user_input:
-        # Пустое значение → склонение шаблона
-        p1, p2, p3 = template.empty
+        # Пустой ввод → склоняем текст для шаблона
+        part1, part2, part3 = template.empty
 
         processed_text: str = await inflect_text(
-            text=await lower_words(base_text, capitalize_first=False),
-            case="винительный"
+            text=await lower_words(
+                base_text,
+                capitalize_first=False,
+            ),
+            case="винительный",
         )
-        text_message = f"{p1}{processed_text}{p2}{format_}{p3}"
-        show_next = not show_next or False
+
+        text_message = (
+            f"{part1}{processed_text}{part2}{format_}{part3}"
+        )
+        show_next = False
 
     else:
-        # Поле заполнено
-        p1, p2, p3 = template.filled
-        text_message = f"{p1}{base_text}{p2}{user_input}{p3}"
+        # Поле заполнено корректно
+        part1, part2, part3 = template.filled
+        text_message = (
+            f"{part1}{base_text}{part2}{user_input}{part3}"
+        )
         show_next = True
 
-    # Формирование клавиатуры
     keyboard: InlineKeyboardMarkup = kb_input(
         state=loc_state.next,
         backstate=loc_state.id,
         show_next=show_next,
-        buttons=loc.buttons
+        buttons=loc.buttons,
     )
 
-    opts = LinkPreviewOptions(is_disabled=True)
+    opts: LinkPreviewOptions = LinkPreviewOptions(is_disabled=True)
+
     return text_message, keyboard, opts

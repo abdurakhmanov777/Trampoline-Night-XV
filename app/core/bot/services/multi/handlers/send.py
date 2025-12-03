@@ -1,9 +1,12 @@
 """
 Модуль обработки состояния отправки финального сообщения с изображением.
+
+Содержит логику генерации кода, создания изображения и отправки финального
+сообщения пользователю с закреплением в чате.
 """
 
 from io import BytesIO
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from aiogram import types
 from aiogram.enums import ChatAction
@@ -18,71 +21,82 @@ from app.core.database.models.user import User
 async def handle_send(
     loc: Any,
     tg_id: int,
-    event: Optional[types.CallbackQuery | types.Message]
+    event: Optional[Union[types.CallbackQuery, types.Message]],
 ) -> Optional[int]:
     """
     Обрабатывает состояние отправки финального сообщения с изображением.
 
+    Проводит загрузку данных пользователя, генерирует код, создает изображение
+    и отправляет финальное сообщение с закреплением.
+
     Args:
-        ctx (MultiContext): Контекст с параметрами обработки.
+        loc (Any): Локализация с шаблонами сообщений.
+        tg_id (int): Telegram ID пользователя.
+        event (CallbackQuery | Message | None): Исходное событие,
+            содержащее сообщение или callback.
 
     Returns:
-        Optional[int]: ID отправленного сообщения (для закрепления),
-            либо None, если отправка невозможна.
+        Optional[int]: Идентификатор отправленного сообщения, если успешно,
+            иначе None.
     """
-
-    # Универсальный способ получить message
-    message: Optional[types.MaybeInaccessibleMessageUnion]
+    # Универсальный способ извлечения сообщения
     if isinstance(event, types.CallbackQuery):
-        message = event.message
+        message: Optional[types.MaybeInaccessibleMessageUnion] = (
+            event.message
+        )
     else:
         message = event
 
+    # Если сообщение недоступно — прекращаем обработку
     if not message or not message.bot:
         return None
 
-    # Генерация кода (временно)
-    user: User | bool | None | int = await manage_user(
+    # Получение пользователя из базы
+    user: Union[User, bool, None, int] = await manage_user(
         tg_id=tg_id,
-        action="get"
+        action="get",
     )
     if not isinstance(user, User):
-        return
-    code: int | None = generate_code(
+        return None
+
+    # Генерация числового кода
+    code: Optional[int] = generate_code(
         user_id=user.id,
-        num_digits=3
+        num_digits=3,
     )
 
-    # Анимация загрузки
+    # Отображение анимации загрузки
     await message.bot.send_chat_action(
         chat_id=tg_id,
-        action=ChatAction.UPLOAD_PHOTO
+        action=ChatAction.UPLOAD_PHOTO,
     )
 
     try:
-        # Генерация изображения
+        # Генерация изображения кода
         buffer: BytesIO = await generate_image(str(code))
 
-        p1: str
-        p2: str
-        p1, p2 = loc.messages.template.send
-        caption: str = f"{p1}{code}{p2}"
+        # Формирование подписи к изображению
+        intro, outro = loc.messages.template.send
+        caption: str = f"{intro}{code}{outro}"
 
-        # Отправка фото
+        # Отправка изображения пользователю
         msg: types.Message = await message.answer_photo(
-            photo=types.BufferedInputFile(buffer.read(), filename="code.png"),
+            photo=types.BufferedInputFile(
+                buffer.read(),
+                filename="code.png",
+            ),
             caption=caption,
             parse_mode="HTML",
-            reply_markup=kb_cancel(loc.buttons)
+            reply_markup=kb_cancel(loc.buttons),
         )
 
-        # Закрепление сообщения
+        # Закрепление отправленного сообщения
         await message.bot.pin_chat_message(
             chat_id=message.chat.id,
-            message_id=msg.message_id
+            message_id=msg.message_id,
         )
 
         return msg.message_id
 
     except BaseException:
-        return
+        return None

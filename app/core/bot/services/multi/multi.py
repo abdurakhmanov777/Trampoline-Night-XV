@@ -1,9 +1,10 @@
 """
-Модуль маршрутизации генерации сообщений и клавиатур для пользователя
+Модуль маршрутизации генерации сообщений и клавиатур пользователя
 на основе локализации и текущего состояния.
 
-Предоставляет функцию `multi`, которая определяет обработчик шага,
-создаёт контекст выполнения и возвращает параметры сообщения для Telegram.
+Определяет функцию `multi`, которая выбирает соответствующий обработчик
+шага, формирует контекст выполнения и возвращает параметры сообщения,
+которые требуется отправить пользователю в Telegram.
 """
 
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -19,14 +20,14 @@ from .handlers.select import handle_select
 from .handlers.start import handle_start
 from .handlers.text import handle_text
 
-# Таблицы стандартных обработчиков по типу состояния
+# Таблица стандартных обработчиков.
 HANDLERS: Dict[str, Callable[[MultiContext], Any]] = {
     "input": handle_input,
     "select": handle_select,
     "text": handle_text,
 }
 
-# Таблицы обработчиков для специальных состояний
+# Таблица обработчиков для специальных состояний.
 SPECIAL_HANDLERS: Dict[str, Callable[[MultiContext], Any]] = {
     "1": handle_start,
     "99": handle_end,
@@ -40,41 +41,56 @@ async def multi(
     data: Optional[str] = None,
     data_select: Optional[List[str]] = None,
     event: Optional[Union[types.CallbackQuery, types.Message]] = None,
-) -> Tuple[str, types.InlineKeyboardMarkup, types.LinkPreviewOptions]:
+) -> Tuple[
+    str,
+    types.InlineKeyboardMarkup,
+    types.LinkPreviewOptions
+]:
     """
-    Формирует параметры ответа Telegram на основе состояния пользователя.
+    Формирует параметры ответа Telegram в зависимости от состояния
+    пользователя.
 
-    Определяет, какой обработчик шага вызвать, подготавливает контекст
-    и возвращает текст сообщения, клавиатуру и параметры предпросмотра.
+    Определяет, какой обработчик шага нужно вызвать, формирует контекст
+    и возвращает текст, клавиатуру и параметры предпросмотра.
 
-    Args:
-        loc (Any): Объект локализации с состоянием пользователя.
-        value (str): Текущее значение состояния пользователя.
-        tg_id (int): Telegram ID пользователя.
-        data (Optional[str]): Дополнительные данные от пользователя.
-        data_select (Optional[List[str]]): Пара ключ–значение для
-            сохранения в хранилище данных.
-        event (Optional[Union[types.CallbackQuery, types.Message]]):
-            Telegram событие (сообщение или callback).
+    Parameters
+    ----------
+    loc : Any
+        Объект локализации текущего пользователя.
+    value : str
+        Текущее значение состояния.
+    tg_id : int
+        Telegram ID пользователя.
+    data : Optional[str]
+        Дополнительные данные, переданные пользователем.
+    data_select : Optional[List[str]]
+        Пара ключ–значение для сохранения в хранилище.
+    event : Optional[Union[types.CallbackQuery, types.Message]]
+        Telegram событие (сообщение или callback).
 
-    Returns:
-        Tuple[str, types.InlineKeyboardMarkup, types.LinkPreviewOptions]:
-            Текст сообщения, клавиатура и параметры предпросмотра ссылок.
+    Returns
+    -------
+    Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]
+        Текст сообщения, клавиатура и параметры предпросмотра ссылок.
     """
-    # Пытаемся получить обработчик для специальных состояний
-    handler: Optional[
-        Callable[[MultiContext], Any]
-    ] = SPECIAL_HANDLERS.get(value)
+    # Определяем обработчик для специальных состояний, если они есть.
+    handler: Optional[Callable[[MultiContext], Any]] = (
+        SPECIAL_HANDLERS.get(value)
+    )
 
     loc_state: Optional[Any] = None
 
     if handler is None:
+        # Если состояние не специальное, определяем его по локализации.
         loc_state = getattr(loc.steps, value, None)
-        # Если состояние не найдено, используем стартовый обработчик
-        handler = HANDLERS.get(
-            loc_state.type,
-            handle_start
-        ) if loc_state else handle_start
+
+        # Если состояние локализации не найдено, используем стартовый
+        # обработчик, чтобы избежать зависания пользователя.
+        handler = (
+            HANDLERS.get(loc_state.type, handle_start)
+            if loc_state
+            else handle_start
+        )
 
     context = MultiContext(
         loc=loc,
@@ -85,7 +101,8 @@ async def multi(
         event=event,
     )
 
-    # Сохраняем выбранные данные асинхронно, не дожидаясь завершения
+    # Сохраняем выбранные пользователем данные заранее, так как они могут
+    # влиять на поведение последующих шагов.
     if data_select:
         key: str
         value_to_store: str
