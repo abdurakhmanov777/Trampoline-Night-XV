@@ -1,7 +1,7 @@
-"""Фильтр callback-запросов, содержащих подстроку 'userstate_'.
+"""Фильтр callback-запросов, содержащих подстроку 'user_'.
 
 Модуль определяет фильтр для обработки callback-запросов, в которых
-данные содержат подстроку 'userstate_'. Используется в маршрутах Aiogram.
+данные содержат подстроку 'user_'. Используется в маршрутах Aiogram.
 """
 
 from typing import Any, Dict, Union
@@ -11,10 +11,10 @@ from aiogram.types import CallbackQuery
 
 
 class CallbackNextFilter(BaseFilter):
-    """Фильтр для callback-запросов, содержащих подстроку 'userstate_'.
+    """Фильтр для callback-запросов, содержащих подстроку 'user_'.
 
-    Если `callback.data` содержит подстроку 'userstate_', фильтр возвращает
-    словарь с этой подстрокой без префикса 'userstate_' для передачи в роутер.
+    Если `callback.data` содержит подстроку 'user_', фильтр возвращает
+    словарь с этой подстрокой без префикса 'user_' для передачи в роутер.
     Иначе возвращает False.
     """
 
@@ -22,7 +22,7 @@ class CallbackNextFilter(BaseFilter):
         self,
         callback: CallbackQuery,
     ) -> Union[Dict[str, Any], bool]:
-        """Проверить наличие подстроки 'userstate_' в данных callback-запроса.
+        """Проверить наличие подстроки 'user_' в данных callback-запроса.
 
         Parameters
         ----------
@@ -32,13 +32,13 @@ class CallbackNextFilter(BaseFilter):
         Returns
         -------
         Union[Dict[str, Any], bool]
-            Словарь с ключом 'user_data', содержащим подстроку после 'userstate_',
-            если подстрока 'userstate_' найдена, иначе False.
+            Словарь с ключом 'user_data', содержащим подстроку после 'user_',
+            если подстрока 'user_' найдена, иначе False.
         """
-        if not callback.data or "userstate_" not in callback.data:
+        if not callback.data or "user_" not in callback.data:
             return False
 
-        # split по "_" и убираем первый элемент 'userstate'
+        # split по "_" и убираем первый элемент 'user'
         user_values: list[str] = callback.data.split("_")[1:]
 
         return {"value": user_values}

@@ -26,7 +26,7 @@ def kb_start(
         types.InlineKeyboardMarkup: Сформированная клавиатура.
     """
     consent_text: str = buttons.consent
-    return make_keyboard([[make_button(consent_text, "userstate_2")]])
+    return make_keyboard([[make_button(consent_text, "user_2")]])
 
 
 def kb_end(
@@ -69,7 +69,7 @@ def kb_text(
     """
     next_text: str = buttons.next
     keyboard_rows: List[List[types.InlineKeyboardButton]] = [
-        [make_button(next_text, f"userstate_{state}")]
+        [make_button(next_text, f"user_{state}")]
     ]
 
     if backstate != "2":
@@ -103,7 +103,7 @@ def kb_input(
 
     if show_next:
         next_text: str = getattr(buttons, "next")
-        keyboard_rows.append([make_button(next_text, f"userstate_{state}")])
+        keyboard_rows.append([make_button(next_text, f"user_{state}")])
 
     if backstate != "2":
         back_text: str = getattr(buttons, "back")
@@ -143,8 +143,8 @@ def kb_select(
     flag: bool
     for text, state, flag in data:
         callback_data: str = (
-            f"userstate_{state}_{text}_{name}"
-            if flag else f"userstate_{state}"
+            f"user_{state}_{text}_{name}"
+            if flag else f"user_{state}"
         )
         button: types.InlineKeyboardButton = make_button(text, callback_data)
 

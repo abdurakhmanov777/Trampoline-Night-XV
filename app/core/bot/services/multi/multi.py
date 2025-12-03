@@ -67,7 +67,7 @@ async def multi(
     loc_state: Optional[Any] = None
 
     if handler is None:
-        loc_state = getattr(loc, f"userstate_{value}", None)
+        loc_state = getattr(loc, value, None)
         # Если состояние не найдено, используем стартовый обработчик
         handler = HANDLERS.get(
             loc_state.type,

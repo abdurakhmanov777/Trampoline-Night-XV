@@ -8,8 +8,8 @@ none = InlineKeyboardMarkup(inline_keyboard=[])
 state_99 = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text='Отправить данные',
-                              callback_data=f'userstate{SYMB}100')],
-        # [InlineKeyboardButton(text='Отправить данные', callback_data=f'userstate_100')],
+                              callback_data=f'user{SYMB}100')],
+        # [InlineKeyboardButton(text='Отправить данные', callback_data=f'user_100')],
         [InlineKeyboardButton(text='Назад', callback_data='userback')]
     ]
 )
@@ -71,7 +71,7 @@ async def keyboard_user(
 async def multi_next(next_state: str | int) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text='Далее', callback_data=f'userstate{SYMB}{next_state}')],
+            [InlineKeyboardButton(text='Далее', callback_data=f'user{SYMB}{next_state}')],
             [InlineKeyboardButton(text='Назад', callback_data='userback')]
         ]
     )
@@ -85,7 +85,7 @@ async def multi_text(
         next_state,
         text: str = 'Даю согласие') -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(
-        text=text, callback_data=f'userstate{SYMB}{next_state}')]])
+        text=text, callback_data=f'user{SYMB}{next_state}')]])
 
 
 async def multi_select(data: list[list[str]]) -> InlineKeyboardMarkup:
@@ -95,7 +95,7 @@ async def multi_select(data: list[list[str]]) -> InlineKeyboardMarkup:
     for txt, state, flag_db in data:
         button = InlineKeyboardButton(
             text=txt,
-            callback_data=f'userstate{SYMB}{state}{SYMB}{txt}{SYMB}{flag_db}'
+            callback_data=f'user{SYMB}{state}{SYMB}{txt}{SYMB}{flag_db}'
         )
         if len(txt) > 13:
             long_buttons.append([button])  # одиночная строка
@@ -119,6 +119,6 @@ async def kb_start(
     return InlineKeyboardMarkup(
         inline_keyboard=[[InlineKeyboardButton(
             text=text,
-            callback_data=f'userstate_2'
+            callback_data=f'user_2'
         )]]
     )

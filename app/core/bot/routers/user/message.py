@@ -7,9 +7,8 @@
 
 from typing import Any
 
-from aiogram import Router
+from aiogram import Router, types
 from aiogram.fsm.context import FSMContext
-from aiogram import types
 
 from app.core.bot.routers.filters import ChatTypeFilter
 from app.core.bot.services.logger import log
@@ -57,7 +56,7 @@ async def msg_user(
         return
 
     # Проверяем, что состояние соответствует "value"
-    state_obj: Any | None = getattr(loc, f"userstate_{value}", None)
+    state_obj: Any | None = getattr(loc, value, None)
     if not state_obj or state_obj.type != "input":
         return
 

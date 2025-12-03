@@ -43,7 +43,7 @@ async def handle_end(
     keep_keys: List[str] = [
         data.text
         for state in states
-        if (data := getattr(ctx.loc, f"userstate_{state}", None)) is not None
+        if (data := getattr(ctx.loc, state, None)) is not None
         and getattr(data, "type", None) not in ("start", "end")
         and getattr(data, "text", None) is not None
     ]
@@ -68,6 +68,6 @@ async def handle_end(
 
     # Формируем клавиатуру завершения
     keyboard: InlineKeyboardMarkup = kb_end(buttons=ctx.loc.button)
-    
+
     opts = LinkPreviewOptions(is_disabled=True)
     return text_message, keyboard, opts
