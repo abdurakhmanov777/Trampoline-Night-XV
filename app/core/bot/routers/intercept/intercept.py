@@ -1,72 +1,16 @@
-from typing import Any, Callable, Dict, Union
+from typing import Dict, Union
 
 from aiogram import Router
 from aiogram.types import CallbackQuery, Message
 
 from app.core.bot.routers.filters import InterceptFilter
 
-router: Router = Router()
+intercept_handler: Router = Router()
 
 
-def intercept(
-    *filters: Any,
-) -> Callable[
-    [Callable[[Union[CallbackQuery, Message], Dict[str, bool]], Any]],
-    Callable[[Union[CallbackQuery, Message]], Any],
-]:
-    """
-    Универсальный декоратор для регистрации обработчиков callback-запросов
-    и сообщений с системной блокировкой. Передаёт словарь активных флагов
-    в обработчик.
-
-    Args:
-        *filters (Any): Дополнительные фильтры для регистрации обработчика.
-
-    Returns:
-        Callable[[Callable[..., Any]], Callable[..., Any]]: Декоратор,
-        регистрирующий обработчик в роутере.
-    """
-
-    def decorator(
-        func: Callable[[Union[CallbackQuery, Message], Dict[str, bool]], Any],
-    ) -> Callable[[Union[CallbackQuery, Message]], Any]:
-        """
-        Декоратор, регистрирующий обработчик с фильтром InterceptFilter.
-
-        Args:
-            func: Асинхронная функция-обработчик событий.
-        """
-
-        async def wrapper(event: Union[CallbackQuery, Message]) -> None:
-            """
-            Обёртка вокруг обработчика, получает флаги системной
-            блокировки и передает их в обработчик.
-
-            Args:
-                event: Событие CallbackQuery или Message.
-            """
-            # Получаем результат фильтра блокировки
-            block_info: Dict[str, bool] | bool = await InterceptFilter()(event)
-
-            # Преобразуем в словарь, если блокировка активна
-            info: Dict[str, bool] = block_info if isinstance(
-                block_info, dict) else {}
-
-            # Вызываем обработчик с информацией о блокировке
-            await func(event, info)
-
-        # Регистрация callback-запросов с фильтром
-        router.callback_query(InterceptFilter(), *filters)(wrapper)
-
-        # Регистрация сообщений (ничего не делает, для совместимости)
-        router.message(InterceptFilter(), *filters)(lambda _: None)
-
-        return wrapper
-
-    return decorator
-
-
-@intercept()
+@intercept_handler.callback_query(
+    InterceptFilter()
+)
 async def open_settings(
     event: Union[CallbackQuery, Message],
     block_info: Dict[str, bool],

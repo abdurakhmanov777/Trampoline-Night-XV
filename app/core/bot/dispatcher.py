@@ -10,7 +10,7 @@ from aiogram.fsm.storage.memory import SimpleEventIsolation
 
 from app.core.bot.middleware import mw
 from app.core.bot.routers import (admin_callback, admin_command, admin_message,
-                                  intercept, user_callback, user_command,
+                                  intercept_handler, user_callback, user_command,
                                   user_message)
 
 
@@ -46,7 +46,7 @@ async def setup_dispatcher() -> Dispatcher:
         admin_callback.callback_query: mw.MwAdminCallback(),
         admin_command.message: mw.MwAdminCommand(),
         admin_message.message: mw.MwAdminMessage(),
-        intercept.message: mw.MwSystemBlock(),
+        intercept_handler.message: mw.MwSystemBlock(),
         user_callback.callback_query: mw.MwUserCallback(),
         user_command.message: mw.MwUserCommand(),
         user_message.message: mw.MwUserMessage(),
@@ -57,7 +57,7 @@ async def setup_dispatcher() -> Dispatcher:
         # admin_callback,
         # admin_command,
         # admin_message,
-        intercept,
+        intercept_handler,
         user_callback,
         user_command,
         user_message,

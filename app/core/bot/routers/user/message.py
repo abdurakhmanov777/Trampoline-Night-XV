@@ -16,10 +16,10 @@ from app.core.bot.services.multi import multi
 from app.core.bot.services.requests.user import manage_user, manage_user_state
 from app.core.database.models.user import User
 
-router: Router = Router()
+user_message: Router = Router()
 
 
-@router.message(
+@user_message.message(
     ChatTypeFilter(chat_type=["private"])
 )
 async def msg_user(

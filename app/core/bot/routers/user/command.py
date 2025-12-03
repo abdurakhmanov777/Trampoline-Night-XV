@@ -19,10 +19,10 @@ from app.core.bot.services.multi.handlers.send import handle_send
 from app.core.bot.services.requests.user import manage_user, manage_user_state
 from app.core.database.models.user import User
 
-router: Router = Router()
+user_command: Router = Router()
 
 
-@router.message(
+@user_command.message(
     ChatTypeFilter(chat_type=["private"]),
     Command("start")
 )
@@ -96,7 +96,7 @@ async def cmd_start(
     await log(message)
 
 
-@router.message(
+@user_command.message(
     ChatTypeFilter(chat_type=["private"]),
     Command("id")
 )
@@ -128,7 +128,7 @@ async def cmd_id(
     await log(message)
 
 
-@router.message(
+@user_command.message(
     ChatTypeFilter(chat_type=["private"]),
     Command("help")
 )

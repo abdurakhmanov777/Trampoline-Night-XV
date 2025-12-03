@@ -19,10 +19,10 @@ from app.core.bot.services.requests.data import manage_data_clear
 from app.core.bot.services.requests.user import manage_user, manage_user_state
 from app.core.database.models import User
 
-router: Router = Router()
+user_callback: Router = Router()
 
 
-@router.callback_query(
+@user_callback.callback_query(
     ChatTypeFilter(chat_type=["private"]),
     F.data == "delete"
 )
@@ -37,7 +37,7 @@ async def clbk_delete(callback: types.CallbackQuery) -> None:
     await log(callback)
 
 
-@router.callback_query(
+@user_callback.callback_query(
     ChatTypeFilter(chat_type=["private"]),
     CallbackNextFilter()
 )
@@ -91,7 +91,7 @@ async def clbk_next(
     await log(callback)
 
 
-@router.callback_query(
+@user_callback.callback_query(
     ChatTypeFilter(chat_type=["private"]),
     F.data == "sending_data"
 )
@@ -144,7 +144,7 @@ async def clbk_send(
     await log(callback)
 
 
-@router.callback_query(
+@user_callback.callback_query(
     ChatTypeFilter(chat_type=["private"]),
     F.data == "userback"
 )
@@ -194,7 +194,7 @@ async def clbk_back(
     await log(callback)
 
 
-@router.callback_query(
+@user_callback.callback_query(
     ChatTypeFilter(chat_type=["private"]),
     F.data == "cancel_reg"
 )
@@ -222,7 +222,7 @@ async def clbk_cancel(
     await log(callback)
 
 
-@router.callback_query(
+@user_callback.callback_query(
     ChatTypeFilter(chat_type=["private"]),
     F.data == "cancel_reg_confirm"
 )
