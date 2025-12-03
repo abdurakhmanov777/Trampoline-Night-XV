@@ -34,7 +34,7 @@ async def handle_select(
     base_text: str = loc_state.text
     p1: str
     p2: str
-    p1, p2 = loc.template.select
+    p1, p2 = loc.messages.template.select
 
     # Формирование сообщения
     text_message: str = f"{p1}{base_text}{p2}"
@@ -43,7 +43,7 @@ async def handle_select(
     keyboard: InlineKeyboardMarkup = kb_select(
         name=base_text,
         data=loc_state.keyboard,
-        buttons=loc.button
+        buttons=loc.buttons
     )
 
     opts = LinkPreviewOptions(is_disabled=True)

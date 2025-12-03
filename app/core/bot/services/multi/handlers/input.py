@@ -39,7 +39,7 @@ async def handle_input(
     format_: str = loc_state.format
     pattern: str = loc_state.pattern
     base_text: str = loc_state.text
-    template: Any = loc.template.input
+    template: Any = loc.messages.template.input
 
     error_occurred: bool = False
     text_message: str
@@ -94,7 +94,7 @@ async def handle_input(
         state=loc_state.keyboard,
         backstate=ctx.value,
         show_next=show_next,
-        buttons=loc.button
+        buttons=loc.buttons
     )
 
     opts = LinkPreviewOptions(is_disabled=True)

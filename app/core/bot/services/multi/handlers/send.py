@@ -65,7 +65,7 @@ async def handle_send(
 
         p1: str
         p2: str
-        p1, p2 = loc.template.send
+        p1, p2 = loc.messages.template.send
         caption: str = f"{p1}{code}{p2}"
 
         # Отправка фото
@@ -73,7 +73,7 @@ async def handle_send(
             photo=types.BufferedInputFile(buffer.read(), filename="code.png"),
             caption=caption,
             parse_mode="HTML",
-            reply_markup=kb_cancel(loc.button)
+            reply_markup=kb_cancel(loc.buttons)
         )
 
         # Закрепление сообщения

@@ -198,8 +198,8 @@ async def clbk_cancel(
         return
 
     await callback.message.answer(
-        text=loc.cancel,
-        reply_markup=kb_cancel_confirm(buttons=loc.button)
+        text=loc.messages.cancel,
+        reply_markup=kb_cancel_confirm(buttons=loc.buttons)
     )
 
     await log(callback)

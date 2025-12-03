@@ -119,12 +119,12 @@ async def cmd_id(
 
     text_prefix: Any
     text_suffix: Any
-    text_prefix, text_suffix = loc.template.id
+    text_prefix, text_suffix = loc.messages.template.id
     text: str = f"{text_prefix}{message.chat.id}{text_suffix}"
 
     await message.answer(
         text=text,
-        reply_markup=kb_delete(loc.button)
+        reply_markup=kb_delete(loc.buttons)
     )
 
     await log(message)
@@ -151,8 +151,8 @@ async def cmd_help(
         return
 
     await message.answer(
-        text=loc.help,
-        reply_markup=kb_delete(buttons=loc.button)
+        text=loc.messages.help,
+        reply_markup=kb_delete(buttons=loc.buttons)
     )
 
     await log(message)
@@ -180,7 +180,7 @@ async def cmd_help(
 
 #     await message.answer(
 #         text=loc.cancel,
-#         reply_markup=kb_cancel_confirm(buttons=loc.button)
+#         reply_markup=kb_cancel_confirm(buttons=loc.buttons)
 #     )
 
 #     await log(message)

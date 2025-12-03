@@ -38,7 +38,7 @@ async def handle_text(
     keyboard: InlineKeyboardMarkup = kb_text(
         state=loc_state.keyboard,
         backstate=state_key,
-        buttons=loc.button
+        buttons=loc.buttons
     )
     # print(loc_state.link_disabled)
     opts = LinkPreviewOptions(

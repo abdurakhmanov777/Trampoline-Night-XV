@@ -32,11 +32,11 @@ async def handle_start(
     # Формируем текст сообщения
     p1: str
     p2: str
-    p1, p2 = loc.template.start
+    p1, p2 = loc.messages.template.start
     text_message: str = f"{p1}{loc.info.name}{p2}"
 
     # Формируем клавиатуру
-    keyboard: InlineKeyboardMarkup = kb_start(buttons=loc.button)
+    keyboard: InlineKeyboardMarkup = kb_start(buttons=loc.buttons)
 
     opts = LinkPreviewOptions(is_disabled=True)
     return text_message, keyboard, opts

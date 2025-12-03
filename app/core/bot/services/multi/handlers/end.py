@@ -62,12 +62,12 @@ async def handle_end(
     # Получаем шаблон локализации для начала и конца сообщения
     start_template: str
     end_template: str
-    start_template, end_template = ctx.loc.template.end
+    start_template, end_template = ctx.loc.messages.template.end
 
     text_message: str = f"{start_template}{items_text}{end_template}"
 
     # Формируем клавиатуру завершения
-    keyboard: InlineKeyboardMarkup = kb_end(buttons=ctx.loc.button)
+    keyboard: InlineKeyboardMarkup = kb_end(buttons=ctx.loc.buttons)
 
     opts = LinkPreviewOptions(is_disabled=True)
     return text_message, keyboard, opts
