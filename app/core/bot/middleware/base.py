@@ -15,8 +15,9 @@ from typing import Any, Awaitable, Callable, Literal, Optional, Set
 from aiogram import BaseMiddleware
 from aiogram.types import ContentType, Message
 
-from app.core.bot.services.localization import update_loc_data
 from app.core.bot.services.logger import log_error
+
+from .refresh import refresh_fsm_data
 
 
 class MwBase(BaseMiddleware):
@@ -91,7 +92,7 @@ class MwBase(BaseMiddleware):
         data.update(self.extra_data)
 
         # Загружаем локализацию в зависимости от роли
-        await update_loc_data(data, event, role=self.role)
+        await refresh_fsm_data(data, event, role=self.role)
 
         try:
             # Вызываем хэндлер
