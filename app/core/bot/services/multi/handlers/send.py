@@ -1,8 +1,8 @@
 """
 Модуль обработки состояния отправки финального сообщения с изображением.
 
-Содержит логику генерации кода, создания изображения и отправки финального
-сообщения пользователю с закреплением в чате.
+Выполняет загрузку данных пользователя, генерацию кода, создание
+итогового изображения и отправку финального сообщения с закреплением.
 """
 
 from datetime import datetime
@@ -22,79 +22,110 @@ from app.core.database.models.user import User
 async def handle_send(
     loc: Any,
     tg_id: int,
-    event: Optional[Union[types.CallbackQuery, types.Message]],
+    event: Optional[
+        Union[
+            types.CallbackQuery,
+            types.Message,
+        ]
+    ],
 ) -> Optional[int]:
     """
     Обрабатывает состояние отправки финального сообщения с изображением.
 
-    Проводит загрузку данных пользователя, генерирует код, создает изображение
-    и отправляет финальное сообщение с закреплением.
+    Загружает данные пользователя, генерирует код, создает изображение
+    и отправляет финальное сообщение. Сообщение закрепляется в чате.
 
-    Args:
-        loc (Any): Локализация с шаблонами сообщений.
-        tg_id (int): Telegram ID пользователя.
-        event (CallbackQuery | Message | None): Исходное событие,
-            содержащее сообщение или callback.
+    Parameters
+    ----------
+    loc : Any
+        Объект локализации, содержащий шаблоны и данные события.
+    tg_id : int
+        Telegram ID пользователя.
+    event : CallbackQuery | Message | None
+        Исходное событие, содержащее сообщение или callback.
 
-    Returns:
-        Optional[int]: Идентификатор отправленного сообщения, если успешно,
-            иначе None.
+    Returns
+    -------
+    Optional[int]
+        Идентификатор отправленного сообщения или None при ошибке.
     """
-    # Универсальный способ извлечения сообщения
+
+    # Универсальное извлечение сообщения
+    message: Optional[types.MaybeInaccessibleMessageUnion]
     if isinstance(event, types.CallbackQuery):
-        message: Optional[types.MaybeInaccessibleMessageUnion] = (
-            event.message
-        )
+        message = event.message
     else:
         message = event
 
-    # Если сообщение недоступно — прекращаем обработку
-    if not message or not message.bot:
+    # Проверка доступности message и его бота
+    if message is None or message.bot is None:
         return None
 
-    # Получение пользователя из базы
-    user: Union[User, bool, None, int] = await manage_user(
+    # Получение пользователя
+    user_result: Union[User, bool, None, int] = await manage_user(
         tg_id=tg_id,
         action="get",
     )
-    if not isinstance(user, User):
+    user: Optional[User] = user_result if isinstance(
+        user_result, User) else None
+    if user is None:
         return None
 
-    # Генерация числового кода
+    # Генерация кода
     code: Optional[int] = generate_code(
         user_id=user.id,
         num_digits=3,
     )
 
-    # Отображение анимации загрузки
+    # Отображение действия загрузки
     await message.bot.send_chat_action(
         chat_id=tg_id,
         action=ChatAction.UPLOAD_PHOTO,
     )
 
     try:
-        # Генерация изображения кода
-        buffer: BytesIO = await generate_image(str(code))
+        # Генерация изображения
+        image_buffer: BytesIO = await generate_image(str(code))
 
-        # Формирование подписи к изображению
+        # Формирование подписи
+        template: Any = loc.messages.template.send
+        info: Any = loc.event
+
         part1: str
         part2: str
         part3: str
-        part1, part2, part3 = loc.messages.template.send
+        part1, part2, part3 = template.parts
+
         dt: datetime = datetime.strptime(
-            f"{loc.event.date} {loc.event.time}", "%Y-%m-%d %H:%M:%S"
+            f"{info.date} {info.time}",
+            "%Y-%m-%d %H:%M:%S",
         )
+
+        month_name: str = getattr(
+            loc.months,
+            str(dt.month - 1),
+        )
+
         date_str: str = (
-            f"{dt.day} {getattr(loc.months, str(dt.month - 1))} "
-            f"{dt.year}, {dt.hour:02d}:{dt.minute:02d}"
+            f"{dt.day} {month_name} {dt.year}, "
+            f"{dt.hour:02d}:{dt.minute:02d}"
         )
 
-        caption: str = f"{part1}{code}{part2}{date_str}{part3}"
+        info_text: str = (
+            f"{template.names.address}{info.address}\n"
+            f"{template.names.date}{date_str}"
+        )
 
-        # Отправка изображения пользователю
-        msg: types.Message = await message.answer_photo(
+        caption: str = (
+            f"{part1}{code}"
+            f"{part2}{info_text}"
+            f"{part3}"
+        )
+
+        # Отправка изображения
+        sent_message: types.Message = await message.answer_photo(
             photo=types.BufferedInputFile(
-                buffer.read(),
+                image_buffer.read(),
                 filename="code.png",
             ),
             caption=caption,
@@ -102,13 +133,14 @@ async def handle_send(
             reply_markup=kb_send(loc.buttons),
         )
 
-        # Закрепление отправленного сообщения
+        # Закрепление сообщения
+        chat_id: int = message.chat.id
         await message.bot.pin_chat_message(
-            chat_id=message.chat.id,
-            message_id=msg.message_id,
+            chat_id=chat_id,
+            message_id=sent_message.message_id,
         )
 
-        return msg.message_id
+        return sent_message.message_id
 
     except BaseException:
         return None

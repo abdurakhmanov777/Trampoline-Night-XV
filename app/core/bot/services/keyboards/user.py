@@ -190,7 +190,7 @@ def kb_send(
         types.InlineKeyboardMarkup: Клавиатура с кнопкой отмены.
     """
     rows: List[List[Tuple[str, str]]] = [
-        [(buttons.time_event, "time_event")],
+        # [(buttons.time_event, "time_event")],
         [(buttons.cancel_reg, "cancel_reg")]
     ]
     return build_keyboard(rows)
