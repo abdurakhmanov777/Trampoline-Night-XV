@@ -29,7 +29,7 @@ def kb_start(
     return build_keyboard(rows)
 
 
-def kb_end(
+def kb_submit(
     buttons: Any
 ) -> types.InlineKeyboardMarkup:
     """Создаёт клавиатуру с кнопками 'Далее' и 'Назад'.

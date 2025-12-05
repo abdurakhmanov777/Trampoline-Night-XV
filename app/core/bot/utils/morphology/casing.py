@@ -5,7 +5,7 @@ from typing import List
 WORD_PATTERN: re.Pattern = re.compile(r'\w+|\s+|[^\w\s]', re.UNICODE)
 
 # Шаблон для поиска конца предложения (., !, ?)
-SENTENCE_ENDINGS_PATTERN: re.Pattern = re.compile(r'([.!?])(\s+|$)')
+SENTENCE_submitINGS_PATTERN: re.Pattern = re.compile(r'([.!?])(\s+|$)')
 
 
 async def lower_words(
@@ -37,7 +37,7 @@ async def lower_words(
         return word if is_abbr(word) else word.lower()
 
     # Разбиваем текст на предложения с сохранением разделителей
-    parts: List[str] = SENTENCE_ENDINGS_PATTERN.split(text)
+    parts: List[str] = SENTENCE_submitINGS_PATTERN.split(text)
     sentences: List[str] = [
         "".join(parts[i:i + 2]) for i in range(0, len(parts), 2)
     ]

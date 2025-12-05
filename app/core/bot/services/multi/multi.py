@@ -14,10 +14,10 @@ from aiogram import types
 from app.core.bot.services.requests.data import manage_data
 
 from .context import MultiContext
-from .handlers.end import handle_end
 from .handlers.input import handle_input
 from .handlers.select import handle_select
 from .handlers.start import handle_start
+from .handlers.submit import handle_submit
 from .handlers.text import handle_text
 
 # Таблица стандартных обработчиков.
@@ -30,7 +30,7 @@ HANDLERS: Dict[str, Callable[[MultiContext], Any]] = {
 # Таблица обработчиков для специальных состояний.
 SPECIAL_HANDLERS: Dict[str, Callable[[MultiContext], Any]] = {
     "1": handle_start,
-    "99": handle_end,
+    "98": handle_submit,
 }
 
 

@@ -1,7 +1,7 @@
 """
 Модуль обработки финального состояния пользователя.
 
-Предоставляет функцию `handle_end`, которая формирует итоговое сообщение
+Предоставляет функцию `handle_submit`, которая формирует итоговое сообщение
 пользователю на основе сохранённых данных, шаблонов локализации и
 клавиатуры завершения.
 """
@@ -10,13 +10,13 @@ from typing import Any, Dict, List, Tuple
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
-from app.core.bot.services.keyboards.user import kb_end
+from app.core.bot.services.keyboards.user import kb_submit
 from app.core.bot.services.multi.context import MultiContext
 from app.core.bot.services.requests.data import manage_data_list
 from app.core.bot.services.requests.user import manage_user_state
 
 
-async def handle_end(
+async def handle_submit(
     ctx: MultiContext,
 ) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
@@ -51,7 +51,7 @@ async def handle_end(
         step_data.text
         for state in states
         if (step_data := getattr(loc.steps, state, None)) is not None
-        and getattr(step_data, "type", None) not in ("start", "end")
+        and getattr(step_data, "type", None) not in ("start", "submit")
         and getattr(step_data, "text", None) is not None
     ]
 
@@ -67,12 +67,12 @@ async def handle_end(
     )
 
     # Получаем шаблоны начала и окончания сообщения
-    start_template, end_template = loc.messages.template.end
+    start_template, end_template = loc.messages.template.submit
 
     text_message: str = f"{start_template}{items_text}{end_template}"
 
     # Создаём финальную клавиатуру
-    keyboard: InlineKeyboardMarkup = kb_end(buttons=loc.buttons)
+    keyboard: InlineKeyboardMarkup = kb_submit(buttons=loc.buttons)
 
     opts: LinkPreviewOptions = LinkPreviewOptions(is_disabled=True)
 
