@@ -59,41 +59,43 @@ async def aaa(
         except:
             pass
 
-# @user_payment.callback_query(
-#     ChatTypeFilter(chat_type=["private"]),
-#     F.data == "payment"
-# )
-# async def clbk_payment(
-#     callback: types.CallbackQuery,
-#     state: FSMContext
-# ) -> None:
-#     user_data: Dict[str, Any] = await state.get_data()
-#     loc: Any = user_data.get("loc_user")
+@user_payment.callback_query(
+    ChatTypeFilter(chat_type=["private"]),
+    F.data == "payment"
+)
+async def clbk_payment(
+    callback: types.CallbackQuery,
+    state: FSMContext
+) -> None:
+    user_data: Dict[str, Any] = await state.get_data()
+    loc: Any = user_data.get("loc_user")
 
-#     if not isinstance(
-#         callback.message, types.Message
-#     ) or not callback.message.bot:
-#         return
+    if not isinstance(
+        callback.message, types.Message
+    ) or not callback.message.bot:
+        return
+    await callback.answer()
+    prices: list[types.LabeledPrice] = [
+        types.LabeledPrice(
+            label="Оплата",
+            amount=loc.event.payment.price * 100
+        )
+    ]
+    msg: types.Message = await callback.message.bot.send_invoice(
+        chat_id=callback.from_user.id,
+        title=loc.event.name,
+        description="Оплата участия",
+        payload="order",
+        provider_token=PROVIDER_TOKEN,
+        currency=CURRENCY,
+        prices=prices,
+    )
 
+    if msg:
+        await manage_user(
+            tg_id=callback.from_user.id,
+            action="update",
+            msg_payment_id=msg.message_id
+        )
 
-#     await callback.message.edit_text(
-#         text=loc.messages.payment,
-#         reply_markup=kb_payment_1(loc.buttons)
-#     )
-#     # prices: list[types.LabeledPrice] = [
-#     #     types.LabeledPrice(
-#     #         label="Оплата",
-#     #         amount=loc.event.payment.price * 100
-#     #     )
-#     # ]
-#     # await callback.message.bot.send_invoice(
-#     #     chat_id=callback.from_user.id,
-#     #     title=loc.event.name,
-#     #     description="Оплата участия",
-#     #     payload="order",
-#     #     provider_token=PROVIDER_TOKEN,
-#     #     currency=CURRENCY,
-#     #     prices=prices,
-#     # )
-
-#     await log(callback)
+    await log(callback)

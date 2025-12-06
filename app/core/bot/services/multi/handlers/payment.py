@@ -10,13 +10,13 @@ from typing import Any, Dict, List, Tuple
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
-from app.core.bot.services.keyboards.user import kb_submit
+from app.core.bot.services.keyboards.user import kb_payment
 from app.core.bot.services.multi.context import MultiContext
 from app.core.bot.services.requests.data import manage_data_list
 from app.core.bot.services.requests.user import manage_user_state
 
 
-async def handler_submit(
+async def handler_payment(
     ctx: MultiContext,
 ) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
@@ -46,36 +46,10 @@ async def handler_submit(
 
     loc: Any = ctx.loc
 
-    # Собираем список ключей данных, подлежащих выводу
-    keep_keys: List[str] = [
-        step_data.text
-        for state in states
-        if (step_data := getattr(loc.steps, state, None)) is not None
-        and getattr(step_data, "type", None) not in ("start", "submit")
-        and getattr(step_data, "text", None) is not None
-    ]
-
-    # Загружаем данные пользователя, фильтруя только нужные поля
-    data_list: Dict[str, Any] = await manage_data_list(
-        tg_id=ctx.tg_id,
-        keep_keys=keep_keys,
-    )
-
-    # Формируем текст блоков данных
-    items_text: str = "\n\n".join(
-        f"🔹️ {key}: {value}" for key, value in data_list.items()
-    )
-
-    # Получаем шаблоны начала и окончания сообщения
-    part1: str
-    part2: str
-    part1, part2 = loc.messages.template.submit
-
-    text_message: str = f"{part1}{items_text}{part2}"
+    text_message: str = loc.messages.payment
 
     # Создаём финальную клавиатуру
-    keyboard: InlineKeyboardMarkup = kb_submit(
-        payment=loc.event.payment.status,
+    keyboard: InlineKeyboardMarkup = kb_payment(
         buttons=loc.buttons
     )
 

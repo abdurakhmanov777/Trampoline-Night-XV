@@ -5,7 +5,7 @@ from app.config import SYMB
 
 none = InlineKeyboardMarkup(inline_keyboard=[])
 
-state_99 = InlineKeyboardMarkup(
+state_98 = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text='Отправить данные',
                               callback_data=f'user{SYMB}100')],
