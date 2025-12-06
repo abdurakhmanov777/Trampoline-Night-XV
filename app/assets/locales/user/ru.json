@@ -2,11 +2,10 @@
     "event": {
         "name": "Батутная ночь",
         "address": "Проспект Маршала Жукова, 4",
-        "link": "https://yandex.ru/profile/95499232862?lang=ru",
         "date": "2025-12-04",
         "time": "20:00:00",
         "payment": {
-            "enabled": true,
+            "status": true,
             "price": 700
         }
     },
@@ -53,7 +52,7 @@
                 },
                 {
                     "text": "Не студент",
-                    "next": "98",
+                    "next": "99",
                     "save": true
                 }
             ]
@@ -68,7 +67,7 @@
                 "format": "ИУ6-84Б"
             },
             "text": "Группа",
-            "next": "98"
+            "next": "99"
         },
         "6": {
             "id": "6",
@@ -80,7 +79,7 @@
                 "format": "МИФИ"
             },
             "text": "ВУЗ",
-            "next": "98"
+            "next": "99"
         }
     },
     "messages": {
@@ -142,6 +141,7 @@
         "consent": "Даю согласие",
         "delete": "Закрыть",
         "cancel_reg": "Отмена регистрации",
+        "payment_status": "Статус оплаты",
         "time_event": "Время до мероприятия"
     },
     "months": {

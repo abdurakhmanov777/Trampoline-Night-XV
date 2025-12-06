@@ -30,7 +30,6 @@ def kb_start(
 
 
 def kb_submit(
-    payment: bool,
     buttons: Any
 ) -> types.InlineKeyboardMarkup:
     """Создаёт клавиатуру с кнопками 'Далее' и 'Назад'.
@@ -42,9 +41,8 @@ def kb_submit(
         types.InlineKeyboardMarkup: Клавиатура с кнопками "Далее"
         и "Назад".
     """
-    text: str = "user_99" if payment else "success"
     rows: List[List[Tuple[str, str]]] = [
-        [(buttons.back, "userback"), (buttons.next, text)]
+        [(buttons.back, "userback"), (buttons.next, "success")]
     ]
     return build_keyboard(rows)
 
@@ -193,7 +191,8 @@ def kb_success(
     """
     rows: List[List[Tuple[str, str]]] = [
         # [(buttons.time_event, "time_event")],
-        [(buttons.cancel_reg, "cancel_reg")]
+        [(buttons.cancel_reg, "cancel_reg")],
+        [(buttons.payment_status, "payment_status")],
     ]
     return build_keyboard(rows)
 
@@ -211,21 +210,5 @@ def kb_payment(
     """
     rows: List[List[Tuple[str, str]]] = [
         [(buttons.cancel_reg, "cancel_reg")]
-    ]
-    return build_keyboard(rows)
-
-def kb_payment_1(
-    buttons: Any
-) -> types.InlineKeyboardMarkup:
-    """Создаёт клавиатуру с кнопкой 'Закрыть окно'.
-
-    Args:
-        buttons (Any): Объект с локализованными текстами кнопок.
-
-    Returns:
-        types.InlineKeyboardMarkup: Клавиатура с кнопкой отмены.
-    """
-    rows: List[List[Tuple[str, str]]] = [
-        [(buttons.back, "userback")]
     ]
     return build_keyboard(rows)

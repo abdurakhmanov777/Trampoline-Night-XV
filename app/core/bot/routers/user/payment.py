@@ -14,7 +14,6 @@ from aiogram.fsm.context import FSMContext
 
 from app.config.settings import CURRENCY, PROVIDER_TOKEN
 from app.core.bot.routers.filters import ChatTypeFilter
-from app.core.bot.services.keyboards.user import kb_payment_1
 from app.core.bot.services.logger import log
 from app.core.bot.services.multi import multi
 from app.core.bot.services.multi.handlers.success import handler_success
@@ -45,78 +44,56 @@ async def aaa(
     loc: Any = user_data.get("loc_user")
     if not loc or not message.from_user:
         return
-
-    user_state: bool | str | list[str] | None = await manage_user_state(
-        message.from_user.id,
-        "peek"
-    )
-
-    db_user: User | bool | None | int = await manage_user(
+    # await message.edit_text()
+    msg_payment_id: User | bool | None | int = await manage_user(
         tg_id=message.from_user.id,
-        action="get"
+        action="msg_payment_update",
+        msg_id=0
     )
-
-    if not isinstance(db_user, User) or not isinstance(user_state, str):
-        return
-
-    msg_id: User | bool | None | int = await manage_user(
-        tg_id=message.from_user.id,
-        action="msg_update",
-        msg_id=message.message_id + 1
-    )
-
-    await handler_success(
-        loc=loc,
-        tg_id=message.from_user.id,
-        event=message
-    )
-    if isinstance(msg_id, int) and msg_id != 0 and message.bot:
+    if message.bot and isinstance(msg_payment_id, int):
         try:
-            await message.bot.delete_message(message.chat.id, msg_id)
+            await message.bot.delete_message(
+                message.chat.id,
+                msg_payment_id
+            )
         except:
             pass
 
-    await manage_user_state(
-        message.from_user.id,
-        "push",
-        "100"
-    )
+# @user_payment.callback_query(
+#     ChatTypeFilter(chat_type=["private"]),
+#     F.data == "payment"
+# )
+# async def clbk_payment(
+#     callback: types.CallbackQuery,
+#     state: FSMContext
+# ) -> None:
+#     user_data: Dict[str, Any] = await state.get_data()
+#     loc: Any = user_data.get("loc_user")
 
-@user_payment.callback_query(
-    ChatTypeFilter(chat_type=["private"]),
-    F.data == "payment"
-)
-async def clbk_payment(
-    callback: types.CallbackQuery,
-    state: FSMContext
-) -> None:
-    user_data: Dict[str, Any] = await state.get_data()
-    loc: Any = user_data.get("loc_user")
-
-    if not isinstance(
-        callback.message, types.Message
-    ) or not callback.message.bot:
-        return
+#     if not isinstance(
+#         callback.message, types.Message
+#     ) or not callback.message.bot:
+#         return
 
 
-    await callback.message.edit_text(
-        text=loc.messages.payment,
-        reply_markup=kb_payment_1(loc.buttons)
-    )
-    # prices: list[types.LabeledPrice] = [
-    #     types.LabeledPrice(
-    #         label="Оплата",
-    #         amount=loc.event.payment.price * 100
-    #     )
-    # ]
-    # await callback.message.bot.send_invoice(
-    #     chat_id=callback.from_user.id,
-    #     title=loc.event.name,
-    #     description="Оплата участия",
-    #     payload="order",
-    #     provider_token=PROVIDER_TOKEN,
-    #     currency=CURRENCY,
-    #     prices=prices,
-    # )
+#     await callback.message.edit_text(
+#         text=loc.messages.payment,
+#         reply_markup=kb_payment_1(loc.buttons)
+#     )
+#     # prices: list[types.LabeledPrice] = [
+#     #     types.LabeledPrice(
+#     #         label="Оплата",
+#     #         amount=loc.event.payment.price * 100
+#     #     )
+#     # ]
+#     # await callback.message.bot.send_invoice(
+#     #     chat_id=callback.from_user.id,
+#     #     title=loc.event.name,
+#     #     description="Оплата участия",
+#     #     payload="order",
+#     #     provider_token=PROVIDER_TOKEN,
+#     #     currency=CURRENCY,
+#     #     prices=prices,
+#     # )
 
-    await log(callback)
+#     await log(callback)

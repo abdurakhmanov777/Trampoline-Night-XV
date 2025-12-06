@@ -75,7 +75,6 @@ async def manage_user(
                 msg_id=fields.get("msg_id", 0),
             )
         elif action == "msg_payment_update":
-            print(1)
             return await manager.msg_payment_update(
                 tg_id,
                 msg_id=fields.get("msg_payment_id", 0),
