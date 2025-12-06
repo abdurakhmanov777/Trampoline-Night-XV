@@ -12,7 +12,7 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
-from app.core.bot.services.keyboards.user import kb_input
+from app.core.bot.services.keyboards.user import kb_dynamic
 from app.core.bot.services.multi.context import MultiContext
 from app.core.bot.services.requests.data.crud import manage_data
 from app.core.bot.utils.morphology.casing import lower_words
@@ -123,11 +123,11 @@ async def handler_input(
         )
         show_next = True
 
-    keyboard: InlineKeyboardMarkup = kb_input(
+    keyboard: InlineKeyboardMarkup = kb_dynamic(
+        buttons=loc.buttons,
         state=loc_state.next,
         backstate=loc_state.id,
         show_next=show_next,
-        buttons=loc.buttons,
     )
 
     opts: LinkPreviewOptions = LinkPreviewOptions(is_disabled=True)

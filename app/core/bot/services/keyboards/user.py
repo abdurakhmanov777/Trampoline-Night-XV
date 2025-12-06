@@ -12,6 +12,19 @@ from aiogram import types
 from .make import build_keyboard
 
 
+def kb_dynamic(
+    buttons: Any,
+    state: str,
+    backstate: str = "2",
+    show_next: bool = True,
+) -> types.InlineKeyboardMarkup:
+    rows: List[List[Tuple[str, str]]] = [[
+        *([(buttons.back, "userback")] if backstate != "2" else []),
+        *([(buttons.next, f"user_{state}")] if show_next else []),
+    ]]
+    return build_keyboard(rows)
+
+
 def kb_start(
     buttons: Any
 ) -> types.InlineKeyboardMarkup:
@@ -46,54 +59,6 @@ def kb_submit(
     rows: List[List[Tuple[str, str]]] = [
         [(buttons.back, "userback"), (buttons.next, text)]
     ]
-    return build_keyboard(rows)
-
-
-def kb_text(
-    state: str,
-    backstate: str,
-    buttons: Any
-) -> types.InlineKeyboardMarkup:
-    """Создаёт клавиатуру с кнопками 'Далее' и 'Назад' при необходимости.
-
-    Args:
-        state (str): Текущий шаг состояния пользователя.
-        backstate (str): Состояние, когда кнопка "Назад" не показывается.
-        buttons (Any): Объект с локализованными текстами кнопок.
-
-    Returns:
-        types.InlineKeyboardMarkup: Клавиатура с кнопками "Далее"
-        и "Назад".
-    """
-    rows: List[List[Tuple[str, str]]] = [[
-        *([(buttons.back, "userback")] if backstate != "2" else []),
-        *([(buttons.next, f"user_{state}")]),
-    ]]
-    return build_keyboard(rows)
-
-
-def kb_input(
-    state: str,
-    backstate: str,
-    show_next: bool,
-    buttons: Any
-) -> types.InlineKeyboardMarkup:
-    """Создаёт клавиатуру для ввода с опциональной кнопкой 'Далее'.
-
-    Args:
-        state (str): Текущий шаг состояния пользователя.
-        backstate (str): Состояние, когда кнопка "Назад" не показывается.
-        show_next (bool): Показывать кнопку "Далее".
-        buttons (Any): Объект с локализованными текстами кнопок.
-
-    Returns:
-        types.InlineKeyboardMarkup: Клавиатура с кнопками "Далее"
-        и "Назад".
-    """
-    rows: List[List[Tuple[str, str]]] = [[
-        *([(buttons.back, "userback")] if backstate != "2" else []),
-        *([(buttons.next, f"user_{state}")] if show_next else []),
-    ]]
     return build_keyboard(rows)
 
 
