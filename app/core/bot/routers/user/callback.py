@@ -62,6 +62,7 @@ async def clbk_next(
         return
 
     user_data: Dict[str, Any] = await state.get_data()
+
     loc: Any = user_data.get("loc_user")
 
     data_select: list[str] | None = None

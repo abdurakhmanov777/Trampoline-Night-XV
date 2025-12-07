@@ -1,13 +1,11 @@
 """
 Управление стеком состояний пользователя.
 
-Содержит методы для добавления, удаления и просмотра
-состояний пользователя в виде стека.
+Работает с user.state как со списком,
+а в БД хранится строка (user._state).
 """
 
 from typing import List, Optional
-
-from sqlalchemy.orm.attributes import flag_modified
 
 from app.core.database.models import User
 
@@ -17,116 +15,57 @@ from .crud import UserCRUD
 class UserState(UserCRUD):
     """Менеджер состояний пользователя."""
 
-    async def push_state(
-        self,
-        tg_id: int,
-        new_state: str,
-    ) -> bool:
+    async def push_state(self, tg_id: int, new_state: str) -> bool:
         """
-        Добавить новое состояние в стек пользователя.
-
-        Args:
-            tg_id (int): Telegram ID пользователя.
-            new_state (str): Новое состояние для добавления.
-
-        Returns:
-            bool: True, если состояние добавлено, иначе False.
+        Добавить новое состояние в стек (в конец списка).
         """
         user: User = await self.get_or_create(tg_id)
 
-        stack: List[str] = user.state.split(",") if user.state else ["1"]
+        stack = user.state       # <-- уже список
         stack.append(new_state)
-        user.state = ",".join(stack)
 
-        flag_modified(user, "state")
+        user.state = stack       # setter сам превратит список в строку
         await self.session.commit()
-
         return True
 
-    async def pop_state(
-        self,
-        tg_id: int,
-    ) -> Optional[str]:
+    async def pop_state(self, tg_id: int) -> Optional[str]:
         """
-        Извлечь последнее состояние из стека пользователя.
-
-        Args:
-            tg_id (int): Telegram ID пользователя.
-
-        Returns:
-            Optional[str]: Последнее состояние или None, если
-                стек пустой или пользователь не найден.
+        Извлечь последнее состояние (pop).
         """
         user: User = await self.get_or_create(tg_id)
 
-        stack: List[str] = user.state.split(",") if user.state else ["1"]
+        stack = user.state
         if not stack:
             return None
 
-        last_state: str = stack.pop()
-        user.state = ",".join(stack)
+        last_state = stack.pop()
 
-        flag_modified(user, "state")
+        user.state = stack
         await self.session.commit()
-
         return last_state
 
-    async def peek_state(
-        self,
-        tg_id: int,
-    ) -> Optional[str]:
+    async def peek_state(self, tg_id: int) -> Optional[str]:
         """
-        Посмотреть последнее состояние в стеке без удаления.
-
-        Args:
-            tg_id (int): Telegram ID пользователя.
-
-        Returns:
-            Optional[str]: Последнее состояние или None, если
-                стек пустой или пользователь не найден.
+        Посмотреть последнее состояние без удаления.
         """
         user: User = await self.get_or_create(tg_id)
-
-        stack: List[str] = user.state.split(",") if user.state else ["1"]
+        stack = user.state
 
         return stack[-1] if stack else None
 
-    async def get_state(
-        self,
-        tg_id: int
-    ) -> List[str]:
+    async def get_state(self, tg_id: int) -> List[str]:
         """
-        Получить весь стек состояний пользователя.
+        Получить весь список состояний.
+        """
+        user: User = await self.get_or_create(tg_id)
+        return user.state
 
-        Args:
-            tg_id (int): Telegram ID пользователя.
-
-        Returns:
-            List[str]: Список состояний пользователя. Пустой список,
-                если пользователь не найден или стек пустой.
+    async def clear_state(self, tg_id: int) -> bool:
+        """
+        Сбросить состояние до ["1"].
         """
         user: User = await self.get_or_create(tg_id)
 
-        return user.state.split(",") if user.state else ["1"]
-
-    async def clear_state(
-        self,
-        tg_id: int
-    ) -> bool:
-        """
-        Полностью сбрасывает стек состояний пользователя и оставляет
-        базовое состояние "1".
-
-        Args:
-            tg_id (int): Telegram ID пользователя.
-
-        Returns:
-            bool: True после успешного сброса.
-        """
-        user: User = await self.get_or_create(tg_id)
-        user.state = "1"
-
-        flag_modified(user, "state")
+        user.state = ["1"]       # setter → "_state='1'"
         await self.session.commit()
-
         return True

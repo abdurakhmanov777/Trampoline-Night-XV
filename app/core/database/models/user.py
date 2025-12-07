@@ -2,7 +2,7 @@
 Модуль модели пользователя Telegram.
 
 Содержит ORM-модель пользователя с полями для идентификации,
-состояния, языка, группы, сообщений и связанных данных.
+состояния (как стек), языка, группы, сообщений и связанных данных.
 """
 
 from __future__ import annotations
@@ -34,11 +34,15 @@ class User(Base):
         nullable=False,
         unique=True
     )
-    state: Mapped[str] = mapped_column(
+
+    # Хранение в БД — обычная строка ("1,2,3")
+    _state: Mapped[str] = mapped_column(
+        "state",
         String(32),
         nullable=False,
         default="1"
     )
+
     lang: Mapped[str] = mapped_column(
         String(8),
         nullable=False,
@@ -71,10 +75,43 @@ class User(Base):
         lazy="selectin"
     )
 
-    def __repr__(self) -> str:
-        """Возвращает строковое представление пользователя.
+    # ------------------------------------------------------------------
+    #                           STATE (STACK API)
+    # ------------------------------------------------------------------
 
-        Returns:
-            str: Строка с идентификатором и tg_id пользователя.
-        """
+    @property
+    def state(self) -> list[str]:
+        """Возвращает состояние как список."""
+        if not self._state:
+            return []
+        return self._state.split(",")
+
+    @state.setter
+    def state(self, value: list[str]) -> None:
+        """Устанавливает состояние списком."""
+        self._state = ",".join(value)
+
+    def push_state(self, value: str) -> None:
+        """Положить элемент в стек состояния."""
+        s: list[str] = self.state
+        s.append(value)
+        self.state = s
+
+    def pop_state(self) -> Optional[str]:
+        """Снять элемент со стека состояния."""
+        s: list[str] = self.state
+        if not s:
+            return None
+        last: str = s.pop()
+        self.state = s
+        return last
+
+    def peek_state(self) -> Optional[str]:
+        """Получить верхний элемент стека без удаления."""
+        s: list[str] = self.state
+        return s[-1] if s else None
+
+    # ------------------------------------------------------------------
+
+    def __repr__(self) -> str:
         return f"<User id={self.id} tg_id={self.tg_id}>"

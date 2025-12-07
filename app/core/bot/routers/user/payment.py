@@ -44,8 +44,24 @@ async def aaa(
     loc: Any = user_data.get("loc_user")
     if not loc or not message.from_user:
         return
-    # await message.edit_text()
-    
+
+    await handler_success(
+        loc=loc,
+        tg_id=message.from_user.id,
+        event=message
+    )
+    if message.bot:
+        msg_id: User | bool | None | int = await manage_user(
+            tg_id=message.from_user.id,
+            action="msg_update",
+            msg_id=message.message_id + 1
+        )
+        if isinstance(msg_id, int) and msg_id != 0:
+            try:
+                await message.bot.delete_message(message.chat.id, msg_id)
+            except BaseException:
+                pass
+
 @user_payment.callback_query(
     ChatTypeFilter(chat_type=["private"]),
     F.data == "payment"

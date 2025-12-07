@@ -12,8 +12,8 @@
 
 import time
 from functools import wraps
-from typing import (Any, Awaitable, Callable, Coroutine, Literal, Optional,
-                    Set, Union)
+from typing import (Any, Awaitable, Callable, Coroutine, Dict, Literal,
+                    Optional, Set, Union)
 
 from aiogram import BaseMiddleware, Bot
 from aiogram.types import CallbackQuery, ContentType, Message
@@ -21,6 +21,8 @@ from aiogram.types.user import User as TgUser
 
 from app.core.bot.services.logger import log_error
 from app.core.bot.services.requests.user.crud import manage_user
+from app.core.database import async_session
+from app.core.database.managers.user import UserManager
 from app.core.database.models.user import User
 
 from .refresh import refresh_fsm_data
@@ -98,12 +100,18 @@ class MwBase(BaseMiddleware):
         data.update(self.extra_data)
 
         # Загружаем локализацию в зависимости от роли
-        await refresh_fsm_data(data, event, role=self.role)
+        user_db: Any = await refresh_fsm_data(data, event, role=self.role)
 
         await delete_stored_message(event)
         try:
             # Вызываем хэндлер
             result: Any = await handler(event, data)
+
+            print(user_db.state)
+            async with async_session() as session:
+                user_manager: UserManager = UserManager(session)
+                await user_manager.update_user(user_db)
+
             # Удаляем событие после обработки, если включено
             if self.delete_event and hasattr(event, "delete"):
                 try:

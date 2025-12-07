@@ -187,3 +187,23 @@ class UserCRUD(UserManagerBase):
         await self.session.commit()
         await self.session.refresh(user)
         return user
+
+    async def update_user(
+        self,
+        user: User
+    ) -> User:
+        """
+        Полностью обновляет объект пользователя в базе данных.
+
+        Сохраняет все текущие поля объекта User в базе.
+
+        Args:
+            user (User): Объект пользователя с обновлёнными данными.
+
+        Returns:
+            User: Обновлённый объект пользователя.
+        """
+        self.session.add(user)
+        await self.session.commit()
+        await self.session.refresh(user)
+        return user
