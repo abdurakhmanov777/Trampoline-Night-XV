@@ -8,7 +8,7 @@ CRUD-операции для работы с таблицей Data.
 from typing import Any, Dict, Optional
 
 from loguru import logger
-from sqlalchemy import delete, select
+from sqlalchemy import Update, delete, insert, select, update
 from sqlalchemy.engine import Result as SAResult
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -125,5 +125,33 @@ class DataList(DataManagerBase):
             logger.error(
                 f"Ошибка при выборочном удалении данных пользователя: {error}"
             )
+            await self.session.rollback()
+            return False
+
+    async def update_all(
+        self,
+        tg_id: int,
+        new_data: Dict[str, Any]
+    ) -> bool:
+        user: Optional[User] = await self._get_user(tg_id)
+        if not user:
+            return False
+
+        try:
+            for key, value in new_data.items():
+                stmt: Update = update(Data).where(
+                    Data.user_id == user.id,
+                    Data.key == key
+                ).values(value=value)
+                result: Any = await self.session.execute(stmt)
+                if result.rowcount is None or result.rowcount == 0:
+                    # Создаём новую запись, если обновление не произошло
+                    await self.session.execute(
+                        insert(Data).values(user_id=user.id, key=key, value=value)
+                    )
+            await self.session.commit()
+            return True
+        except Exception as e:
+            logger.error(f"Ошибка при обновлении данных пользователя: {e}")
             await self.session.rollback()
             return False

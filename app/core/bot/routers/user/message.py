@@ -62,7 +62,7 @@ async def msg_user(
     link_opts: types.LinkPreviewOptions
 
     text_message, keyboard_message, link_opts = await multi(
-        user_data=user_data,
+        state=state,
         value=user_state,
         tg_id=tg_id,
         data=message.text,

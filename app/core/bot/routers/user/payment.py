@@ -50,7 +50,6 @@ async def aaa(
     if message.bot:
         msg_id: int = user_db.msg_id
         user_db.msg_id = message.message_id + 1
-        await state.update_data(user_db=user_db)
 
         if isinstance(msg_id, int) and msg_id != 0:
             try:
@@ -94,6 +93,5 @@ async def clbk_payment(
 
     if msg:
         user_db.msg_payment_id = msg.message_id
-        await state.update_data(user_db=user_db)
 
     await log(callback)

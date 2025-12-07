@@ -11,8 +11,8 @@
 """
 
 import time
-from typing import (Any, Awaitable, Callable, Coroutine, Literal, Optional,
-                    Set, Union)
+from typing import (Any, Awaitable, Callable, Coroutine, Dict, Literal,
+                    Optional, Set, Union)
 
 from aiogram import BaseMiddleware, Bot
 from aiogram.types import CallbackQuery, ContentType, Message
@@ -20,7 +20,8 @@ from aiogram.types.user import User as TgUser
 
 from app.core.bot.services.logger import log_error
 from app.core.database import async_session
-from app.core.database.managers.user import UserManager
+from app.core.database.managers import DataManager, UserManager
+from app.core.database.models.user import User
 
 from .refresh import refresh_fsm_data
 
@@ -74,7 +75,7 @@ class MwBase(BaseMiddleware):
         Returns:
             Any: Результат работы хэндлера.
         """
-        if event is None:
+        if event is None or not event.from_user:
             return await handler(event, data or {})
 
         # Фильтруем сообщения по разрешённым типам
@@ -97,18 +98,28 @@ class MwBase(BaseMiddleware):
         data.update(self.extra_data)
 
         # Загружаем локализацию в зависимости от роли
-        user_db: Any = await refresh_fsm_data(data, event, role=self.role)
-        msg_id: int = user_db.msg_payment_id
+        user_db: User | None
+        data_db: Dict[str, str] | None
+        user_db, data_db = await refresh_fsm_data(
+            data=data,
+            event=event,
+            role=self.role
+        )
+        msg_id: int = user_db.msg_payment_id if user_db else 0
+
         try:
             # Вызываем хэндлер
             result: Any = await handler(event, data)
 
-            await delete_stored_message(event, msg_id)
-            print(user_db.state)
-            async with async_session() as session:
-                user_manager: UserManager = UserManager(session)
-                await user_manager.update_user(user_db)
+            if user_db and data_db is not None:
+                await delete_stored_message(event, msg_id)
+                print(data_db)
+                async with async_session() as session:
+                    user_manager: UserManager = UserManager(session)
+                    await user_manager.update_user(user_db)
 
+                # data_manager: DataManager = DataManager(session)
+                # await data_manager.update_all(event.from_user.id, )
             # Удаляем событие после обработки, если включено
             if self.delete_event and hasattr(event, "delete"):
                 try:
@@ -146,7 +157,6 @@ async def delete_stored_message(
     Удаляет сообщение, id которого хранится в БД,
     основываясь на tg_id пользователя.
     """
-    # from_user есть всегда
     user: TgUser | None = event.from_user
     if user is None:  # защита для статического анализатора
         return
@@ -157,7 +167,7 @@ async def delete_stored_message(
 
     # --- Получаем chat_id корректно ---
     if isinstance(event, CallbackQuery):
-        if event.message is None:  # защита для Pylance
+        if event.message is None:
             return
         chat_id: int = event.message.chat.id
     else:

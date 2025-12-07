@@ -53,6 +53,8 @@ async def handler_input(
     part1: str
     part2: str
     part3: str
+    user_data: Dict[str, Any] = await ctx.state.get_data()
+    data_db: Any = user_data.get("data_db")
 
     # Проверяем пользовательский ввод через регулярное выражение
     if user_input is not None:
@@ -71,24 +73,27 @@ async def handler_input(
         #         )
         #         return None
         if re.fullmatch(pattern, user_input):
-            result: str | None = await manage_data(
-                tg_id=tg_id,
-                action="create_or_update",
-                key=base_text,
-                value=user_input,
-                value_type=value_type
-            )
-            if result is None:
-                error_occurred = True
+            # result: str | None = await manage_data(
+            #     tg_id=tg_id,
+            #     action="create_or_update",
+            #     key=base_text,
+            #     value=user_input,
+            #     value_type=value_type
+            # )
+            data_db[base_text] = user_input
+            # if result is None:
+                # error_occurred = True
+            pass
         else:
             error_occurred = True
     else:
         # Если пользователь ничего не ввёл, пробуем взять сохранённые данные
-        user_input = await manage_data(
-            tg_id=tg_id,
-            action="get",
-            key=base_text,
-        )
+        user_input = data_db.get(base_text, None)
+        # user_input = await manage_data(
+        #     tg_id=tg_id,
+        #     action="get",
+        #     key=base_text,
+        # )
 
     # Формируем текст сообщения в зависимости от результата проверки
     if error_occurred:

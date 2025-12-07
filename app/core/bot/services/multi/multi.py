@@ -10,6 +10,7 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from aiogram import types
+from aiogram.fsm.context import FSMContext
 
 from app.core.bot.services.requests.data import manage_data
 
@@ -37,7 +38,7 @@ SPECIAL_HANDLERS: Dict[str, Callable[[MultiContext], Any]] = {
 
 
 async def multi(
-    user_data: Any,
+    state: FSMContext,
     value: str,
     tg_id: int,
     data: Optional[str] = None,
@@ -75,8 +76,8 @@ async def multi(
     Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]
         Текст сообщения, клавиатура и параметры предпросмотра ссылок.
     """
+    user_data: Dict[str, Any] = await state.get_data()
     loc: Any = user_data.get("loc_user")
-    states: list[str] = user_data.get("user_db").state
     # Определяем обработчик для специальных состояний, если они есть.
     handler: Optional[Callable[[MultiContext], Any]] = (
         SPECIAL_HANDLERS.get(value)
@@ -97,13 +98,13 @@ async def multi(
         )
 
     context = MultiContext(
+        state=state,
         loc=loc,
         loc_state=loc_state,
         value=value,
         tg_id=tg_id,
         data=data,
         event=event,
-        states=states,
     )
 
     # Сохраняем выбранные пользователем данные заранее, так как они могут

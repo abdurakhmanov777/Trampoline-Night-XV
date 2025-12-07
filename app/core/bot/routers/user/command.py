@@ -52,7 +52,6 @@ async def cmd_start(
 
     msg_id: int = user_db.msg_id
     user_db.msg_id = message.message_id + 1
-    await state.update_data(user_db=user_db)
 
     if user_state != "100":
         text_message: str
@@ -60,7 +59,7 @@ async def cmd_start(
         link_opts: types.LinkPreviewOptions
 
         text_message, keyboard_message, link_opts = await multi(
-            user_data=user_data,
+            state=state,
             value=user_state,
             tg_id=message.from_user.id,
         )

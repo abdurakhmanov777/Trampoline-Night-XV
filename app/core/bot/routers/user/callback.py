@@ -72,7 +72,7 @@ async def clbk_next(
     link_opts: types.LinkPreviewOptions
 
     text_message, keyboard_message, link_opts = await multi(
-        user_data=user_data,
+        state=state,
         value=value[0],
         tg_id=callback.from_user.id,
         data_select=data_select,
@@ -87,7 +87,6 @@ async def clbk_next(
         )
 
         user_db.state = user_db.state + [value[0]]
-        await state.update_data(user_db=user_db)
 
     except BaseException:
         pass
@@ -138,7 +137,6 @@ async def clbk_success(
             )
 
         user_db.state = user_db.state + ["100"]
-        await state.update_data(user_db=user_db)
     except BaseException:
         pass
 
@@ -170,8 +168,6 @@ async def clbk_back(
 
     user_db.state = user_db.state[:-1]
     backstate: str = user_db.state[-1]
-    await state.update_data(user_db=user_db)
-
     if not isinstance(backstate, str):
         return
 
@@ -180,7 +176,7 @@ async def clbk_back(
     link_opts: types.LinkPreviewOptions
 
     text_message, keyboard_message, link_opts = await multi(
-        user_data=user_data,
+        state=state,
         value=backstate,
         tg_id=callback.from_user.id,
     )
@@ -246,19 +242,18 @@ async def clbk_cancel_confirm(
     """
     user_data: Dict[str, Any] = await state.get_data()
     user_db: Any = user_data.get("user_db")
-    data_db: Any = user_data.get("data_db")
 
     if not isinstance(callback.message, types.Message):
         return
 
     user_db.state = ["1"]
     await manage_data_clear(tg_id=callback.from_user.id)
-    
+
     text_message: str
     keyboard_message: types.InlineKeyboardMarkup
     link_opts: types.LinkPreviewOptions
     text_message, keyboard_message, link_opts = await multi(
-        user_data=user_data,
+        state=state,
         value="1",
         tg_id=callback.from_user.id,
     )
@@ -271,7 +266,10 @@ async def clbk_cancel_confirm(
 
     msg_id: int = user_db.msg_id
     user_db.msg_id = callback.message.message_id
-    await state.update_data(user_db=user_db)
+    await state.update_data(
+        user_db=user_db,
+        data_db={}
+    )
     if (
         isinstance(msg_id, int) and msg_id != 0 and callback.message.bot
     ):

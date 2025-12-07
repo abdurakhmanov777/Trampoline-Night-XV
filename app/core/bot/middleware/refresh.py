@@ -3,7 +3,7 @@
 объект пользователя и данные пользователя.
 """
 
-from typing import Any, Dict, Literal, Optional, cast
+from typing import Any, Dict, Literal, Optional, Tuple, cast
 
 from app.core.bot.services.localization import Localization, load_localization
 from app.core.database import async_session
@@ -15,7 +15,7 @@ async def refresh_fsm_data(
     data: Dict[str, Any],
     event: Any = None,
     role: Literal["user", "admin"] = "user",
-) -> Optional[User]:
+) -> Tuple[Optional[User], Optional[Dict[str, str]]]:
     """
     Обновляет данные FSM, включая локализацию, объект пользователя
     и данные пользователя (data_db).
@@ -30,7 +30,8 @@ async def refresh_fsm_data(
         role (Literal["user", "admin"]): Роль пользователя для локализации.
 
     Returns:
-        Optional[User]: Объект пользователя из FSM или БД, None для админа.
+        Tuple[Optional[User], Optional[Dict[str, Any]]]: Объект пользователя
+        из FSM или БД и словарь данных пользователя (data_db). None для админа.
     """
     state: Any = data.get("state")
     if state is None:
@@ -43,7 +44,7 @@ async def refresh_fsm_data(
     # Получаем данные из FSM
     fsm_data: Dict[str, Any] = await state.get_data()
 
-    # Берём user_db из FSM, если он уже существует
+    # Берём user_db и data_db из FSM, если они уже существуют
     user_db: Optional[User] = cast(Optional[User], fsm_data.get(user_key))
     data_db: Optional[Dict[str, Any]] = fsm_data.get(data_key)
 
@@ -62,7 +63,7 @@ async def refresh_fsm_data(
 
     # Для админа можно вернуть None
     elif user_db is None and role == "admin":
-        return None
+        return None, None
 
     # --- Обновление локализации ---
     if loc_key not in fsm_data:
@@ -70,4 +71,4 @@ async def refresh_fsm_data(
         loc: Localization = await load_localization(language=lang, role=role)
         await state.update_data(**{loc_key: loc, "lang": lang})
 
-    return user_db
+    return user_db, data_db

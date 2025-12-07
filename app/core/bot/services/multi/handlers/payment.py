@@ -32,7 +32,8 @@ async def handler_payment(
         Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
             Итоговое сообщение, финальная клавиатура и настройки предпросмотра.
     """
-    states: List[str] = ctx.states
+    user_data: Dict[str, Any] = await ctx.state.get_data()
+    states: list[str] = user_data["user_db"].state
 
     if not isinstance(states, list):
         raise ValueError(
