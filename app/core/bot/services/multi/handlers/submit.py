@@ -13,7 +13,6 @@ from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 from app.core.bot.services.keyboards.user import kb_submit
 from app.core.bot.services.multi.context import MultiContext
 from app.core.bot.services.requests.data import manage_data_list
-from app.core.bot.services.requests.user import manage_user_state
 
 
 async def handler_submit(
@@ -34,10 +33,7 @@ async def handler_submit(
         Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
             Итоговое сообщение, финальная клавиатура и настройки предпросмотра.
     """
-    states: bool | str | List[str] | None = await manage_user_state(
-        tg_id=ctx.tg_id,
-        action="get_state",
-    )
+    states: List[str] = ctx.states
 
     if not isinstance(states, list):
         raise ValueError(

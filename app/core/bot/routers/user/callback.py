@@ -77,7 +77,8 @@ async def clbk_next(
         value=value[0],
         tg_id=callback.from_user.id,
         data_select=data_select,
-        event=callback
+        event=callback,
+        states=user_db.state
     )
 
     try:
@@ -184,7 +185,8 @@ async def clbk_back(
     text_message, keyboard_message, link_opts = await multi(
         loc=loc,
         value=backstate,
-        tg_id=callback.from_user.id
+        tg_id=callback.from_user.id,
+        states=user_db.state
     )
 
     await callback.answer()
@@ -261,7 +263,8 @@ async def clbk_cancel_confirm(
     text_message, keyboard_message, link_opts = await multi(
         loc=loc,
         value="1",
-        tg_id=callback.from_user.id
+        tg_id=callback.from_user.id,
+        states=user_db.state
     )
 
     await callback.message.edit_text(

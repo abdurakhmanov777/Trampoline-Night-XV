@@ -43,6 +43,7 @@ async def multi(
     data: Optional[str] = None,
     data_select: Optional[List[str]] = None,
     event: Optional[Union[types.CallbackQuery, types.Message]] = None,
+    states: list[str] = []
 ) -> Tuple[
     str,
     types.InlineKeyboardMarkup,
@@ -101,6 +102,7 @@ async def multi(
         tg_id=tg_id,
         data=data,
         event=event,
+        states=states,
     )
 
     # Сохраняем выбранные пользователем данные заранее, так как они могут

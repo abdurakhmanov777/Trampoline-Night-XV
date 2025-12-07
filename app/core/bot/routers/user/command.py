@@ -62,7 +62,8 @@ async def cmd_start(
         text_message, keyboard_message, link_opts = await multi(
             loc=loc,
             value=user_state,
-            tg_id=message.from_user.id
+            tg_id=message.from_user.id,
+            states=user_db.state
         )
 
         await message.answer(

@@ -20,6 +20,7 @@ async def manage_data(
     value: Optional[str] = None,
     value_type: Optional[str] = None
 ) -> Optional[Union[str, None]]:
+    print(1111111111)
     """Выполняет CRUD-операции с пользовательскими данными.
 
     Оборачивает методы DataManager для работы с таблицей Data.

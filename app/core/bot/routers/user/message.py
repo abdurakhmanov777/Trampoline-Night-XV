@@ -65,7 +65,8 @@ async def msg_user(
         loc=loc,
         value=user_state,
         tg_id=tg_id,
-        data=message.text
+        data=message.text,
+        states=user_db.state
     )
 
     # Обновляем предыдущее сообщение с новым текстом и клавиатурой
