@@ -61,9 +61,6 @@ async def handler_success(
         return "", InlineKeyboardMarkup(
             inline_keyboard=[[]]
         ), LinkPreviewOptions()
-    # Проверка доступности message и его бота
-    # if message is None or message.bot is None:
-    #     return None
 
     # Генерация кода
     code: Optional[int] = generate_code(
@@ -123,7 +120,10 @@ async def handler_success(
         ),
         caption=caption,
         parse_mode="HTML",
-        reply_markup=kb_success(loc.buttons),
+        reply_markup=kb_success(
+            payment=loc.event.payment.status,
+            buttons=loc.buttons
+        ),
     )
 
     # Закрепление сообщения

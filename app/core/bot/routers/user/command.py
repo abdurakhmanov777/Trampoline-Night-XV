@@ -22,7 +22,7 @@ user_command: Router = Router()
 
 @user_command.message(
     ChatTypeFilter(chat_type=["private"]),
-    Command("start")
+    Command("b")
 )
 async def cmd_start(
     message: types.Message,
