@@ -37,13 +37,12 @@ SPECIAL_HANDLERS: Dict[str, Callable[[MultiContext], Any]] = {
 
 
 async def multi(
-    loc: Any,
+    user_data: Any,
     value: str,
     tg_id: int,
     data: Optional[str] = None,
     data_select: Optional[List[str]] = None,
     event: Optional[Union[types.CallbackQuery, types.Message]] = None,
-    states: list[str] = []
 ) -> Tuple[
     str,
     types.InlineKeyboardMarkup,
@@ -76,6 +75,8 @@ async def multi(
     Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]
         Текст сообщения, клавиатура и параметры предпросмотра ссылок.
     """
+    loc: Any = user_data.get("loc_user")
+    states: list[str] = user_data.get("user_db").state
     # Определяем обработчик для специальных состояний, если они есть.
     handler: Optional[Callable[[MultiContext], Any]] = (
         SPECIAL_HANDLERS.get(value)

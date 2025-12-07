@@ -62,11 +62,10 @@ async def msg_user(
     link_opts: types.LinkPreviewOptions
 
     text_message, keyboard_message, link_opts = await multi(
-        loc=loc,
+        user_data=user_data,
         value=user_state,
         tg_id=tg_id,
         data=message.text,
-        states=user_db.state
     )
 
     # Обновляем предыдущее сообщение с новым текстом и клавиатурой

@@ -61,7 +61,6 @@ async def clbk_next(
 
     user_data: Dict[str, Any] = await state.get_data()
 
-    loc: Any = user_data.get("loc_user")
     user_db: Any = user_data.get("user_db")
 
     data_select: list[str] | None = None
@@ -73,12 +72,11 @@ async def clbk_next(
     link_opts: types.LinkPreviewOptions
 
     text_message, keyboard_message, link_opts = await multi(
-        loc=loc,
+        user_data=user_data,
         value=value[0],
         tg_id=callback.from_user.id,
         data_select=data_select,
         event=callback,
-        states=user_db.state
     )
 
     try:
@@ -168,7 +166,6 @@ async def clbk_back(
         return
 
     user_data: Dict[str, Any] = await state.get_data()
-    loc: Any = user_data.get("loc_user")
     user_db: Any = user_data.get("user_db")
 
     user_db.state = user_db.state[:-1]
@@ -183,10 +180,9 @@ async def clbk_back(
     link_opts: types.LinkPreviewOptions
 
     text_message, keyboard_message, link_opts = await multi(
-        loc=loc,
+        user_data=user_data,
         value=backstate,
         tg_id=callback.from_user.id,
-        states=user_db.state
     )
 
     await callback.answer()
@@ -249,22 +245,22 @@ async def clbk_cancel_confirm(
         state (FSMContext): Контекст FSM для хранения данных пользователя.
     """
     user_data: Dict[str, Any] = await state.get_data()
-    loc: Any = user_data.get("loc_user")
     user_db: Any = user_data.get("user_db")
+    data_db: Any = user_data.get("data_db")
+
     if not isinstance(callback.message, types.Message):
         return
 
     user_db.state = ["1"]
     await manage_data_clear(tg_id=callback.from_user.id)
-
+    
     text_message: str
     keyboard_message: types.InlineKeyboardMarkup
     link_opts: types.LinkPreviewOptions
     text_message, keyboard_message, link_opts = await multi(
-        loc=loc,
+        user_data=user_data,
         value="1",
         tg_id=callback.from_user.id,
-        states=user_db.state
     )
 
     await callback.message.edit_text(

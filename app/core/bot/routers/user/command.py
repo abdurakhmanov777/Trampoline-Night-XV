@@ -60,10 +60,9 @@ async def cmd_start(
         link_opts: types.LinkPreviewOptions
 
         text_message, keyboard_message, link_opts = await multi(
-            loc=loc,
+            user_data=user_data,
             value=user_state,
             tg_id=message.from_user.id,
-            states=user_db.state
         )
 
         await message.answer(

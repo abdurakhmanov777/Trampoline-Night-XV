@@ -113,9 +113,6 @@ async def handler_input(
         show_next = False
 
     else:
-        # if value_type == "date":
-        #     print(111)
-        #     print(type(user_input), user_input.strftime("%d.%m.%Y")) # type: ignore
         # Поле заполнено корректно
         part1, part2, part3 = template.filled
         text_message = (

@@ -1,12 +1,13 @@
 """
-Модуль для обновления данных FSM, включая локализацию и объект пользователя.
+Модуль для обновления данных FSM, включая локализацию,
+объект пользователя и данные пользователя.
 """
 
-from typing import Any, Dict, Literal, cast
+from typing import Any, Dict, Literal, Optional, cast
 
 from app.core.bot.services.localization import Localization, load_localization
 from app.core.database import async_session
-from app.core.database.managers import UserManager
+from app.core.database.managers import DataManager, UserManager
 from app.core.database.models import User
 
 
@@ -14,11 +15,12 @@ async def refresh_fsm_data(
     data: Dict[str, Any],
     event: Any = None,
     role: Literal["user", "admin"] = "user",
-) -> User:
+) -> Optional[User]:
     """
-    Обновляет данные FSM, включая локализацию и объект пользователя.
+    Обновляет данные FSM, включая локализацию, объект пользователя
+    и данные пользователя (data_db).
 
-    Проверяет наличие локализации и user_db в FSM. Если их нет,
+    Проверяет наличие локализации, user_db и data_db в FSM. Если их нет,
     создаёт или загружает необходимые данные. Для пользователей
     язык определяется из БД, для админов используется язык по умолчанию.
 
@@ -28,7 +30,7 @@ async def refresh_fsm_data(
         role (Literal["user", "admin"]): Роль пользователя для локализации.
 
     Returns:
-        User: Объект пользователя из FSM или БД.
+        Optional[User]: Объект пользователя из FSM или БД, None для админа.
     """
     state: Any = data.get("state")
     if state is None:
@@ -36,12 +38,14 @@ async def refresh_fsm_data(
 
     loc_key: str = f"loc_{role}"
     user_key: str = "user_db"
+    data_key: str = "data_db"
 
     # Получаем данные из FSM
     fsm_data: Dict[str, Any] = await state.get_data()
 
     # Берём user_db из FSM, если он уже существует
-    user_db: User = cast(User, fsm_data.get(user_key))
+    user_db: Optional[User] = cast(Optional[User], fsm_data.get(user_key))
+    data_db: Optional[Dict[str, Any]] = fsm_data.get(data_key)
 
     # Если user_db отсутствует, создаём для обычного пользователя
     if user_db is None and role == "user" and event:
@@ -49,15 +53,20 @@ async def refresh_fsm_data(
         async with async_session() as session:
             user_manager: UserManager = UserManager(session)
             user_db = await user_manager.get_or_create(tg_id)
-        await state.update_data(**{user_key: user_db})
 
-    # Для админа можно создать фиктивного пользователя
+            data_manager: DataManager = DataManager(session)
+            data_db = await data_manager.dict_all(tg_id)
+
+        # Сохраняем user_db и data_db в FSM
+        await state.update_data(**{user_key: user_db, data_key: data_db})
+
+    # Для админа можно вернуть None
     elif user_db is None and role == "admin":
         return None
 
     # --- Обновление локализации ---
     if loc_key not in fsm_data:
-        lang: str = getattr(user_db, "lang", "ru")
+        lang: str = getattr(user_db, "lang", "ru") if user_db else "ru"
         loc: Localization = await load_localization(language=lang, role=role)
         await state.update_data(**{loc_key: loc, "lang": lang})
 
