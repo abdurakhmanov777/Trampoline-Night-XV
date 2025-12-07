@@ -43,7 +43,11 @@ async def handler_payment(
 
     loc: Any = ctx.loc
 
-    text_message: str = loc.messages.payment
+    part1: str
+    part2: str
+
+    part1, part2 = loc.messages.template.payment
+    text_message: str = f"{part1}{loc.buttons.payment}{part2}"
 
     # Создаём финальную клавиатуру
     keyboard: InlineKeyboardMarkup = kb_payment(
