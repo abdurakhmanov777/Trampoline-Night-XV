@@ -51,7 +51,7 @@ async def log(
     # Формируем строку дополнительных аргументов
     extra_info: str = ", ".join(str(arg) for arg in args if arg is not None)
 
-    # Итоговое сообщение
+    # Сообщение
     message: str = (
         f"[{module}/{filename}:{lineno}] {func_name} "
         f"({extra_info + ', ' if extra_info else ''}{tg_id})"
@@ -132,7 +132,7 @@ async def log_error(
         type(error).__name__ if error else "UnknownError"
     )
 
-    # Итоговое сообщение
+    # Сообщение
     message: str = (
         f"[{module}/{filename}:{lineno}] {func_name} — "
         f"{error_type}: {error} "

@@ -24,7 +24,7 @@ class CallbackNextFilter(BaseFilter):
         self,
         callback: CallbackQuery,
     ) -> Union[Dict[str, Any], bool]:
-        """Проверить наличие подстроки 'user{SYMB}' в данных callback-запроса.
+        """Проверить наличие подстроки 'user{SYMB}' в данных запроса.
 
         Parameters
         ----------
@@ -34,13 +34,13 @@ class CallbackNextFilter(BaseFilter):
         Returns
         -------
         Union[Dict[str, Any], bool]
-            Словарь с ключом 'user_data', содержащим подстроку после 'user{SYMB}',
+            Словарь с ключом 'user{SYMB}data',
+                содержащим подстроку после 'user{SYMB}',
             если подстрока 'user{SYMB}' найдена, иначе False.
         """
         if not callback.data or f"user{SYMB}" not in callback.data:
             return False
 
-        # split по "_" и убираем первый элемент 'user'
         user_values: list[str] = callback.data.split(SYMB)[1:]
 
         return {"value": user_values}

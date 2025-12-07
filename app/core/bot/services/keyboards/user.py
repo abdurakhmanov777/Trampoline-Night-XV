@@ -39,7 +39,7 @@ def kb_start(
         types.InlineKeyboardMarkup: Клавиатура с кнопкой согласия.
     """
     rows: List[List[Tuple[str, str]]] = [
-        [(buttons.consent, "user{SYMB}2")]
+        [(buttons.consent, f"user{SYMB}2")]
     ]
     return build_keyboard(rows)
 
@@ -57,7 +57,7 @@ def kb_submit(
         types.InlineKeyboardMarkup: Клавиатура с кнопками "Далее"
         и "Назад".
     """
-    text: str = "user{SYMB}99" if payment else "success"
+    text: str = f"user{SYMB}99" if payment else "success"
     rows: List[List[Tuple[str, str]]] = [
         [(buttons.back, "userback"), (buttons.next, text)]
     ]
@@ -92,9 +92,12 @@ def kb_select(
         next_step: str = option["next"]
         save: bool = option.get("save") is True
         callback_data: str = (
-            f"user{SYMB}{next_step}_{text}_{name}" if save else f"user{SYMB}{next_step}"
+            f"user{SYMB}{next_step}{SYMB}{text}{SYMB}{name}"
+            if save else f"user{SYMB}{next_step}"
         )
-
+        # print(callback_data)
+        if len(callback_data) > 64:
+            return build_keyboard([[]])
         # Перенос ряда, если кнопка не помещается
         if current_length + len(text) > max_length_per_row:
             if current_row:

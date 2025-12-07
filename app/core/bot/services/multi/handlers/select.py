@@ -48,7 +48,6 @@ async def handler_select(
         options=loc_state.options,
         buttons=loc.buttons,
     )
-
     opts: LinkPreviewOptions = LinkPreviewOptions(is_disabled=True)
 
     return text_message, keyboard, opts
