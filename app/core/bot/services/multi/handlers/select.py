@@ -11,7 +11,6 @@ from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
 from app.core.bot.services.keyboards.user import kb_select
 from app.core.bot.services.multi.context import MultiContext
-from app.core.bot.services.requests.data.crud import manage_data
 
 
 async def handler_select(

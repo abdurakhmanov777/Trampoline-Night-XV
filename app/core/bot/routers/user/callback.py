@@ -16,7 +16,6 @@ from app.core.bot.routers.filters import CallbackNextFilter, ChatTypeFilter
 from app.core.bot.services.keyboards.user import kb_cancel_confirm
 from app.core.bot.services.logger import log
 from app.core.bot.services.multi import handler_success, multi
-from app.core.bot.services.requests.data import manage_data_clear
 
 user_callback: Router = Router()
 
@@ -242,12 +241,13 @@ async def clbk_cancel_confirm(
     """
     user_data: Dict[str, Any] = await state.get_data()
     user_db: Any = user_data.get("user_db")
+    data_db: Any = user_data.get("data_db")
+    data_db.clear()
 
     if not isinstance(callback.message, types.Message):
         return
 
     user_db.state = ["1"]
-    await manage_data_clear(tg_id=callback.from_user.id)
 
     text_message: str
     keyboard_message: types.InlineKeyboardMarkup
@@ -266,10 +266,7 @@ async def clbk_cancel_confirm(
 
     msg_id: int = user_db.msg_id
     user_db.msg_id = callback.message.message_id
-    await state.update_data(
-        user_db=user_db,
-        data_db={}
-    )
+
     if (
         isinstance(msg_id, int) and msg_id != 0 and callback.message.bot
     ):

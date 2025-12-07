@@ -12,8 +12,6 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 
-from app.core.bot.services.requests.data import manage_data
-
 from .context import MultiContext
 from .handlers.input import handler_input
 from .handlers.payment import handler_payment

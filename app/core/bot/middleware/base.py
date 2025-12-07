@@ -21,7 +21,7 @@ from aiogram.types.user import User as TgUser
 from app.core.bot.services.logger import log_error
 from app.core.database import async_session
 from app.core.database.managers import DataManager, UserManager
-from app.core.database.models.user import User
+from app.core.database.models import User
 
 from .refresh import refresh_fsm_data
 
@@ -110,16 +110,14 @@ class MwBase(BaseMiddleware):
         try:
             # Вызываем хэндлер
             result: Any = await handler(event, data)
-
+            await delete_stored_message(event, msg_id)
             if user_db and data_db is not None:
-                await delete_stored_message(event, msg_id)
-                print(data_db)
                 async with async_session() as session:
                     user_manager: UserManager = UserManager(session)
                     await user_manager.update_user(user_db)
 
-                # data_manager: DataManager = DataManager(session)
-                # await data_manager.update_all(event.from_user.id, )
+                    data_manager: DataManager = DataManager(session)
+                    await data_manager.update_all(event.from_user.id, data_db)
             # Удаляем событие после обработки, если включено
             if self.delete_event and hasattr(event, "delete"):
                 try:
@@ -131,22 +129,6 @@ class MwBase(BaseMiddleware):
         except Exception as e:
             # Логируем ошибки
             await log_error(event, error=e)
-
-
-async def measure_time(coro: Coroutine[Any, Any, Any]) -> Any:
-    """
-    Измеряет время выполнения уже созданного coroutine.
-
-    Usage:
-        await measure_time(delete_stored_message(event))
-    """
-    start = time.perf_counter()
-    result = await coro
-    end = time.perf_counter()
-    print(f"{coro.__name__ if hasattr(
-        coro, '__name__'
-    ) else 'coroutine'} заняла {end - start:.4f} секунд")
-    return result
 
 
 async def delete_stored_message(

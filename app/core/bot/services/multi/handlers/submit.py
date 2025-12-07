@@ -12,7 +12,6 @@ from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
 from app.core.bot.services.keyboards.user import kb_submit
 from app.core.bot.services.multi.context import MultiContext
-from app.core.bot.services.requests.data import manage_data_list
 
 
 async def handler_submit(

@@ -138,6 +138,11 @@ class DataList(DataManagerBase):
             return False
 
         try:
+            # Если пришёл пустой словарь, удаляем все записи
+            if not new_data:
+                return await self.clear_all(tg_id)
+
+            # Обновляем или создаём записи
             for key, value in new_data.items():
                 stmt: Update = update(Data).where(
                     Data.user_id == user.id,
