@@ -12,20 +12,24 @@ from typing import Any, Literal
 import aiofiles
 from loguru import logger
 
-from app.config import LOCALIZATIONS_ADMIN_DIR, LOCALIZATIONS_USER_DIR
+from app.config import LOCALIZATIONS_DIR
 from app.core.bot.services.localization.model import Localization
 
 
 async def load_localization(
     language: str,
-    role: Literal["user", "admin"] = "user",
+    role: Literal[
+        "user",
+        "admin",
+    ],
 ) -> Localization:
     """
     Асинхронно загружает файл локализации по указанному языку и роли.
 
     Args:
         language (str): Код языка, например "ru".
-        role (Literal["user", "admin"]): "user" для пользовательской локализации,
+        role (Literal["user", "admin"]):
+            "user" для пользовательской локализации,
             "admin" для админской.
 
     Returns:
@@ -33,14 +37,11 @@ async def load_localization(
         Если файл не найден или произошла ошибка, возвращается пустая
         локализация.
     """
-    dir_map: dict[str, Path] = {
-        "user": LOCALIZATIONS_USER_DIR,
-        "admin": LOCALIZATIONS_ADMIN_DIR,
-    }
+    # Определяем директорию в зависимости от роли
+    dir_path: Path = LOCALIZATIONS_DIR / role
 
-    file_path: Path = dir_map.get(role, LOCALIZATIONS_USER_DIR) / (
-        f"{language}.json"
-    )
+    # Формируем путь к файлу
+    file_path: Path = dir_path / f"{language}.json"
 
     if not file_path.exists():
         logger.error(f"Localization file not found: {file_path.resolve()}")

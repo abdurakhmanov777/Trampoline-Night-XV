@@ -9,7 +9,7 @@ from app.core.bot.services.localization import Localization, load_localization
 from app.core.database import DataManager, User, UserManager, async_session
 
 
-async def refresh_fsm_data(
+async def refresh_data_user(
     data: Dict[str, Any],
     event: Any = None,
     role: Literal["user", "admin"] = "user",
@@ -35,7 +35,7 @@ async def refresh_fsm_data(
     if state is None:
         raise ValueError("FSMContext не найден в data")
 
-    loc_key: str = f"loc_{role}"
+    loc_key: str = f"loc_user"
     user_key: str = "user_db"
     data_key: str = "data_db"
 
@@ -47,7 +47,7 @@ async def refresh_fsm_data(
     data_db: Optional[Dict[str, Any]] = fsm_data.get(data_key)
 
     # Если user_db отсутствует, создаём для обычного пользователя
-    if user_db is None and role == "user" and event:
+    if user_db is None and event:
         tg_id: int = getattr(event.from_user, "id")
         async with async_session() as session:
             user_manager: UserManager = UserManager(session)
@@ -59,14 +59,13 @@ async def refresh_fsm_data(
         # Сохраняем user_db и data_db в FSM
         await state.update_data(**{user_key: user_db, data_key: data_db})
 
-    # Для админа можно вернуть None
-    elif user_db is None and role == "admin":
-        return None, None
-
     # --- Обновление локализации ---
     if loc_key not in fsm_data:
         lang: str = getattr(user_db, "lang", "ru") if user_db else "ru"
-        loc: Localization = await load_localization(language=lang, role=role)
+        loc: Localization = await load_localization(
+            language=lang,
+            role="user"
+        )
         await state.update_data(**{loc_key: loc, "lang": lang})
 
     return user_db, data_db

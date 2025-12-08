@@ -23,8 +23,7 @@ FONTS_DIR: Path = ASSETS_DIR / "fonts"          # Шрифты
 DOCUMENTS_DIR: Path = ASSETS_DIR / "documents"  # Документы
 
 # Директории локализаций
-LOCALIZATIONS_USER_DIR: Path = ASSETS_DIR / "locales" / "user"
-LOCALIZATIONS_ADMIN_DIR: Path = ASSETS_DIR / "locales" / "admin"
+LOCALIZATIONS_DIR: Path = ASSETS_DIR / "locales"
 
 # Пути к основным файлам проекта
 BACKGROUND_PATH: Path = IMAGES_DIR / os.getenv(

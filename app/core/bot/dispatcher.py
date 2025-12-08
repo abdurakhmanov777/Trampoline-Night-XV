@@ -11,10 +11,6 @@ from aiogram.fsm.storage.memory import MemoryStorage, SimpleEventIsolation
 from app.core.bot import routers
 from app.core.bot.middleware import mw
 
-# from app.core.bot.routers import (admin_callback, admin_command, admin_message,
-#                                   intercept_handler, user_callback,
-#                                   user_command, user_message)
-
 
 async def _apply_middlewares(
     router_middleware_map: Dict[Any, Any],
