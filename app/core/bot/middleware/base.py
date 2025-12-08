@@ -12,9 +12,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import ContentType, Message
 
 from app.core.bot.services.logger import log_error
-from app.core.database import async_session
-from app.core.database.managers import DataManager, UserManager
-from app.core.database.models import User
+from app.core.database import DataManager, User, UserManager, async_session
 
 from .refresh import refresh_fsm_data
 

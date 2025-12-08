@@ -11,7 +11,7 @@ from loguru import logger
 from sqlalchemy import Result, select
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.core.database.models import Admin
+from ...models import Admin
 
 from .base import AdminManagerBase
 

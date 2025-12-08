@@ -12,8 +12,7 @@ from sqlalchemy import Update, delete, insert, select, update
 from sqlalchemy.engine import Result as SAResult
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.core.database.models import Data, User
-
+from ...models import Data, User
 from .base import DataManagerBase
 
 

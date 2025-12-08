@@ -7,8 +7,7 @@
 
 from typing import List, Optional
 
-from app.core.database.models import Admin
-
+from ...models import Admin
 from .crud import AdminCRUD
 
 

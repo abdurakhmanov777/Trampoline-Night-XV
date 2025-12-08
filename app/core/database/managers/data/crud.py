@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-import json
 from datetime import datetime
 from typing import Any, Callable, Dict, Optional
 
@@ -16,8 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.engine import Result as SAResult
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.core.database.models import Data, User
-
+from ...models import Data, User
 from .base import DataManagerBase
 
 
@@ -109,7 +107,7 @@ class DataCRUD(DataManagerBase):
 
             caster: Optional[Callable[[str], Any]] = type_map.get(
                 value_type.lower()
-                )
+            )
             if not caster:
                 logger.error(f"Неподдерживаемый тип: {value_type}")
                 return None
@@ -139,7 +137,6 @@ class DataCRUD(DataManagerBase):
             logger.error(f"Ошибка при создании/обновлении данных: {error}")
             await self.session.rollback()
             return None
-
 
     async def delete(
         self,

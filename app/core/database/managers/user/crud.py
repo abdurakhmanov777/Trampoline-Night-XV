@@ -10,8 +10,7 @@ from loguru import logger
 from sqlalchemy import Result, select
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.core.database.models import User
-
+from ...models import User
 from .base import UserManagerBase
 
 

@@ -10,8 +10,7 @@ from loguru import logger
 from sqlalchemy import Result, select
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.core.database.models import Flag
-
+from ...models import Flag
 from .base import FlagManagerBase
 
 

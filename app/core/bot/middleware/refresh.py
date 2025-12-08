@@ -6,9 +6,7 @@
 from typing import Any, Dict, Literal, Optional, Tuple, cast
 
 from app.core.bot.services.localization import Localization, load_localization
-from app.core.database import async_session
-from app.core.database.managers import DataManager, UserManager
-from app.core.database.models import User
+from app.core.database import DataManager, User, UserManager, async_session
 
 
 async def refresh_fsm_data(
