@@ -17,72 +17,125 @@ from app.core.bot.services.keyboards.user import kb_cancel_confirm
 from app.core.bot.services.logger import log
 from app.core.bot.services.multi import multi
 
-user_callback: Router = Router()
 
+def get_router_user_callback() -> Router:
 
-@user_callback.callback_query(
-    ChatTypeFilter(chat_type=["private"]),
-    F.data == "delete"
-)
-async def clbk_delete(
-    callback: types.CallbackQuery
-) -> None:
-    """Удаляет сообщение, вызвавшее callback-запрос.
+    user_callback: Router = Router()
 
-    Args:
-        callback (types.CallbackQuery): Callback-запрос Telegram.
-    """
-    if isinstance(callback.message, types.Message):
-        await callback.message.delete()
-    await log(callback)
-
-
-@user_callback.callback_query(
-    ChatTypeFilter(chat_type=["private"]),
-    CallbackNextFilter()
-)
-async def clbk_next(
-    callback: types.CallbackQuery,
-    state: FSMContext,
-    value: str,
-) -> None:
-    """
-    Обрабатывает переход пользователя к следующему состоянию.
-
-    Получает данные пользователя из FSMContext, формирует текст и клавиатуру
-    через функцию `multi`, редактирует текущее сообщение и добавляет новое
-    состояние в стек `user_db.state`.
-
-    Args:
-        callback (types.CallbackQuery): Входящий callback-запрос.
-        state (FSMContext): Контекст FSM для хранения данных пользователя.
-        value (str): Код состояния/действия, переданный кнопкой.
-    """
-    await callback.answer()
-    if not isinstance(callback.message, types.Message):
-        return
-
-    user_data: Dict[str, Any] = await state.get_data()
-
-    user_db: Any = user_data.get("user_db")
-
-    data_select: list[str] | None = None
-    if len(value) == 3:
-        data_select = [value[2], value[1]]
-
-    text_message: str
-    keyboard_message: types.InlineKeyboardMarkup
-    link_opts: types.LinkPreviewOptions
-
-    text_message, keyboard_message, link_opts = await multi(
-        state=state,
-        value=value[0],
-        tg_id=callback.from_user.id,
-        data_select=data_select,
-        event=callback,
+    @user_callback.callback_query(
+        ChatTypeFilter(chat_type=["private"]),
+        F.data == "delete"
     )
-    user_db.state = user_db.state + [value[0]]
-    if value[0] != "100":
+    async def clbk_delete(
+        callback: types.CallbackQuery
+    ) -> None:
+        """Удаляет сообщение, вызвавшее callback-запрос.
+
+        Args:
+            callback (types.CallbackQuery): Callback-запрос Telegram.
+        """
+        if isinstance(callback.message, types.Message):
+            await callback.message.delete()
+        await log(callback)
+
+    @user_callback.callback_query(
+        ChatTypeFilter(chat_type=["private"]),
+        CallbackNextFilter()
+    )
+    async def clbk_next(
+        callback: types.CallbackQuery,
+        state: FSMContext,
+        value: str,
+    ) -> None:
+        """
+        Обрабатывает переход пользователя к следующему состоянию.
+
+        Получает данные пользователя из FSMContext, формирует текст и клавиатуру
+        через функцию `multi`, редактирует текущее сообщение и добавляет новое
+        состояние в стек `user_db.state`.
+
+        Args:
+            callback (types.CallbackQuery): Входящий callback-запрос.
+            state (FSMContext): Контекст FSM для хранения данных пользователя.
+            value (str): Код состояния/действия, переданный кнопкой.
+        """
+        await callback.answer()
+        if not isinstance(callback.message, types.Message):
+            return
+
+        user_data: Dict[str, Any] = await state.get_data()
+
+        user_db: Any = user_data.get("user_db")
+
+        data_select: list[str] | None = None
+        if len(value) == 3:
+            data_select = [value[2], value[1]]
+
+        text_message: str
+        keyboard_message: types.InlineKeyboardMarkup
+        link_opts: types.LinkPreviewOptions
+
+        text_message, keyboard_message, link_opts = await multi(
+            state=state,
+            value=value[0],
+            tg_id=callback.from_user.id,
+            data_select=data_select,
+            event=callback,
+        )
+        user_db.state = user_db.state + [value[0]]
+        if value[0] != "100":
+            try:
+                await callback.message.edit_text(
+                    text=text_message,
+                    reply_markup=keyboard_message,
+                    link_preview_options=link_opts
+                )
+            except Exception:
+                pass
+
+        await log(callback)
+
+    @user_callback.callback_query(
+        ChatTypeFilter(chat_type=["private"]),
+        F.data == "userback"
+    )
+    async def clbk_back(
+        callback: types.CallbackQuery,
+        state: FSMContext,
+    ) -> None:
+        """
+        Возвращает пользователя к предыдущему состоянию.
+
+        Удаляет последнее состояние из стека, получает предыдущее состояние,
+        формирует новое сообщение через `multi` и редактирует текущий текст
+        и клавиатуру.
+
+        Args:
+            callback (types.CallbackQuery): Callback-запрос Telegram.
+            state (FSMContext): Контекст FSM с пользовательскими данными.
+        """
+        await callback.answer()
+        if not isinstance(callback.message, types.Message):
+            return
+
+        user_data: Dict[str, Any] = await state.get_data()
+        user_db: Any = user_data.get("user_db")
+
+        user_db.state = user_db.state[:-1]
+        backstate: str = user_db.state[-1]
+        if not isinstance(backstate, str):
+            return
+
+        text_message: str
+        keyboard_message: types.InlineKeyboardMarkup
+        link_opts: types.LinkPreviewOptions
+
+        text_message, keyboard_message, link_opts = await multi(
+            state=state,
+            value=backstate,
+            tg_id=callback.from_user.id,
+        )
+
         try:
             await callback.message.edit_text(
                 text=text_message,
@@ -92,194 +145,140 @@ async def clbk_next(
         except Exception:
             pass
 
-    await log(callback)
+        await log(callback)
 
-
-@user_callback.callback_query(
-    ChatTypeFilter(chat_type=["private"]),
-    F.data == "userback"
-)
-async def clbk_back(
-    callback: types.CallbackQuery,
-    state: FSMContext,
-) -> None:
-    """
-    Возвращает пользователя к предыдущему состоянию.
-
-    Удаляет последнее состояние из стека, получает предыдущее состояние,
-    формирует новое сообщение через `multi` и редактирует текущий текст
-    и клавиатуру.
-
-    Args:
-        callback (types.CallbackQuery): Callback-запрос Telegram.
-        state (FSMContext): Контекст FSM с пользовательскими данными.
-    """
-    await callback.answer()
-    if not isinstance(callback.message, types.Message):
-        return
-
-    user_data: Dict[str, Any] = await state.get_data()
-    user_db: Any = user_data.get("user_db")
-
-    user_db.state = user_db.state[:-1]
-    backstate: str = user_db.state[-1]
-    if not isinstance(backstate, str):
-        return
-
-    text_message: str
-    keyboard_message: types.InlineKeyboardMarkup
-    link_opts: types.LinkPreviewOptions
-
-    text_message, keyboard_message, link_opts = await multi(
-        state=state,
-        value=backstate,
-        tg_id=callback.from_user.id,
+    @user_callback.callback_query(
+        ChatTypeFilter(chat_type=["private"]),
+        F.data == "cancel_reg"
     )
+    async def clbk_cancel(
+        callback: types.CallbackQuery,
+        state: FSMContext
+    ) -> None:
+        """
+        Отправляет пользователю запрос на подтверждение отмены регистрации.
 
-    try:
-        await callback.message.edit_text(
-            text=text_message,
-            reply_markup=keyboard_message,
-            link_preview_options=link_opts
+        Показывает сообщение с кнопками для отмены и возврата.
+
+        Args:
+            callback (types.CallbackQuery): Callback-запрос Telegram.
+            state (FSMContext): Контекст FSM данных пользователя.
+        """
+        await callback.answer()
+        user_data: Dict[str, Any] = await state.get_data()
+        loc: Any = user_data.get("loc_user")
+        if not callback.message:
+            return
+
+        await callback.message.answer(
+            text=loc.messages.cancel,
+            reply_markup=kb_cancel_confirm(buttons=loc.buttons)
         )
-    except Exception:
-        pass
 
-    await log(callback)
+        await log(callback)
 
-
-@user_callback.callback_query(
-    ChatTypeFilter(chat_type=["private"]),
-    F.data == "cancel_reg"
-)
-async def clbk_cancel(
-    callback: types.CallbackQuery,
-    state: FSMContext
-) -> None:
-    """
-    Отправляет пользователю запрос на подтверждение отмены регистрации.
-
-    Показывает сообщение с кнопками для отмены и возврата.
-
-    Args:
-        callback (types.CallbackQuery): Callback-запрос Telegram.
-        state (FSMContext): Контекст FSM данных пользователя.
-    """
-    await callback.answer()
-    user_data: Dict[str, Any] = await state.get_data()
-    loc: Any = user_data.get("loc_user")
-    if not callback.message:
-        return
-
-    await callback.message.answer(
-        text=loc.messages.cancel,
-        reply_markup=kb_cancel_confirm(buttons=loc.buttons)
+    @user_callback.callback_query(
+        ChatTypeFilter(chat_type=["private"]),
+        F.data == "cancel_reg_confirm"
     )
+    async def clbk_cancel_confirm(
+        callback: types.CallbackQuery,
+        state: FSMContext,
+    ) -> None:
+        """
+        Подтверждает отмену регистрации и сбрасывает прогресс.
 
-    await log(callback)
+        Полностью очищает пользовательские данные (`data_db`), сбрасывает стек
+        состояния в начальное значение, формирует стартовое сообщение через
+        `multi` и обновляет сообщение в чате.
 
+        Args:
+            callback (types.CallbackQuery): Callback-запрос Telegram.
+            state (FSMContext): Контекст FSM для хранения данных пользователя.
+        """
+        await callback.answer()
+        user_data: Dict[str, Any] = await state.get_data()
+        user_db: Any = user_data.get("user_db")
+        data_db: Any = user_data.get("data_db")
+        data_db.clear()
 
-@user_callback.callback_query(
-    ChatTypeFilter(chat_type=["private"]),
-    F.data == "cancel_reg_confirm"
-)
-async def clbk_cancel_confirm(
-    callback: types.CallbackQuery,
-    state: FSMContext,
-) -> None:
-    """
-    Подтверждает отмену регистрации и сбрасывает прогресс.
+        if not isinstance(callback.message, types.Message):
+            return
 
-    Полностью очищает пользовательские данные (`data_db`), сбрасывает стек
-    состояния в начальное значение, формирует стартовое сообщение через
-    `multi` и обновляет сообщение в чате.
+        user_db.state = ["1"]
 
-    Args:
-        callback (types.CallbackQuery): Callback-запрос Telegram.
-        state (FSMContext): Контекст FSM для хранения данных пользователя.
-    """
-    await callback.answer()
-    user_data: Dict[str, Any] = await state.get_data()
-    user_db: Any = user_data.get("user_db")
-    data_db: Any = user_data.get("data_db")
-    data_db.clear()
-
-    if not isinstance(callback.message, types.Message):
-        return
-
-    user_db.state = ["1"]
-
-    text_message: str
-    keyboard_message: types.InlineKeyboardMarkup
-    link_opts: types.LinkPreviewOptions
-    text_message, keyboard_message, link_opts = await multi(
-        state=state,
-        value="1",
-        tg_id=callback.from_user.id,
-    )
-    try:
-        await callback.message.edit_text(
-            text=text_message,
-            reply_markup=keyboard_message,
-            link_preview_options=link_opts
+        text_message: str
+        keyboard_message: types.InlineKeyboardMarkup
+        link_opts: types.LinkPreviewOptions
+        text_message, keyboard_message, link_opts = await multi(
+            state=state,
+            value="1",
+            tg_id=callback.from_user.id,
         )
-    except Exception:
-        pass
-
-    msg_id: int = user_db.msg_id
-    user_db.msg_id = callback.message.message_id
-
-    if (
-        isinstance(msg_id, int) and msg_id != 0 and callback.message.bot
-    ):
         try:
-            await callback.message.bot.delete_message(
-                callback.message.chat.id,
-                msg_id
+            await callback.message.edit_text(
+                text=text_message,
+                reply_markup=keyboard_message,
+                link_preview_options=link_opts
             )
         except Exception:
             pass
 
-    await log(callback)
+        msg_id: int = user_db.msg_id
+        user_db.msg_id = callback.message.message_id
 
+        if (
+            isinstance(msg_id, int) and msg_id != 0 and callback.message.bot
+        ):
+            try:
+                await callback.message.bot.delete_message(
+                    callback.message.chat.id,
+                    msg_id
+                )
+            except Exception:
+                pass
 
-@user_callback.callback_query(
-    ChatTypeFilter(chat_type=["private"]),
-    F.data == "time_event"
-)
-async def clbk_time_event(
-    callback: types.CallbackQuery,
-    state: FSMContext,
-) -> None:
-    """
-    Показывает пользователю, сколько времени осталось до мероприятия.
+        await log(callback)
 
-    Рассчитывает разницу между текущим временем и временем события,
-    выводит эту информацию во всплывающем уведомлении Telegram.
-
-    Args:
-        callback (types.CallbackQuery): Callback-запрос Telegram.
-        state (FSMContext): Контекст FSM с пользовательскими данными.
-    """
-    await callback.answer()
-    user_data: Dict[str, Any] = await state.get_data()
-    loc: Any = user_data.get("loc_user")
-
-    dt: datetime = datetime.strptime(
-        f"{loc.event.date} {loc.event.time}", "%Y-%m-%d %H:%M:%S"
+    @user_callback.callback_query(
+        ChatTypeFilter(chat_type=["private"]),
+        F.data == "time_event"
     )
-    now: datetime = datetime.now()
-    time_left: timedelta = dt - now
+    async def clbk_time_event(
+        callback: types.CallbackQuery,
+        state: FSMContext,
+    ) -> None:
+        """
+        Показывает пользователю, сколько времени осталось до мероприятия.
 
-    if time_left.total_seconds() > 0:
-        days: int = time_left.days
-        hours, remainder = divmod(time_left.seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        clbk_text: str = (
-            f"Состоится через: {days}д {hours}ч {minutes}м {seconds}с"
+        Рассчитывает разницу между текущим временем и временем события,
+        выводит эту информацию во всплывающем уведомлении Telegram.
+
+        Args:
+            callback (types.CallbackQuery): Callback-запрос Telegram.
+            state (FSMContext): Контекст FSM с пользовательскими данными.
+        """
+        await callback.answer()
+        user_data: Dict[str, Any] = await state.get_data()
+        loc: Any = user_data.get("loc_user")
+
+        dt: datetime = datetime.strptime(
+            f"{loc.event.date} {loc.event.time}", "%Y-%m-%d %H:%M:%S"
         )
-    else:
-        clbk_text: str = "Мероприятие уже прошло."
+        now: datetime = datetime.now()
+        time_left: timedelta = dt - now
 
-    await callback.answer(clbk_text, show_alert=True)
-    await log(callback)
+        if time_left.total_seconds() > 0:
+            days: int = time_left.days
+            hours, remainder = divmod(time_left.seconds, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            clbk_text: str = (
+                f"Состоится через: {days}д {hours}ч {minutes}м {seconds}с"
+            )
+        else:
+            clbk_text: str = "Мероприятие уже прошло."
+
+        await callback.answer(clbk_text, show_alert=True)
+        await log(callback)
+
+    return user_callback

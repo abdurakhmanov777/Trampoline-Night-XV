@@ -1,71 +1,82 @@
 """
-Модуль для инициализации и запуска Telegram-бота с polling.
+Модуль для запуска, остановки и проверки состояния Telegram-ботов.
 
-Предоставляет функции для создания бота, регистрации команд,
-настройки диспетчера и запуска polling с обработкой ошибок.
+Содержит функции для управления ботами через PollingManager, а также
+регистрацию команд и настройку диспетчера.
 """
 
 import asyncio
-from typing import Optional
 
 from aiogram import Bot, Dispatcher
 from aiogram.types.user import User
 from loguru import logger
 
+from app.core.bot.polling_manager import PollingManager
+
 from .commands import register_bot_commands
 from .dispatcher import setup_dispatcher
-from .factory import create_bot
+from .polling_manager import get_polling_manager
 
 
-async def run_bot() -> None:
+async def run_bot(
+    api_token: str
+) -> None:
+    """Запускает Telegram-бота и его polling.
+
+    Args:
+        api_token (str): Токен API бота.
     """
-    Асинхронная инициализация и запуск Telegram-бота.
+    dp: Dispatcher = await setup_dispatcher()
+    polling_manager: PollingManager = get_polling_manager()
 
-    Функция выполняет следующие действия:
-        - Создает экземпляр бота
-        - Регистрирует команды
-        - Настраивает диспетчер
-        - Запускает polling
-        - Обрабатывает ошибки и закрывает сессию
-    """
-    bot: Optional[Bot] = None
-
-    try:
-        # Создаем экземпляр бота
-        bot = await create_bot()
-
+    async with Bot(api_token) as bot:
         # Регистрируем команды бота
         await register_bot_commands(bot)
 
-        # Настройка диспетчера
-        dp: Dispatcher = await setup_dispatcher()
-
-        async def on_startup(
-            bot: Bot,
-        ) -> None:
-            """
-            Callback при запуске polling.
-
-            Логирует успешный старт бота.
-
-            Args:
-                bot (Bot): Экземпляр Telegram-бота.
-            """
+        async def on_startup() -> None:
+            """Функция вызывается при запуске бота."""
             bot_info: User = await bot.get_me()
             logger.debug(f"Бот @{bot_info.username} запущен")
 
-        dp.startup.register(on_startup)
+        async def on_shutdown() -> None:
+            """Функция вызывается при остановке бота."""
+            logger.debug("Бот остановлен")
 
-        # Запуск polling
-        await dp.start_polling(bot)
+        # Запуск polling через менеджер
+        polling_manager.start_bot_polling(
+            dp=dp,
+            api_token=api_token,
+            on_bot_startup=on_startup,
+            on_bot_shutdown=on_shutdown,
+        )
 
-    except (asyncio.CancelledError, KeyboardInterrupt):
-        logger.debug("Бот остановлен")
-    except Exception as e:
-        logger.exception(f"Ошибка при запуске бота: {e}")
-    finally:
-        if bot:
-            try:
-                await bot.session.close()
-            except Exception as e:
-                logger.exception(f"Ошибка при закрытии сессии бота: {e}")
+        # Ждем завершения polling
+        while polling_manager.is_bot_running(api_token):
+            await asyncio.sleep(1)
+
+
+def stop_bot(
+    api_token: str
+) -> None:
+    """Останавливает бота по API токену.
+
+    Args:
+        api_token (str): Токен API бота.
+    """
+    polling_manager: PollingManager = get_polling_manager()
+    polling_manager.stop_bot_polling(api_token)
+
+
+def is_bot_running(
+    api_token: str
+) -> bool:
+    """Проверяет, запущен ли бот по API токену.
+
+    Args:
+        api_token (str): Токен API бота.
+
+    Returns:
+        bool: True, если бот запущен, иначе False.
+    """
+    polling_manager: PollingManager = get_polling_manager()
+    return polling_manager.is_bot_running(api_token)

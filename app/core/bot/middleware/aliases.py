@@ -4,7 +4,7 @@
 Доступные алиасы:
     - MwAdminCallback для admin callback_query
     - MwAdminMessage для admin сообщений
-    - MwSystemBlock для системной блокировки
+    - MwIntercept для системной блокировки
     - MwUserCallback для пользовательских callback_query
     - MwUserMessage для пользовательских сообщений
 """
@@ -54,7 +54,7 @@ def MwAdminMessage(
     )
 
 
-def MwSystemBlock(
+def MwIntercept(
     **extra_data: Any,
 ) -> MwBase:
     """

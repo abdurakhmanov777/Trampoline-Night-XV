@@ -5,38 +5,42 @@ from app.core.bot.routers.filters import InterceptFilter
 from app.core.bot.routers.filters.chat_type import ChatTypeFilter
 from app.core.bot.services.logger import log
 
-intercept_handler: Router = Router()
 
+def get_router_intercept() -> Router:
 
-@intercept_handler.callback_query(
-    ChatTypeFilter(chat_type=["private"]),
-    InterceptFilter()
-)
-async def clbk_check_flag(
-    callback: CallbackQuery,
-    flag_bot: bool,
-    flag_reg: bool,
-) -> None:
-    """
-    Обработчик открытия настроек администратора.
+    intercept_handler: Router = Router()
 
-    Args:
-        event: Событие от пользователя (CallbackQuery или Message).
-        block_info: Словарь активных флагов системного блока.
-    """
+    @intercept_handler.callback_query(
+        ChatTypeFilter(chat_type=["private"]),
+        InterceptFilter()
+    )
+    async def clbk_check_flag(
+        callback: CallbackQuery,
+        flag_bot: bool,
+        flag_reg: bool,
+    ) -> None:
+        """
+        Обработчик открытия настроек администратора.
 
-    # Получаем первое сообщение для активного флага
-    if flag_bot:
-        text = "Технические шоколадки\n\nПопробуйте зайти через 10 минут"
-    elif flag_reg:
-        text = "К сожалению, регистрация закрыта"
-    else:
-        text = None
+        Args:
+            event: Событие от пользователя (CallbackQuery или Message).
+            block_info: Словарь активных флагов системного блока.
+        """
 
-    # Если есть сообщение, показываем его пользователю
-    if text is not None:
-        await callback.answer(
-            text=text,
-            show_alert=True,
-        )
-    await log(callback)
+        # Получаем первое сообщение для активного флага
+        if flag_bot:
+            text = "Технические шоколадки\n\nПопробуйте зайти через 10 минут"
+        elif flag_reg:
+            text = "К сожалению, регистрация закрыта"
+        else:
+            text = None
+
+        # Если есть сообщение, показываем его пользователю
+        if text is not None:
+            await callback.answer(
+                text=text,
+                show_alert=True,
+            )
+        await log(callback)
+
+    return intercept_handler
