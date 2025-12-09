@@ -12,7 +12,6 @@ from app.core.database import DataManager, User, UserManager, async_session
 async def refresh_data_user(
     data: Dict[str, Any],
     event: Any = None,
-    role: Literal["user", "admin"] = "user",
 ) -> Tuple[Optional[User], Optional[Dict[str, str]]]:
     """
     Обновляет данные FSM, включая локализацию, объект пользователя

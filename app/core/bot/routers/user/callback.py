@@ -196,8 +196,12 @@ def get_router_user_callback() -> Router:
             callback (types.CallbackQuery): Callback-запрос Telegram.
             state (FSMContext): Контекст FSM для хранения данных пользователя.
         """
-        await callback.answer()
         user_data: Dict[str, Any] = await state.get_data()
+        loc: Any = user_data.get("loc_user")
+        await callback.answer(
+            text=loc.messages.callback_calcel,
+            show_alert=True,
+        )
         user_db: Any = user_data.get("user_db")
         data_db: Any = user_data.get("data_db")
         data_db.clear()
@@ -226,7 +230,7 @@ def get_router_user_callback() -> Router:
         user_db.msg_id = callback.message.message_id
         user_db.state = ["1"]
         user_db.date_registration = None
-        
+
         if (
             isinstance(msg_id, int) and msg_id != 0 and callback.message.bot
         ):
@@ -238,47 +242,6 @@ def get_router_user_callback() -> Router:
             except Exception:
                 pass
 
-        await log(callback)
-
-    @router.callback_query(
-        ChatTypeFilter(chat_type=["private"]),
-        F.data == "time_event"
-    )
-    async def clbk_time_event(
-        callback: types.CallbackQuery,
-        state: FSMContext,
-    ) -> None:
-        """
-        Показывает пользователю, сколько времени осталось до мероприятия.
-
-        Рассчитывает разницу между текущим временем и временем события,
-        выводит эту информацию во всплывающем уведомлении Telegram.
-
-        Args:
-            callback (types.CallbackQuery): Callback-запрос Telegram.
-            state (FSMContext): Контекст FSM с пользовательскими данными.
-        """
-        await callback.answer()
-        user_data: Dict[str, Any] = await state.get_data()
-        loc: Any = user_data.get("loc_user")
-
-        dt: datetime = datetime.strptime(
-            f"{loc.event.date} {loc.event.time}", "%Y-%m-%d %H:%M:%S"
-        )
-        now: datetime = datetime.now()
-        time_left: timedelta = dt - now
-
-        if time_left.total_seconds() > 0:
-            days: int = time_left.days
-            hours, remainder = divmod(time_left.seconds, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            clbk_text: str = (
-                f"Состоится через: {days}д {hours}ч {minutes}м {seconds}с"
-            )
-        else:
-            clbk_text: str = "Мероприятие уже прошло."
-
-        await callback.answer(clbk_text, show_alert=True)
         await log(callback)
 
     return router

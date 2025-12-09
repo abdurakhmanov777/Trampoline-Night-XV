@@ -5,7 +5,7 @@
 итогового изображения и отправку финального сообщения с закреплением.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from typing import Any, Dict, Optional, Tuple
 
@@ -150,8 +150,8 @@ async def handler_final(
         except Exception:
             pass
 
-    user_db.state = user_db.state + ["100"]
-    user_db.date_registration = datetime.now()
+    tz = timezone(timedelta(hours=loc.event.timezone))
+    user_db.date_registration = datetime.now(tz=tz)
 
     return "", InlineKeyboardMarkup(
         inline_keyboard=[[]]

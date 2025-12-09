@@ -75,7 +75,6 @@ class MwBase(BaseMiddleware):
         user_db, data_db = await refresh_data_user(
             data=data,
             event=event,
-            role=self.role,
         )
         msg_id: int = user_db.msg_id_other if user_db else 0
         return user_db, data_db, msg_id
@@ -163,6 +162,9 @@ class MwBase(BaseMiddleware):
             user_db, data_db, msg_id = await self._process_user_before(
                 data, event
             )
+        else:
+            # в будущем обработка для админов
+            pass
 
         # ------------------------------
         # ВЫЗОВ handler
@@ -189,5 +191,8 @@ class MwBase(BaseMiddleware):
                 data_db=data_db,
                 user_id=event.from_user.id,
             )
+        else:
+            # в будущем обработка для админов
+            pass
 
         return result
