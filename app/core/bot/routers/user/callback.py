@@ -20,9 +20,9 @@ from app.core.bot.services.multi import multi
 
 def get_router_user_callback() -> Router:
 
-    user_callback: Router = Router()
+    router: Router = Router()
 
-    @user_callback.callback_query(
+    @router.callback_query(
         ChatTypeFilter(chat_type=["private"]),
         F.data == "delete"
     )
@@ -38,7 +38,7 @@ def get_router_user_callback() -> Router:
             await callback.message.delete()
         await log(callback)
 
-    @user_callback.callback_query(
+    @router.callback_query(
         ChatTypeFilter(chat_type=["private"]),
         CallbackNextFilter()
     )
@@ -83,7 +83,7 @@ def get_router_user_callback() -> Router:
             event=callback,
         )
         user_db.state = user_db.state + [value[0]]
-        if value[0] != "100":
+        if text_message != "":
             try:
                 await callback.message.edit_text(
                     text=text_message,
@@ -95,7 +95,7 @@ def get_router_user_callback() -> Router:
 
         await log(callback)
 
-    @user_callback.callback_query(
+    @router.callback_query(
         ChatTypeFilter(chat_type=["private"]),
         F.data == "userback"
     )
@@ -147,7 +147,7 @@ def get_router_user_callback() -> Router:
 
         await log(callback)
 
-    @user_callback.callback_query(
+    @router.callback_query(
         ChatTypeFilter(chat_type=["private"]),
         F.data == "cancel_reg"
     )
@@ -177,7 +177,7 @@ def get_router_user_callback() -> Router:
 
         await log(callback)
 
-    @user_callback.callback_query(
+    @router.callback_query(
         ChatTypeFilter(chat_type=["private"]),
         F.data == "cancel_reg_confirm"
     )
@@ -240,7 +240,7 @@ def get_router_user_callback() -> Router:
 
         await log(callback)
 
-    @user_callback.callback_query(
+    @router.callback_query(
         ChatTypeFilter(chat_type=["private"]),
         F.data == "time_event"
     )
@@ -281,4 +281,4 @@ def get_router_user_callback() -> Router:
         await callback.answer(clbk_text, show_alert=True)
         await log(callback)
 
-    return user_callback
+    return router

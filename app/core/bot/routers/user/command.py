@@ -20,9 +20,9 @@ from app.core.bot.services.multi import multi
 
 def get_router_user_command() -> Router:
 
-    user_command: Router = Router()
+    router: Router = Router()
 
-    @user_command.message(
+    @router.message(
         ChatTypeFilter(chat_type=["private"]),
         Command("start")
     )
@@ -62,7 +62,7 @@ def get_router_user_command() -> Router:
             tg_id=message.from_user.id,
             event=message
         )
-        if user_state != "100":
+        if text_message != "":
             await message.answer(
                 text=text_message,
                 reply_markup=keyboard_message,
@@ -78,7 +78,7 @@ def get_router_user_command() -> Router:
 
         await log(message)
 
-    @user_command.message(
+    @router.message(
         ChatTypeFilter(chat_type=["private"]),
         Command("id")
     )
@@ -113,7 +113,7 @@ def get_router_user_command() -> Router:
 
         await log(message)
 
-    @user_command.message(
+    @router.message(
         ChatTypeFilter(chat_type=["private"]),
         Command("help")
     )
@@ -143,4 +143,4 @@ def get_router_user_command() -> Router:
 
         await log(message)
 
-    return user_command
+    return router

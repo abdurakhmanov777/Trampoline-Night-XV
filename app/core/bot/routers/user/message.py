@@ -21,10 +21,9 @@ from app.core.bot.services.multi import multi
 
 def get_router_user_message() -> Router:
 
-    user_message: Router = Router()
+    router: Router = Router()
 
-
-    @user_message.message(
+    @router.message(
         ChatTypeFilter(chat_type=["private"])
     )
     async def msg_user(
@@ -98,4 +97,4 @@ def get_router_user_message() -> Router:
 
         await log(message)
 
-    return user_message
+    return router

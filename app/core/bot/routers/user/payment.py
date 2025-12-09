@@ -24,10 +24,9 @@ from app.core.bot.services.multi import multi
 
 def get_router_user_payment() -> Router:
 
-    user_payment: Router = Router()
+    router: Router = Router()
 
-
-    @user_payment.pre_checkout_query()
+    @router.pre_checkout_query()
     async def process_pre_checkout_query(
         pre_checkout_query: types.PreCheckoutQuery,
         bot: Bot
@@ -50,7 +49,7 @@ def get_router_user_payment() -> Router:
         )
 
 
-    @user_payment.message(F.successful_payment)
+    @router.message(F.successful_payment)
     async def final(
         message: types.Message,
         state: FSMContext,
@@ -81,7 +80,7 @@ def get_router_user_payment() -> Router:
         user_db.state = user_db.state + ["100"]
 
 
-    @user_payment.callback_query(
+    @router.callback_query(
         ChatTypeFilter(chat_type=["private"]),
         F.data == "payment"
     )
@@ -131,4 +130,4 @@ def get_router_user_payment() -> Router:
         user_db.msg_id_other = msg.message_id
         await log(callback)
 
-    return user_payment
+    return router
