@@ -39,7 +39,7 @@ async def run_bot(
         polling_manager: PollingManager = get_polling_manager()
 
         if polling_manager.is_bot_running(api_token):
-            logger.info("Бот уже запущен.")
+            logger.warning("Бот уже запущен, старт бота отклонен")
             return False
 
         async with Bot(api_token) as bot:
@@ -52,7 +52,7 @@ async def run_bot(
                 """
                 bot_info: User = await bot.get_me()
                 logger.debug(
-                    f"Бот @{bot_info.username} успешно запущен."
+                    f"Бот @{bot_info.username} запущен"
                 )
 
             async def on_shutdown() -> None:
@@ -60,7 +60,7 @@ async def run_bot(
 
                 Вызывается после завершения polling.
                 """
-                logger.debug("Бот остановлен.")
+                logger.debug("Бот остановлен")
 
             polling_manager.start_bot_polling(
                 dp=dispatcher,
@@ -99,7 +99,7 @@ def stop_bot(
         polling_manager: PollingManager = get_polling_manager()
 
         if not polling_manager.is_bot_running(api_token):
-            logger.info("Невозможно остановить: бот не запущен.")
+            logger.warning("Бот не запущен, остановка бота отклонена")
             return False
 
         polling_manager.stop_bot_polling(api_token)
