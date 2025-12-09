@@ -32,9 +32,6 @@ async def terminal_test() -> None:
             logger.info("Выход из теста")
             break
 
-        else:
-            print("Неизвестная команда. Используйте 1, 0 или q.")
-
 
 if __name__ == "__main__":
     try:

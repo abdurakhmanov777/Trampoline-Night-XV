@@ -1,12 +1,12 @@
 """
-Модуль для запуска и остановки Telegram-ботов, а также проверки их
-состояния.
+Модуль для запуска и остановки Telegram-ботов и проверки их состояния.
 
-Предоставляет функции для управления жизненным циклом ботов через
-PollingManager, включая регистрацию команд и настройку диспетчера.
+Содержит функции для управления жизненным циклом ботов через PollingManager,
+включая регистрацию команд и настройку диспетчера.
 """
 
 import asyncio
+from typing import List, Union
 
 from aiogram import Bot, Dispatcher
 from aiogram.types.user import User
@@ -18,89 +18,98 @@ from .services.polling import PollingManager, get_polling_manager
 
 
 async def run_bot(
-    api_token: str,
+    api_tokens: Union[str, List[str]],
 ) -> bool:
-    """Запускает Telegram-бота и его механизм polling.
+    """Запускает одного или нескольких Telegram-ботов.
 
-    Parameters
-    ----------
-    api_token : str
-        API-токен Telegram-бота.
+    Args:
+        api_tokens (Union[str, List[str]]): API-токен бота или список токенов.
 
-    Returns
-    -------
-    bool
-        `True`, если бот успешно запущен, иначе `False`.
+    Returns:
+        bool: True, если хотя бы один бот успешно запущен, иначе False.
     """
-    try:
-        dispatcher: Dispatcher = await setup_dispatcher()
-        polling_manager: PollingManager = get_polling_manager()
+    if isinstance(api_tokens, str):
+        api_tokens = [api_tokens]
 
-        if polling_manager.is_bot_running(api_token):
+    dispatcher: Dispatcher = await setup_dispatcher()
+    polling_manager: PollingManager = get_polling_manager()
+
+    async def start_single_bot(token: str) -> bool:
+        """Запускает одного бота по API-токену.
+
+        Args:
+            token (str): API-токен бота.
+
+        Returns:
+            bool: True, если бот успешно запущен, иначе False.
+        """
+        if polling_manager.is_bot_running(token):
             logger.warning("Бот запущен, повторный запуск отклонен")
             return False
 
-        async with Bot(api_token) as bot:
-            await register_bot_commands(bot)
+        try:
+            async with Bot(token) as bot:
+                await register_bot_commands(bot)
 
-            async def on_startup() -> None:
-                """Обрабатывает запуск бота.
+                async def on_startup() -> None:
+                    """Обрабатывает запуск бота."""
+                    bot_info: User = await bot.get_me()
+                    logger.debug(f"Бот @{bot_info.username} запущен")
 
-                Выполняется сразу после успешного старта polling.
-                """
-                bot_info: User = await bot.get_me()
-                logger.debug(f"Бот @{bot_info.username} запущен")
+                async def on_shutdown() -> None:
+                    """Обрабатывает остановку бота."""
+                    logger.debug(f"Бот остановлен")
 
-            async def on_shutdown() -> None:
-                """Обрабатывает остановку бота.
+                polling_manager.start_bot_polling(
+                    dp=dispatcher,
+                    api_token=token,
+                    on_bot_startup=on_startup,
+                    on_bot_shutdown=on_shutdown,
+                )
 
-                Вызывается после завершения polling.
-                """
-                logger.debug("Бот остановлен")
+                # Ждем, пока бот не будет остановлен
+                while polling_manager.is_bot_running(token):
+                    await asyncio.sleep(1)
 
-            polling_manager.start_bot_polling(
-                dp=dispatcher,
-                api_token=api_token,
-                on_bot_startup=on_startup,
-                on_bot_shutdown=on_shutdown,
-            )
+            return True
 
-            # Цикл ожидания, чтобы не завершать контекст до остановки бота.
-            while polling_manager.is_bot_running(api_token):
-                await asyncio.sleep(1)
+        except Exception as error:
+            logger.exception(f"Ошибка при запуске бота {token}: {error}")
+            return False
 
-        return True
-
-    except Exception as error:
-        logger.exception(f"Ошибка при запуске бота: {error}")
-        return False
+    results: List[bool] = await asyncio.gather(
+        *(start_single_bot(t) for t in api_tokens)
+    )
+    return any(results)
 
 
 def stop_bot(
-    api_token: str,
+    api_tokens: Union[str, List[str]],
 ) -> bool:
-    """Останавливает Telegram-бота по API-токену.
+    """Останавливает одного или нескольких Telegram-ботов.
 
-    Parameters
-    ----------
-    api_token : str
-        API-токен бота, который требуется остановить.
+    Args:
+        api_tokens (Union[str, List[str]]): API-токен бота или список токенов.
 
-    Returns
-    -------
-    bool
-        `True`, если бот был остановлен, иначе `False`.
+    Returns:
+        bool: True, если хотя бы один бот был остановлен, иначе False.
     """
-    try:
-        polling_manager: PollingManager = get_polling_manager()
+    if isinstance(api_tokens, str):
+        api_tokens = [api_tokens]
 
-        if not polling_manager.is_bot_running(api_token):
-            logger.warning("Бот не запущен, оставнока отклонена")
-            return False
+    polling_manager: PollingManager = get_polling_manager()
+    stopped_any: bool = False
 
-        polling_manager.stop_bot_polling(api_token)
-        return True
+    for token in api_tokens:
+        try:
+            if not polling_manager.is_bot_running(token):
+                logger.warning(f"Бот не запущен, остановка отклонена")
+                continue
 
-    except Exception as error:
-        logger.exception(f"Ошибка при остановке бота: {error}")
-        return False
+            polling_manager.stop_bot_polling(token)
+            stopped_any = True
+
+        except Exception as error:
+            logger.exception(f"Ошибка при остановке бота {token}: {error}")
+
+    return stopped_any

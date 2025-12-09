@@ -28,7 +28,7 @@ async def main() -> None:
         await init_db()
 
         # Запуск Telegram-бота.
-        await run_bot(api_token=BOT_TOKEN)
+        await run_bot(api_tokens=BOT_TOKEN)
 
     except (asyncio.CancelledError, KeyboardInterrupt):
         logger.warning("Главный цикл остановлен пользователем")
