@@ -1,8 +1,9 @@
 """
-Модуль для запуска, остановки и проверки состояния Telegram-ботов.
+Модуль для запуска и остановки Telegram-ботов, а также проверки их
+состояния.
 
-Содержит функции для управления ботами через PollingManager, а также
-регистрацию команд и настройку диспетчера.
+Предоставляет функции для управления жизненным циклом ботов через
+PollingManager, включая регистрацию команд и настройку диспетчера.
 """
 
 import asyncio
@@ -19,64 +20,91 @@ from .services.polling import get_polling_manager
 
 
 async def run_bot(
-    api_token: str
-) -> None:
-    """Запускает Telegram-бота и его polling.
+    api_token: str,
+) -> bool:
+    """Запускает Telegram-бота и его механизм polling.
 
-    Args:
-        api_token (str): Токен API бота.
+    Parameters
+    ----------
+    api_token : str
+        API-токен Telegram-бота.
+
+    Returns
+    -------
+    bool
+        `True`, если бот успешно запущен, иначе `False`.
     """
-    dp: Dispatcher = await setup_dispatcher()
-    polling_manager: PollingManager = get_polling_manager()
+    try:
+        dispatcher: Dispatcher = await setup_dispatcher()
+        polling_manager: PollingManager = get_polling_manager()
 
-    async with Bot(api_token) as bot:
-        # Регистрируем команды бота
-        await register_bot_commands(bot)
+        if polling_manager.is_bot_running(api_token):
+            logger.info("Бот уже запущен.")
+            return False
 
-        async def on_startup() -> None:
-            """Функция вызывается при запуске бота."""
-            bot_info: User = await bot.get_me()
-            logger.debug(f"Бот @{bot_info.username} запущен")
+        async with Bot(api_token) as bot:
+            await register_bot_commands(bot)
 
-        async def on_shutdown() -> None:
-            """Функция вызывается при остановке бота."""
-            logger.debug("Бот остановлен")
+            async def on_startup() -> None:
+                """Обрабатывает запуск бота.
 
-        # Запуск polling через менеджер
-        polling_manager.start_bot_polling(
-            dp=dp,
-            api_token=api_token,
-            on_bot_startup=on_startup,
-            on_bot_shutdown=on_shutdown,
-        )
+                Выполняется сразу после успешного старта polling.
+                """
+                bot_info: User = await bot.get_me()
+                logger.debug(
+                    f"Бот @{bot_info.username} успешно запущен."
+                )
 
-        # Ждем завершения polling
-        while polling_manager.is_bot_running(api_token):
-            await asyncio.sleep(1)
+            async def on_shutdown() -> None:
+                """Обрабатывает остановку бота.
+
+                Вызывается после завершения polling.
+                """
+                logger.debug("Бот остановлен.")
+
+            polling_manager.start_bot_polling(
+                dp=dispatcher,
+                api_token=api_token,
+                on_bot_startup=on_startup,
+                on_bot_shutdown=on_shutdown,
+            )
+
+            # Цикл ожидания, чтобы не завершать контекст до остановки бота.
+            while polling_manager.is_bot_running(api_token):
+                await asyncio.sleep(1)
+
+        return True
+
+    except Exception as error:
+        logger.exception(f"Ошибка при запуске бота: {error}")
+        return False
 
 
 def stop_bot(
-    api_token: str
-) -> None:
-    """Останавливает бота по API токену.
-
-    Args:
-        api_token (str): Токен API бота.
-    """
-    polling_manager: PollingManager = get_polling_manager()
-    polling_manager.stop_bot_polling(api_token)
-
-
-def is_bot_running(
-    api_token: str
+    api_token: str,
 ) -> bool:
-    """Проверяет, запущен ли бот по API токену.
+    """Останавливает Telegram-бота по API-токену.
 
-    Args:
-        api_token (str): Токен API бота.
+    Parameters
+    ----------
+    api_token : str
+        API-токен бота, который требуется остановить.
 
-    Returns:
-        bool: True, если бот запущен, иначе False.
+    Returns
+    -------
+    bool
+        `True`, если бот был остановлен, иначе `False`.
     """
-    polling_manager: PollingManager = get_polling_manager()
-    return polling_manager.is_bot_running(api_token)
+    try:
+        polling_manager: PollingManager = get_polling_manager()
+
+        if not polling_manager.is_bot_running(api_token):
+            logger.info("Невозможно остановить: бот не запущен.")
+            return False
+
+        polling_manager.stop_bot_polling(api_token)
+        return True
+
+    except Exception as error:
+        logger.exception(f"Ошибка при остановке бота: {error}")
+        return False
