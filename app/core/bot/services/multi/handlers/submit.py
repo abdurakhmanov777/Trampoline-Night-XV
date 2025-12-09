@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Tuple
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
-from app.core.bot.services.keyboards.user import kb_submit
+from app.core.bot.services.keyboards import kb_submit
 
 from ..context import MultiContext
 

@@ -12,7 +12,7 @@ from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
-from app.core.bot.services.keyboards.user import kb_dynamic
+from app.core.bot.services.keyboards import kb_dynamic
 from app.core.bot.utils.morphology.casing import lower_words
 from app.core.bot.utils.morphology.inflection import inflect_text
 

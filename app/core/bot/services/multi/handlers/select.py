@@ -9,7 +9,7 @@ from typing import Any, Tuple
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
-from app.core.bot.services.keyboards.user import kb_select
+from app.core.bot.services.keyboards import kb_select
 
 from ..context import MultiContext
 

@@ -11,7 +11,7 @@ from typing import Any, Tuple
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
-from app.core.bot.services.keyboards.user import kb_start
+from app.core.bot.services.keyboards import kb_start
 
 from ..context import MultiContext
 

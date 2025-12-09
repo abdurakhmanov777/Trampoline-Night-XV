@@ -6,11 +6,11 @@
 клавиатуры завершения.
 """
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Tuple
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
-from app.core.bot.services.keyboards.user import kb_payment
+from app.core.bot.services.keyboards import kb_payment
 
 from ..context import MultiContext
 

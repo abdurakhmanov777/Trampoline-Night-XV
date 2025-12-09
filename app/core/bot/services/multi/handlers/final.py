@@ -15,7 +15,7 @@ from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
 from app.core.bot.services.generator import generate_image
 from app.core.bot.services.generator.generator_code import generate_code
-from app.core.bot.services.keyboards.user import kb_success
+from app.core.bot.services.keyboards import kb_success
 from app.core.database.models import User
 
 from ..context import MultiContext
