@@ -3,13 +3,13 @@
 объект пользователя и данные пользователя.
 """
 
-from typing import Any, Dict, Literal, Optional, Tuple, cast
+from typing import Any, Dict, Optional, Tuple, cast
 
 from app.core.bot.services.localization import Localization, load_localization
 from app.core.database import DataManager, User, UserManager, async_session
 
 
-async def refresh_data_user(
+async def fsm_data_user(
     data: Dict[str, Any],
     event: Any = None,
 ) -> Tuple[Optional[User], Optional[Dict[str, str]]]:
