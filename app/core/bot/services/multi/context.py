@@ -21,7 +21,7 @@ class MultiContext:
         value (str): Идентификатор текущего состояния.
         tg_id (int): Telegram ID пользователя.
         data (str | None): Дополнительные данные, переданные пользователем.
-        event (Union[types.CallbackQuery, types.Message] | None):
+        event (types.CallbackQuery | types.Message | None):
             Событие Telegram, которое вызвало этот контекст.
     """
     state: FSMContext

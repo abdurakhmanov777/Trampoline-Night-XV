@@ -8,7 +8,7 @@
 
 import re
 from datetime import datetime
-from typing import Any, Callable, Union
+from typing import Any, Callable
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 

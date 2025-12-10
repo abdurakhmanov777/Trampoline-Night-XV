@@ -2,7 +2,7 @@
 Фильтр для проверки прав администратора с произвольными ролями.
 """
 
-from typing import Any, Union
+from typing import Any
 
 from aiogram.filters import BaseFilter
 from aiogram.types import CallbackQuery, Message
@@ -42,14 +42,14 @@ class AdminFilter(BaseFilter):
     async def __call__(
         self,
         event: Message | CallbackQuery,
-    ) -> Union[dict[str, Any], bool]:
+    ) -> dict[str, Any] | bool:
         """Проверяет роль пользователя.
 
         Args:
             event (Message | CallbackQuery): Событие от Telegram.
 
         Returns:
-            Union[dict[str, Any], bool]: Словарь с ролью, если
+            dict[str, Any] | bool: Словарь с ролью, если
                 пользователь найден, иначе False.
         """
         from_user: Any | None = getattr(event, "from_user", None)

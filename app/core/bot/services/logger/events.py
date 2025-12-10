@@ -10,7 +10,7 @@ import sys
 import traceback
 from pathlib import Path
 from types import FrameType
-from typing import Any, Union
+from typing import Any
 
 from aiogram import types
 
@@ -18,17 +18,14 @@ from .base import logger
 
 
 async def log(
-    event: Union[
-        types.Message,
-        types.CallbackQuery
-    ],
+    event: types.Message | types.CallbackQuery,
     *args: Any,
 ) -> None:
     """
     Логирует информацию о событии Telegram.
 
     Args:
-        event (Union[types.Message, types.CallbackQuery]):
+        event (types.Message | types.CallbackQuery):
             Событие Telegram (Message или CallbackQuery).
         *args (Any):
             Дополнительные данные для логирования.
@@ -60,9 +57,7 @@ async def log(
 
 
 async def log_error(
-    event: Union[
-        types.Message, types.CallbackQuery
-    ] | None = None,
+    event: types.Message | types.CallbackQuery | None = None,
     error: BaseException | None = None,
     *args: Any,
 ) -> None:
@@ -70,7 +65,7 @@ async def log_error(
     Логирует информацию об ошибке, включая контекст и источник ошибки.
 
     Args:
-        event (Union[types.Message, types.CallbackQuery] | None):
+        event (types.Message | types.CallbackQuery | None):
             Событие Telegram (Message или CallbackQuery). Может быть None.
         error (BaseException | None):
             Исключение, которое требуется залогировать.

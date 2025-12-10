@@ -2,7 +2,7 @@
 Фильтр для проверки типа чата.
 """
 
-from typing import Any, Union
+from typing import Any
 
 from aiogram.filters import BaseFilter
 from aiogram.types import CallbackQuery, Message
@@ -17,16 +17,16 @@ class ChatTypeFilter(BaseFilter):
 
     def __init__(
         self,
-        chat_type: Union[str, list[str]],
+        chat_type: str | list[str],
     ) -> None:
         """Инициализирует фильтр типа чата.
 
         Args:
-            chat_type (Union[str, list[str]]): Тип чата или список
+            chat_type (str | list[str]): Тип чата или список
                 допустимых типов. Примеры: "private", "group",
                 ["supergroup", "channel"].
         """
-        self.chat_type: Union[str, list[str]] = chat_type
+        self.chat_type: str | list[str] = chat_type
 
     async def __call__(
         self,
