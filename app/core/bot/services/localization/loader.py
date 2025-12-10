@@ -3,6 +3,7 @@
 в единый объект локализации для пользователя или администратора.
 """
 
+import asyncio
 import json
 from pathlib import Path
 from typing import Any, Literal
@@ -15,34 +16,24 @@ from app.core.bot.services.localization.model import Localization
 
 
 async def _read_json(
-    file_path: Path,
+    file_path: Path
 ) -> dict[str, Any]:
     """Асинхронно читает JSON-файл и возвращает его содержимое.
 
-    Parameters
-    ----------
-    file_path : Path
-        Путь к JSON-файлу, который необходимо прочитать.
+    Args:
+        file_path (Path): Путь к JSON-файлу для чтения.
 
-    Returns
-    -------
-    dict[str, Any]
-        Содержимое JSON-файла в виде словаря. При ошибке или отсутствии
-        файла возвращается пустой словарь.
+    Returns:
+        dict[str, Any]: Содержимое JSON-файла в виде словаря.
+        При ошибке или отсутствии файла возвращается пустой словарь.
     """
     if not file_path.exists():
         logger.error(f"File not found: {file_path.resolve()}")
         return {}
 
     try:
-        async with aiofiles.open(
-            file_path,
-            mode="r",
-            encoding="utf-8",
-        ) as file:
-            content: str = await file.read()
-            return json.loads(content)
-
+        async with aiofiles.open(file_path, "r", encoding="utf-8") as f:
+            return json.loads(await f.read())
     except Exception as exc:
         logger.error(f"Error loading {file_path}: {exc}")
         return {}
@@ -52,39 +43,31 @@ async def load_localization(
     lang: str,
     role: Literal["user", "admin"],
 ) -> Localization:
-    """Загружает локализацию для выбранной роли и языка.
+    """Загружает локализацию для указанной роли и языка.
 
-    Пользовательская локализация формируется объединением двух файлов:
-    локализации по умолчанию и пользовательской локализации.
+    Для пользователей объединяет основной файл и файл локализации
+    по умолчанию. Для администраторов загружает только основной файл.
 
-    Parameters
-    ----------
-    lang : str
-        Код языка локализации (например, "ru", "en").
-    role : Literal["user", "admin"]
-        Роль, для которой загружается локализация.
+    Args:
+        lang (str): Код языка локализации (например, "ru", "en").
+        role (Literal["user", "admin"]): Роль пользователя или администратора.
 
-    Returns
-    -------
-    Localization
-        Объект локализации с объединёнными данными.
+    Returns:
+        Localization: Объект локализации с объединёнными данными.
     """
     role_dir: Path = LOCALIZATIONS_DIR / role
     primary_file: Path = role_dir / f"{lang}.json"
 
-    localization_data: dict[str, Any] = await _read_json(
-        primary_file
-    )
-
     if role == "user":
-        # Для пользователей объединяем с файлом по умолчанию
-        default_file: Path = (
-            LOCALIZATIONS_DIR / "default" / f"{lang}.json"
+        default_file: Path = LOCALIZATIONS_DIR / "default" / f"{lang}.json"
+        default_data: dict[str, Any]
+        primary_data, default_data = await asyncio.gather(
+            _read_json(primary_file),
+            _read_json(default_file),
         )
-        default_data: dict[str, Any] = await _read_json(
-            default_file
-        )
+        # Объединяем данные дефолтной локализации с основной
+        primary_data.update(default_data)
+    else:
+        primary_data: dict[str, Any] = await _read_json(primary_file)
 
-        localization_data.update(default_data)
-
-    return Localization(localization_data)
+    return Localization(primary_data)

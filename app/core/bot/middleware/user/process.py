@@ -6,7 +6,7 @@ from typing import Any
 
 from app.core.database import User
 
-from .fsm import fsm_data_user
+from .fsm import get_user_fsm
 
 
 async def user_before(
@@ -33,6 +33,6 @@ async def user_before(
     """
     user: User | None
     db: dict[str, str] | None
-    user, db = await fsm_data_user(data=data, event=event)
+    user, db = await get_user_fsm(data=data, event=event)
     msg_id: int = user.msg_id_other if user else 0
     return user, db, msg_id

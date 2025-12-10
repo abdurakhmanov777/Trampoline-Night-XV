@@ -7,7 +7,7 @@ from typing import Any, Awaitable, Callable, Literal
 
 from aiogram import BaseMiddleware
 
-from app.core.bot.middleware.user.fsm import clear_fsm_user
+from app.core.bot.middleware.user import clear_fsm_user
 from app.core.bot.services.logger import log_error
 from app.core.database import User
 

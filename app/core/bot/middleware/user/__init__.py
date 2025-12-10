@@ -4,10 +4,11 @@
 данных пользователя до вызова handler.
 """
 
-from .fsm import fsm_data_user
+from .fsm import clear_fsm_user, get_user_fsm
 from .process import user_before
 
 __all__: list[str] = [
-    "fsm_data_user",
+    "clear_fsm_user",
+    "get_user_fsm",
     "user_before",
 ]
