@@ -97,9 +97,7 @@ class MwBase(BaseMiddleware):
             return None
 
         if self.role == "user":
-            chat_id: Any | None = await utils.extract_attribute(
-                event, "chat.id"
-            )
+            chat_id: Any = utils.get_message(event).chat.id
             if chat_id is not None:
                 await utils.remove_old_msg(event, chat_id, msg_id)
 
@@ -113,5 +111,5 @@ class MwBase(BaseMiddleware):
         else:
             # Логика для админов будет добавлена позже
             pass
-        
+
         return result
