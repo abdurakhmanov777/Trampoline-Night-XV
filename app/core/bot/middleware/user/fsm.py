@@ -20,17 +20,18 @@ async def fsm_data_user(
     и данные пользователя (data_db).
 
     Проверяет наличие локализации, user_db и data_db в FSM. Если их нет,
-    создаёт или загружает необходимые данные. Для пользователей
-    язык определяется из БД, для админов используется язык по умолчанию.
+    создаёт или загружает необходимые данные. Язык определяется из БД.
 
     Args:
-        data (Dict[str, Any]): Словарь данных между middleware и хэндлером.
-        event (Any): Объект события Telegram (Message/CallbackQuery).
-        role (Literal["user", "admin"]): Роль пользователя для локализации.
+        data (Dict[str, Any]):
+            Словарь данных между middleware и хэндлером.
+        event (Any):
+            Объект события Telegram (Message/CallbackQuery).
 
     Returns:
-        Tuple[Optional[User], Optional[Dict[str, Any]]]: Объект пользователя
-        из FSM или БД и словарь данных пользователя (data_db). None для админа.
+        Tuple[Optional[User], Optional[Dict[str, Any]]]:
+            Объект пользователя из FSM или БД и словарь
+            данных пользователя (data_db). None для админа.
     """
     state: FSMContext | None = data.get("state")
     if state is None:
@@ -49,19 +50,19 @@ async def fsm_data_user(
 
     # Если user_db отсутствует, создаём для обычного пользователя
     if user_db is None and event:
-        bot_id: int = getattr(event, "bot").id
+        chat_id: int = getattr(event, "bot").id
         tg_id: int = event.from_user.id
         async with async_session() as session:
             user_manager: UserManager = UserManager(session)
             user_db = await user_manager.get_or_create(
                 tg_id=tg_id,
-                bot_id=bot_id,
+                chat_id=chat_id,
             )
 
             data_manager: DataManager = DataManager(session)
             data_db = await data_manager.dict_all(
                 tg_id=tg_id,
-                bot_id=bot_id,
+                chat_id=chat_id,
             )
 
         # Сохраняем user_db и data_db в FSM

@@ -17,7 +17,7 @@ class AdminText(AdminCRUD):
     async def update_text(
         self,
         tg_id: int,
-        bot_id: int,
+        chat_id: int,
         new_text: str,
     ) -> bool:
         """
@@ -25,7 +25,7 @@ class AdminText(AdminCRUD):
 
         Args:
             tg_id (int): Telegram ID администратора.
-            bot_id (int): ID бота.
+            chat_id (int): ID бота.
             new_text (str): Новый текст администратора.
 
         Returns:
@@ -33,7 +33,7 @@ class AdminText(AdminCRUD):
         """
         admin: Optional[Admin] = await self.get(
             tg_id=tg_id,
-            bot_id=bot_id,)
+            chat_id=chat_id,)
         if not admin:
             # Администратор не найден
             return False
