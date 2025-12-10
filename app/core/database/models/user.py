@@ -37,14 +37,12 @@ class User(Base):
         BigInteger,
         nullable=False
     )
-    # Хранение в БД — обычная строка ("1,2,3")
     _state: Mapped[str] = mapped_column(
         "state",
         String(32),
         nullable=False,
         default="1"
     )
-
     lang: Mapped[str] = mapped_column(
         String(8),
         nullable=False,
