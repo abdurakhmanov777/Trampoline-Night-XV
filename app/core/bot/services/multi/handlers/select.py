@@ -5,7 +5,7 @@
 для выбора пользователя на основе текущей локализации.
 """
 
-from typing import Any, Tuple
+from typing import Any
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
@@ -16,7 +16,7 @@ from ..context import MultiContext
 
 async def handler_select(
     ctx: MultiContext,
-) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+) -> tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
     Обрабатывает состояние выбора и формирует сообщение и клавиатуру.
 
@@ -28,7 +28,7 @@ async def handler_select(
             состояние шага, идентификатор пользователя и другие параметры.
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+        tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
             Сформированное сообщение, клавиатура выбора и параметры
             предпросмотра ссылок.
     """

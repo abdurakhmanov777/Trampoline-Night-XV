@@ -4,7 +4,7 @@ CRUD-операции для таблицы User.
 Содержит методы для создания, получения, обновления и удаления пользователей.
 """
 
-from typing import Any, Optional, Tuple
+from typing import Any
 
 from loguru import logger
 from sqlalchemy import Result, select
@@ -36,7 +36,7 @@ class UserCRUD(UserManagerBase):
         Returns:
             User: Существующий или созданный объект пользователя.
         """
-        user: Optional[User] = await self.get(
+        user: User | None = await self.get(
             tg_id=tg_id,
             bot_id=bot_id,)
         if user is None:
@@ -52,7 +52,7 @@ class UserCRUD(UserManagerBase):
         self,
         tg_id: int,
         bot_id: int,
-    ) -> Optional[User]:
+    ) -> User | None:
         """
         Получить пользователя по Telegram ID.
 
@@ -61,11 +61,11 @@ class UserCRUD(UserManagerBase):
             bot_id (int): ID бота.
 
         Returns:
-            Optional[User]: Объект User или None, если пользователь
+            User | None: Объект User или None, если пользователь
                 не найден.
         """
         try:
-            result: Result[Tuple[User]] = await self.session.execute(
+            result: Result[tuple[User]] = await self.session.execute(
                 select(User).where(
                     User.tg_id == tg_id,
                     User.bot_id == bot_id,
@@ -124,7 +124,7 @@ class UserCRUD(UserManagerBase):
         Returns:
             bool: True, если удаление прошло успешно, иначе False.
         """
-        user: Optional[User] = await self.get(
+        user: User | None = await self.get(
             tg_id=tg_id,
             bot_id=bot_id,
         )
@@ -141,7 +141,7 @@ class UserCRUD(UserManagerBase):
         tg_id: int,
         bot_id: int,
         **fields: Any
-    ) -> Optional[User]:
+    ) -> User | None:
         """
         Обновить поля существующего пользователя через kwargs.
 
@@ -151,10 +151,10 @@ class UserCRUD(UserManagerBase):
             **fields: Поля для обновления (lang, msg_id, state и др.).
 
         Returns:
-            Optional[User]: Обновлённый объект User или None, если
+            User | None: Обновлённый объект User или None, если
             пользователь не найден.
         """
-        user: Optional[User] = await self.get(
+        user: User | None = await self.get(
             tg_id=tg_id,
             bot_id=bot_id,
         )

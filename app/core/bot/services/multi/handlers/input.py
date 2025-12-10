@@ -8,7 +8,7 @@
 
 import re
 from datetime import datetime
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+from typing import Any, Callable, Union
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
@@ -21,7 +21,7 @@ from ..context import MultiContext
 
 async def handler_input(
     ctx: MultiContext,
-) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+) -> tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
     Обрабатывает состояние ввода пользователя и формирует сообщение.
 
@@ -34,13 +34,12 @@ async def handler_input(
             локализацию, состояние шага, ID пользователя и данные.
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+        tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
             Сообщение, клавиатура и настройки предпросмотра ссылок.
     """
     loc: Any = ctx.loc
     loc_state: Any = ctx.loc_state
-    tg_id: int = ctx.tg_id
-    user_input: Optional[Union[str, datetime]] = ctx.data
+    user_input: str | datetime | None = ctx.data
 
     format_: str = loc_state.data.format
     pattern: str = loc_state.data.pattern
@@ -53,7 +52,7 @@ async def handler_input(
     part1: str
     part2: str
     part3: str
-    user_data: Dict[str, Any] = await ctx.state.get_data()
+    user_data: dict[str, Any] = await ctx.state.get_data()
     data_db: Any = user_data.get("data_db")
 
     # Проверяем пользовательский ввод через регулярное выражение
@@ -132,14 +131,14 @@ async def type_check(
     value: str,
     value_type: str
 ) -> bool:
-    type_map: Dict[str, Callable[[str], Any]] = {
+    type_map: dict[str, Callable[[str], Any]] = {
         "int": int,
         "bool": lambda v: v.lower() == "true",
         "date": lambda v: datetime.strptime(v, "%d.%m.%Y"),
         "time": lambda v: datetime.strptime(v, "%d.%m.%Y %H:%M:%S"),
         "str": str
     }
-    caster: Optional[Callable[[str], Any]] = type_map.get(
+    caster: Callable[[str], Any] | None = type_map.get(
         value_type.lower()
     )
     if not caster:

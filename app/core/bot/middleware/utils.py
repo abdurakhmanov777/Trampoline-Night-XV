@@ -2,7 +2,7 @@
 Вспомогательные функции для базового middleware Aiogram.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from aiogram.types import Message
 
@@ -95,17 +95,17 @@ async def remove_event(
 async def update_db(
     tg_id: int,
     bot_id: int,
-    user: Optional[User],
-    data: Optional[Dict[str, str]],
+    user: User | None,
+    data: dict[str, str] | None,
 ) -> None:
     """
     Обновляет User и Data в БД при необходимости.
 
     Parameters
     ----------
-    user : Optional[User]
+    user : User | None
         Экземпляр пользователя.
-    data : Optional[Dict[str, str]]
+    data : dict[str, str] | None
         Данные пользователя.
     tg_id : int
         Идентификатор пользователя.

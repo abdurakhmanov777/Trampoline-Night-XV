@@ -10,7 +10,7 @@ import sys
 import traceback
 from pathlib import Path
 from types import FrameType
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 from aiogram import types
 
@@ -33,8 +33,8 @@ async def log(
         *args (Any):
             Дополнительные данные для логирования.
     """
-    from_user: Optional[types.User] = getattr(event, "from_user", None)
-    tg_id: Optional[int] = getattr(from_user, "id", None)
+    from_user: types.User | None = getattr(event, "from_user", None)
+    tg_id: int | None = getattr(from_user, "id", None)
 
     # Fallback для неизвестного пользователя
     if tg_id is None:
@@ -60,29 +60,29 @@ async def log(
 
 
 async def log_error(
-    event: Optional[
-        Union[types.Message, types.CallbackQuery]
-    ] = None,
-    error: Optional[BaseException] = None,
+    event: Union[
+        types.Message, types.CallbackQuery
+    ] | None = None,
+    error: BaseException | None = None,
     *args: Any,
 ) -> None:
     """
     Логирует информацию об ошибке, включая контекст и источник ошибки.
 
     Args:
-        event (Optional[Union[types.Message, types.CallbackQuery]]):
+        event (Union[types.Message, types.CallbackQuery] | None):
             Событие Telegram (Message или CallbackQuery). Может быть None.
-        error (Optional[BaseException]):
+        error (BaseException | None):
             Исключение, которое требуется залогировать.
         *args (Any):
             Дополнительные данные для контекста.
     """
     # Извлекаем информацию о пользователе
-    from_user: Optional[types.User] = (
+    from_user: types.User | None = (
         getattr(event, "from_user", None) if event else None
     )
     tg_id: int = getattr(from_user, "id", -1)
-    username: Optional[str] = getattr(from_user, "username", None)
+    username: str | None = getattr(from_user, "username", None)
 
     # Формируем строку дополнительных аргументов
     extra_info: str = ", ".join(str(arg) for arg in args if arg is not None)
@@ -100,7 +100,7 @@ async def log_error(
         )
 
         # Ищем фрейм приложения (не из site-packages)
-        app_frame: Optional[traceback.FrameSummary] = next(
+        app_frame: traceback.FrameSummary | None = next(
             (
                 frame for frame in reversed(tb)
                 if "site-packages" not in frame.filename

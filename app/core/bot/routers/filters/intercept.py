@@ -2,7 +2,7 @@
 Фильтр для проверки активных блокировок бота.
 """
 
-from typing import Dict, Union
+from typing import Union
 
 from aiogram.filters import BaseFilter
 from aiogram.types import CallbackQuery, Message
@@ -36,14 +36,14 @@ class InterceptFilter(BaseFilter):
     async def __call__(
         self,
         event: Message | CallbackQuery,
-    ) -> Union[Dict[str, bool], bool]:
+    ) -> Union[dict[str, bool], bool]:
         """Проверяет наличие активной блокировки.
 
         Args:
             event (Message | CallbackQuery): Событие от пользователя.
 
         Returns:
-            Union[Dict[str, bool], bool]: Словарь с активными флагами,
+            Union[dict[str, bool], bool]: Словарь с активными флагами,
                 если есть блокировка, иначе False.
         """
         if self.flag_bot or self.flag_reg:

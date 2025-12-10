@@ -11,7 +11,7 @@
 динамических состояний и локализацией.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 from aiogram import Bot, F, Router, types
 from aiogram.fsm.context import FSMContext
@@ -66,7 +66,7 @@ def get_router_user_payment() -> Router:
         Returns:
             None
         """
-        user_data: Dict[str, Any] = await state.get_data()
+        user_data: dict[str, Any] = await state.get_data()
         if not message.from_user:
             return
         await multi(
@@ -100,7 +100,7 @@ def get_router_user_payment() -> Router:
             None
         """
         await callback.answer()
-        user_data: Dict[str, Any] = await state.get_data()
+        user_data: dict[str, Any] = await state.get_data()
         loc: Any = user_data.get("loc_user")
         user_db: Any = user_data.get("user_db")
 

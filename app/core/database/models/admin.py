@@ -5,7 +5,7 @@
 идентификации, состояния, языка и текста сообщений.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import BigInteger, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -35,7 +35,7 @@ class Admin(Base):
         default="1",
         nullable=False
     )
-    name: Mapped[Optional[str]] = mapped_column(
+    name: Mapped[str | None] = mapped_column(
         String(255),
         nullable=True
     )

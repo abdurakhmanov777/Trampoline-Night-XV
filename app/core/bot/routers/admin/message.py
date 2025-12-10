@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict
+from typing import Any, Callable
 
 from aiogram import Router
 from aiogram.filters import Command

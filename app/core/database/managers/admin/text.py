@@ -5,8 +5,6 @@
 в базе данных.
 """
 
-from typing import Optional
-
 from ...models import Admin
 from .crud import AdminCRUD
 
@@ -31,7 +29,7 @@ class AdminText(AdminCRUD):
         Returns:
             bool: True, если текст успешно обновлён, иначе False.
         """
-        admin: Optional[Admin] = await self.get(
+        admin: Admin | None = await self.get(
             tg_id=tg_id,
             bot_id=bot_id,)
         if not admin:

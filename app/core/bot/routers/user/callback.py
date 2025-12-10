@@ -6,7 +6,7 @@
 текущего шага и получения служебной информации.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
@@ -62,7 +62,7 @@ def get_router_user_callback() -> Router:
         if not isinstance(callback.message, types.Message):
             return
 
-        user_data: Dict[str, Any] = await state.get_data()
+        user_data: dict[str, Any] = await state.get_data()
 
         user_db: Any = user_data.get("user_db")
 
@@ -117,7 +117,7 @@ def get_router_user_callback() -> Router:
         if not isinstance(callback.message, types.Message):
             return
 
-        user_data: Dict[str, Any] = await state.get_data()
+        user_data: dict[str, Any] = await state.get_data()
         user_db: Any = user_data.get("user_db")
 
         user_db.state = user_db.state[:-1]
@@ -164,7 +164,7 @@ def get_router_user_callback() -> Router:
             state (FSMContext): Контекст FSM данных пользователя.
         """
         await callback.answer()
-        user_data: Dict[str, Any] = await state.get_data()
+        user_data: dict[str, Any] = await state.get_data()
         loc: Any = user_data.get("loc_user")
         if not callback.message:
             return
@@ -195,7 +195,7 @@ def get_router_user_callback() -> Router:
             callback (types.CallbackQuery): Callback-запрос Telegram.
             state (FSMContext): Контекст FSM для хранения данных пользователя.
         """
-        user_data: Dict[str, Any] = await state.get_data()
+        user_data: dict[str, Any] = await state.get_data()
         loc: Any = user_data.get("loc_user")
         await callback.answer(
             text=loc.messages.callback_calcel,

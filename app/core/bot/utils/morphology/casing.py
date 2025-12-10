@@ -1,5 +1,4 @@
 import re
-from typing import List
 
 # Шаблон для поиска слов, пробелов и пунктуации
 WORD_PATTERN: re.Pattern = re.compile(r'\w+|\s+|[^\w\s]', re.UNICODE)
@@ -37,16 +36,16 @@ async def lower_words(
         return word if is_abbr(word) else word.lower()
 
     # Разбиваем текст на предложения с сохранением разделителей
-    parts: List[str] = SENTENCE_submitINGS_PATTERN.split(text)
-    sentences: List[str] = [
+    parts: list[str] = SENTENCE_submitINGS_PATTERN.split(text)
+    sentences: list[str] = [
         "".join(parts[i:i + 2]) for i in range(0, len(parts), 2)
     ]
 
-    processed_sentences: List[str] = []
+    processed_sentences: list[str] = []
 
     for sentence in sentences:
-        tokens: List[str] = WORD_PATTERN.findall(sentence)
-        result: List[str] = []
+        tokens: list[str] = WORD_PATTERN.findall(sentence)
+        result: list[str] = []
         capitalize_next: bool = capitalize_first
 
         for token in tokens:
@@ -88,7 +87,7 @@ def cap_words(
             return token if is_abbr(token) else token.capitalize()
         return token
 
-    tokens: List[str] = WORD_PATTERN.findall(text)
-    processed: List[str] = [process_token(token) for token in tokens]
+    tokens: list[str] = WORD_PATTERN.findall(text)
+    processed: list[str] = [process_token(token) for token in tokens]
 
     return ''.join(processed)

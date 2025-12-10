@@ -1,7 +1,10 @@
-"""Модуль, содержащий класс контекста для обработки состояния пользователя в боте."""
+"""
+Модуль, содержащий класс контекста
+для обработки состояния пользователя в боте.
+"""
 
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from typing import Any
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
@@ -12,12 +15,13 @@ class MultiContext:
     """Контекст, содержащий параметры для обработки состояния пользователя.
 
     Атрибуты:
+        state (Any): Данные из временного хранилища FSMContext.
         loc (Any): Объект локализации, содержащий состояния пользователя.
-        loc_state (Any): Конкретное состояние пользователя.
+        loc_state (Any): Текущие состояния локализации.
         value (str): Идентификатор текущего состояния.
         tg_id (int): Telegram ID пользователя.
-        data (Optional[str]): Дополнительные данные, переданные пользователем.
-        event (Optional[Union[types.CallbackQuery, types.Message]]):
+        data (str | None): Дополнительные данные, переданные пользователем.
+        event (Union[types.CallbackQuery, types.Message] | None):
             Событие Telegram, которое вызвало этот контекст.
     """
     state: FSMContext
@@ -25,5 +29,5 @@ class MultiContext:
     loc_state: Any
     value: str = ""
     tg_id: int = 0
-    data: Optional[str] = None
-    event: Optional[types.CallbackQuery | types.Message] = None
+    data: str | None = None
+    event: types.CallbackQuery | types.Message | None = None

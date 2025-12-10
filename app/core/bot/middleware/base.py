@@ -2,13 +2,14 @@
 Базовый middleware для обработки событий Aiogram.
 """
 
-from typing import Any, Awaitable, Callable, Dict, Literal, Optional, Set
+from datetime import datetime
+from typing import Any, Awaitable, Callable, Literal
 
 from aiogram import BaseMiddleware
 
 from app.core.bot.middleware.user.fsm import clear_fsm_user
 from app.core.bot.services.logger import log_error
-from app.core.database import Admin, User
+from app.core.database import User
 
 from . import utils
 from .user.process import user_before
@@ -21,7 +22,7 @@ class MwBase(BaseMiddleware):
         self,
         delete_event: bool = False,
         role: Literal["user", "admin"] = "user",
-        allowed_types: Optional[Set[str]] = None,
+        allowed_types: set[str] | None = None,
         **extra_data: Any,
     ) -> None:
         """
@@ -33,35 +34,35 @@ class MwBase(BaseMiddleware):
             Флаг удаления исходного сообщения после обработки.
         role : Literal["user", "admin"]
             Роль для обработки (user или admin).
-        allowed_types : Optional[Set[str]]
+        allowed_types : set[str] | None
             Разрешённые типы сообщений.
         **extra_data : Any
             Дополнительные данные для передачи в handler.
         """
         self.delete_event: bool = delete_event
         self.role: Literal["user", "admin"] = role
-        self.extra_data: Dict[str, Any] = extra_data
+        self.extra_data: dict[str, Any] = extra_data
 
-        self.allowed: Set[str] = {"text"}
+        self.allowed: set[str] = {"text"}
         if allowed_types:
             self.allowed.update(allowed_types)
 
     async def __call__(
         self,
-        handler: Callable[[Any, Dict[str, Any]], Awaitable[Any]],
-        event: Optional[Any] = None,
-        data: Optional[Dict[str, Any]] = None,
+        handler: Callable[[Any, dict[str, Any]], Awaitable[Any]],
+        event: Any | None = None,
+        data: dict[str, Any] | None = None,
     ) -> Any:
         """
         Обрабатывает событие и вызывает handler.
 
         Parameters
         ----------
-        handler : Callable[[Any, Dict[str, Any]], Awaitable[Any]]
+        handler : Callable[[Any, dict[str, Any]], Awaitable[Any]]
             Асинхронная функция-обработчик события.
-        event : Optional[Any]
+        event : Any | None
             Событие пользователя.
-        data : Optional[Dict[str, Any]]
+        data : dict[str, Any] | None
             Словарь данных для передачи в handler.
 
         Returns
@@ -78,12 +79,15 @@ class MwBase(BaseMiddleware):
         data = data or {}
         data.update(self.extra_data)
 
-        user: Optional[User] = None
-        db: Optional[Dict[str, str]] = None
+        user: User | None = None
+        db: dict[str, str] | None = None
         msg_id: int = 0
 
         if self.role == "user":
+            time1: datetime = datetime.now()
             user, db, msg_id = await user_before(data, event)
+            time2: datetime = datetime.now()
+            print(f"user_before time: {(time2 - time1).total_seconds()} sec")
         else:
             # Логика для админов будет добавлена позже
             pass
@@ -107,7 +111,8 @@ class MwBase(BaseMiddleware):
                 user=user,
                 data=db,
             )
-
+            if user and int(user.state[-1]) >= 100:
+                await clear_fsm_user(data)
         else:
             # Логика для админов будет добавлена позже
             pass

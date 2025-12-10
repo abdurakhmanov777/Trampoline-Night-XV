@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable
 
 from loguru import logger
 from sqlalchemy import select
@@ -26,7 +26,7 @@ class DataCRUD(DataManagerBase):
         self,
         tg_id: int,
         bot_id: int,
-    ) -> Optional[User]:
+    ) -> User | None:
         """Получает пользователя по его Telegram ID.
 
         Args:
@@ -34,7 +34,7 @@ class DataCRUD(DataManagerBase):
             bot_id (int): ID бота.
 
         Returns:
-            Optional[User]: Объект User или None, если пользователь
+            User | None: Объект User или None, если пользователь
                 не найден.
         """
         try:
@@ -54,7 +54,7 @@ class DataCRUD(DataManagerBase):
         tg_id: int,
         bot_id: int,
         key: str
-    ) -> Optional[Data]:
+    ) -> Data | None:
         """Получает запись данных по ключу для конкретного пользователя.
 
         Args:
@@ -63,9 +63,9 @@ class DataCRUD(DataManagerBase):
             key (str): Ключ данных.
 
         Returns:
-            Optional[Data]: Объект Data, если запись найдена, иначе None.
+            Data | None: Объект Data, если запись найдена, иначе None.
         """
-        user: Optional[User] = await self._get_user(
+        user: User | None = await self._get_user(
             tg_id=tg_id,
             bot_id=bot_id,
         )
@@ -90,8 +90,8 @@ class DataCRUD(DataManagerBase):
         bot_id: int,
         key: str,
         value: str,
-        value_type: Optional[str] = None
-    ) -> Optional[Data]:
+        value_type: str | None = None
+    ) -> Data | None:
         """Создает или обновляет запись данных для пользователя.
 
         Аргументы:
@@ -99,14 +99,14 @@ class DataCRUD(DataManagerBase):
             bot_id (int): ID бота.
             key (str): Ключ данных.
             value (str): Значение данных в строковом виде.
-            value_type (Optional[str]): Тип значения (int, bool, str, dict,
+            value_type (str | None): Тип значения (int, bool, str, dict,
                 date, time). Используется только для проверки формата.
 
         Возвращает:
-            Optional[Data]: Созданная или обновленная запись Data.
+            Data | None: Созданная или обновленная запись Data.
         """
         # Получаем пользователя один раз
-        user: Optional[User] = await self._get_user(
+        user: User | None = await self._get_user(
             tg_id=tg_id,
             bot_id=bot_id,
         )
@@ -115,7 +115,7 @@ class DataCRUD(DataManagerBase):
 
         # Проверка формата значения, если указан тип
         if value_type:
-            type_map: Dict[str, Callable[[str], Any]] = {
+            type_map: dict[str, Callable[[str], Any]] = {
                 "int": int,
                 "bool": lambda v: v.lower() == "true",
                 "date": lambda v: datetime.strptime(v, "%d.%m.%Y"),
@@ -123,7 +123,7 @@ class DataCRUD(DataManagerBase):
                 "str": str
             }
 
-            caster: Optional[Callable[[str], Any]] = type_map.get(
+            caster: Callable[[str], Any] | None = type_map.get(
                 value_type.lower()
             )
             if not caster:
@@ -138,7 +138,7 @@ class DataCRUD(DataManagerBase):
 
         try:
             # Объединяем один блок для уменьшения транзакций
-            data: Optional[Data] = await self.session.scalar(
+            data: Data | None = await self.session.scalar(
                 select(Data).where(
                     Data.user_id == user.id,
                     Data.key == key
@@ -175,7 +175,7 @@ class DataCRUD(DataManagerBase):
         Returns:
             bool: True, если удаление прошло успешно, иначе False.
         """
-        data: Optional[Data] = await self.get(
+        data: Data | None = await self.get(
             tg_id=tg_id,
             bot_id=bot_id,
             key=key,

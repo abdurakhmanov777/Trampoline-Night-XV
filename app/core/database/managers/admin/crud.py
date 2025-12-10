@@ -5,8 +5,6 @@ CRUD-операции для работы с таблицей администр
 в базе данных.
 """
 
-from typing import Optional, Tuple
-
 from loguru import logger
 from sqlalchemy import Result, select
 from sqlalchemy.exc import SQLAlchemyError
@@ -22,7 +20,7 @@ class AdminCRUD(AdminManagerBase):
         self,
         tg_id: int,
         bot_id: int,
-    ) -> Optional[Admin]:
+    ) -> Admin | None:
         """
         Получить администратора по Telegram ID.
 
@@ -31,10 +29,10 @@ class AdminCRUD(AdminManagerBase):
             bot_id (int): ID бота.
 
         Returns:
-            Optional[Admin]: Объект администратора или None.
+            Admin | None: Объект администратора или None.
         """
         try:
-            result: Result[Tuple[Admin]] = await self.session.execute(
+            result: Result[tuple[Admin]] = await self.session.execute(
                 select(Admin).where(
                     Admin.tg_id == tg_id, Admin.bot_id == bot_id
                 )
@@ -49,7 +47,7 @@ class AdminCRUD(AdminManagerBase):
         self,
         tg_id: int,
         bot_id: int,
-        name: Optional[str] = None,
+        name: str | None = None,
         lang: str = "ru",
         text: str = "Нет текста",
         entities: str = "None",
@@ -61,7 +59,7 @@ class AdminCRUD(AdminManagerBase):
         Args:
             tg_id (int): Telegram ID администратора.
             bot_id (int): ID бота.
-            name (Optional[str]): Имя администратора.
+            name (str | None): Имя администратора.
             lang (str): Язык администратора.
             text (str): Текст сообщения администратора.
             entities (str): Сущности сообщения.
@@ -101,7 +99,7 @@ class AdminCRUD(AdminManagerBase):
         Returns:
             bool: True, если удаление успешно, иначе False.
         """
-        admin: Optional[Admin] = await self.get(
+        admin: Admin | None = await self.get(
             tg_id=tg_id,
             bot_id=bot_id
         )

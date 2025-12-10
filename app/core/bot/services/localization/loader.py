@@ -5,7 +5,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Literal
+from typing import Any, Literal
 
 import aiofiles
 from loguru import logger
@@ -16,7 +16,7 @@ from app.core.bot.services.localization.model import Localization
 
 async def _read_json(
     file_path: Path,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Асинхронно читает JSON-файл и возвращает его содержимое.
 
     Parameters
@@ -26,7 +26,7 @@ async def _read_json(
 
     Returns
     -------
-    Dict[str, Any]
+    dict[str, Any]
         Содержимое JSON-файла в виде словаря. При ошибке или отсутствии
         файла возвращается пустой словарь.
     """
@@ -72,7 +72,7 @@ async def load_localization(
     role_dir: Path = LOCALIZATIONS_DIR / role
     primary_file: Path = role_dir / f"{lang}.json"
 
-    localization_data: Dict[str, Any] = await _read_json(
+    localization_data: dict[str, Any] = await _read_json(
         primary_file
     )
 
@@ -81,7 +81,7 @@ async def load_localization(
         default_file: Path = (
             LOCALIZATIONS_DIR / "default" / f"{lang}.json"
         )
-        default_data: Dict[str, Any] = await _read_json(
+        default_data: dict[str, Any] = await _read_json(
             default_file
         )
 

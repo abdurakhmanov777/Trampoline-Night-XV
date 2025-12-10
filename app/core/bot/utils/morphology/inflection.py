@@ -1,4 +1,4 @@
-from typing import Any, List, Optional, Set
+from typing import Any
 
 import pymorphy3
 
@@ -32,7 +32,7 @@ async def inflect_text(
         Строка с изменённым падежом или исходная строка,
         если подходящий падеж не найден.
     """
-    case_code: Optional[str] = CASES.get(case)
+    case_code: str | None = CASES.get(case)
     if not case_code:
         return f"Неизвестный падеж: {case}"
 
@@ -42,7 +42,7 @@ async def inflect_text(
         Предпочтение отдаётся существительным и прилагательным
         в именительном падеже.
         """
-        parses: List[Any] = morph.parse(word)
+        parses: list[Any] = morph.parse(word)
         for p in parses:
             if "NOUN" in p.tag and "nomn" in p.tag:
                 return p
@@ -59,25 +59,25 @@ async def inflect_text(
             for o, n in zip(original, new)
         ) + new[len(original):]
 
-    words: List[str] = text.split()
-    parsed: List[Any] = [choose_best_parse(w) for w in words]
+    words: list[str] = text.split()
+    parsed: list[Any] = [choose_best_parse(w) for w in words]
 
     # Находим существительное для согласования
-    noun: Optional[Any] = next(
+    noun: Any | None = next(
         (p for p in parsed if "NOUN" in p.tag),
         None
     )
     if not noun:
         return text
 
-    number: Optional[str] = noun.tag.number
-    result: List[str] = []
+    number: str | None = noun.tag.number
+    result: list[str] = []
 
     for word, parse in zip(words, parsed):
         # Склоняем существительное и согласованные прилагательные
         if parse == noun or (
                 "ADJF" in parse.tag and parse.tag.number == number):
-            tags: Set[str] = set()
+            tags: set[str] = set()
 
             # Особенности склонения винительного падежа
             if case_code == "accs":
@@ -101,7 +101,7 @@ async def inflect_text(
             if number:
                 tags.add(number)
 
-            inflected: Optional[Any] = parse.inflect(tags)
+            inflected: Any | None = parse.inflect(tags)
             new_word: str = inflected.word if inflected else word
             result.append(preserve_case(word, new_word))
         else:

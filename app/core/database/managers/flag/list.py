@@ -4,7 +4,7 @@
 Содержит методы для получения всех записей из таблицы Flag.
 """
 
-from typing import Sequence, Tuple
+from typing import Sequence
 
 from loguru import logger
 from sqlalchemy import Result, select
@@ -25,7 +25,7 @@ class FlagList(FlagManagerBase):
             Sequence[Flag]: Список всех объектов Flag.
         """
         try:
-            result: Result[Tuple[Flag]] = await self.session.execute(
+            result: Result[tuple[Flag]] = await self.session.execute(
                 select(Flag)
             )
             # Возвращаем все флаги

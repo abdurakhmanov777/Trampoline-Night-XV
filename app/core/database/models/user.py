@@ -8,7 +8,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import BigInteger, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -58,10 +58,10 @@ class User(Base):
         Integer,
         nullable=True
     )
-    date_registration: Mapped[Optional[datetime]] = mapped_column(
+    date_registration: Mapped[datetime | None] = mapped_column(
         DateTime
     )
-    date_confirm: Mapped[Optional[datetime]] = mapped_column(
+    date_confirm: Mapped[datetime | None] = mapped_column(
         DateTime
     )
 
@@ -99,7 +99,7 @@ class User(Base):
         s.append(value)
         self.state = s
 
-    def pop_state(self) -> Optional[str]:
+    def pop_state(self) -> str | None:
         """Снять элемент со стека состояния."""
         s: list[str] = self.state
         if not s:
@@ -108,7 +108,7 @@ class User(Base):
         self.state = s
         return last
 
-    def peek_state(self) -> Optional[str]:
+    def peek_state(self) -> str | None:
         """Получить верхний элемент стека без удаления."""
         s: list[str] = self.state
         return s[-1] if s else None

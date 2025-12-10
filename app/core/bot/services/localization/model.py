@@ -5,7 +5,7 @@
 строкам с поддержкой вложенных словарей.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class Localization:
@@ -16,24 +16,24 @@ class Localization:
     Автоматически создаёт вложенные объекты для словарей.
     """
 
-    default: Optional['Localization']
+    default: 'Localization'
 
     def __init__(
         self,
-        localization_data: Dict[str, Any]
+        localization_data: dict[str, Any]
     ) -> None:
         """
         Инициализирует объект локализации на основе словаря.
 
         Args:
-            localization_data (Dict[str, Any]): Данные локализации в виде
+            localization_data (dict[str, Any]): Данные локализации в виде
                 словаря.
         """
         self._parse_data(localization_data)
 
     def _parse_data(
         self,
-        data: Dict[str, Any]
+        data: dict[str, Any]
     ) -> None:
         """
         Рекурсивно создаёт атрибуты для ключей словаря локализации.
@@ -42,7 +42,7 @@ class Localization:
         Localization. Иначе значение сохраняется как обычный атрибут.
 
         Args:
-            data (Dict[str, Any]): Словарь с локализационными данными.
+            data (dict[str, Any]): Словарь с локализационными данными.
         """
         for key, value in data.items():
             # Если значение — словарь, создаём вложенный объект

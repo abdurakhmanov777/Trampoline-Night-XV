@@ -6,7 +6,7 @@
 клавиатуры завершения.
 """
 
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
@@ -17,7 +17,7 @@ from ..context import MultiContext
 
 async def handler_payment(
     ctx: MultiContext,
-) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+) -> tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
     Формирует Сообщение пользователя по завершении сценария.
 
@@ -30,10 +30,10 @@ async def handler_payment(
             локализацию, ID пользователя и связанные данные.
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+        tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
             Сообщение, клавиатура и настройки предпросмотра.
     """
-    user_data: Dict[str, Any] = await ctx.state.get_data()
+    user_data: dict[str, Any] = await ctx.state.get_data()
     states: list[str] = user_data["user_db"].state
 
     if not isinstance(states, list):

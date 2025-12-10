@@ -4,7 +4,7 @@
 данные содержат подстроку 'user{SYMB}'. Используется в маршрутах Aiogram.
 """
 
-from typing import Any, Dict, Union
+from typing import Any, Union
 
 from aiogram.filters import BaseFilter
 from aiogram.types import CallbackQuery
@@ -23,7 +23,7 @@ class CallbackNextFilter(BaseFilter):
     async def __call__(
         self,
         callback: CallbackQuery,
-    ) -> Union[Dict[str, Any], bool]:
+    ) -> Union[dict[str, Any], bool]:
         """Проверить наличие подстроки 'user{SYMB}' в данных запроса.
 
         Parameters
@@ -33,7 +33,7 @@ class CallbackNextFilter(BaseFilter):
 
         Returns
         -------
-        Union[Dict[str, Any], bool]
+        Union[dict[str, Any], bool]
             Словарь с ключом 'user{SYMB}data',
                 содержащим подстроку после 'user{SYMB}',
             если подстрока 'user{SYMB}' найдена, иначе False.

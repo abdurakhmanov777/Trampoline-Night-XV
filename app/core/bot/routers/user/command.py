@@ -6,7 +6,7 @@
 и обновляет состояние пользователя при необходимости.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 from aiogram import Router, types
 from aiogram.filters import Command
@@ -43,7 +43,7 @@ def get_router_user_command() -> Router:
             message: Объект входящего сообщения Telegram.
             state: FSM-контекст, содержащий локализацию и данные пользователя.
         """
-        user_data: Dict[str, Any] = await state.get_data()
+        user_data: dict[str, Any] = await state.get_data()
         user_db: Any = user_data.get("user_db")
         user_state: list = user_db.state[-1]
         if not message.from_user or not message.bot or not isinstance(
@@ -96,7 +96,7 @@ def get_router_user_command() -> Router:
             message: Объект входящего сообщения Telegram.
             state: FSM-контекст, содержащий локализацию.
         """
-        user_data: Dict[str, Any] = await state.get_data()
+        user_data: dict[str, Any] = await state.get_data()
         loc: Any = user_data.get("loc_user")
         if not loc:
             return
@@ -131,7 +131,7 @@ def get_router_user_command() -> Router:
             message: Объект входящего сообщения Telegram.
             state: FSM-контекст, содержащий локализацию.
         """
-        user_data: Dict[str, Any] = await state.get_data()
+        user_data: dict[str, Any] = await state.get_data()
         loc: Any = user_data.get("loc_user")
         if not loc:
             return

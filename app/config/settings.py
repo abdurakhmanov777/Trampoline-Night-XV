@@ -6,7 +6,6 @@
 """
 
 import os
-from typing import List, Set
 
 from dotenv import load_dotenv
 
@@ -26,7 +25,7 @@ PROVIDER_TOKEN: str = os.getenv("PROVIDER_TOKEN", "")
 TIME_ZONE: int = int(os.getenv("TIME_ZONE", "0"))
 
 # Список ID основных администраторов
-MAIN_ADMINS: List[int] = [
+MAIN_ADMINS: list[int] = [
     int(x) for x in os.getenv("MAIN_ADMINS", "").split(",") if x
 ]
 
@@ -38,10 +37,10 @@ GSHEET_NAME: str = os.getenv("GSHEET_NAME", "")  # Имя таблицы
 GSHEET_PAGE: str = os.getenv("GSHEET_PAGE", "")  # Имя листа таблицы
 
 # Основные команды бота
-COMMAND_MAIN: Set[str] = {"start", "test", "admin"}
+COMMAND_MAIN: set[str] = {"start", "test", "admin"}
 
 # Основные callback-префиксы
-CALLBACK_MAIN: List[str] = [
+CALLBACK_MAIN: list[str] = [
     "start",
     "settings",
     "info",
@@ -51,4 +50,4 @@ CALLBACK_MAIN: List[str] = [
 ]
 
 # Callback-префиксы для выбора
-CALLBACK_SELECT: Set[str] = {"lang"}
+CALLBACK_SELECT: set[str] = {"lang"}

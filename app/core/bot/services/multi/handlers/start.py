@@ -7,7 +7,7 @@
 с пользователем.
 """
 
-from typing import Any, Tuple
+from typing import Any
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
@@ -18,7 +18,7 @@ from ..context import MultiContext
 
 async def handler_start(
     ctx: MultiContext,
-) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+) -> tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
     Обрабатывает стартовое состояние пользователя.
 
@@ -33,7 +33,7 @@ async def handler_start(
 
     Returns
     -------
-    Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]
+    tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]
         Кортеж, содержащий текст сообщения, клавиатуру и параметры
         предпросмотра ссылок.
     """

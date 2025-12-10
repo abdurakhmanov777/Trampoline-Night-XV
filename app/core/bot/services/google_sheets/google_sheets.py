@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any
 
 import gspread
 
@@ -15,8 +15,8 @@ class GoogleSheetsService:
 
     def __init__(self) -> None:
         """Инициализация сервиса и подключение к таблице."""
-        self.gc: Optional[gspread.Client] = None
-        self.wks: Optional[gspread.Worksheet] = None
+        self.gc: gspread.Client | None = None
+        self.wks: gspread.Worksheet | None = None
         self._connect()
 
     def _connect(self) -> None:
@@ -42,7 +42,7 @@ class GoogleSheetsService:
         except Exception as e:
             self.wks = None
 
-    def get_worksheet(self) -> Optional[gspread.Worksheet]:
+    def get_worksheet(self) -> gspread.Worksheet | None:
         """
         Возвращает объект worksheet.
 
@@ -68,7 +68,7 @@ class GoogleSheetsService:
 
     def append_row(
         self,
-        values: List[Any]
+        values: list[Any]
     ) -> None:
         """
         Добавляет новую строку в таблицу.

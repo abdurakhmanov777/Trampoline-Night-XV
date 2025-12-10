@@ -6,7 +6,7 @@
 """
 
 import asyncio
-from typing import List, Union
+from typing import Union
 
 from aiogram import Bot, Dispatcher
 from aiogram.types.user import User
@@ -18,12 +18,12 @@ from .services.polling import PollingManager, get_polling_manager
 
 
 async def run_bot(
-    api_tokens: Union[str, List[str]],
+    api_tokens: Union[str, list[str]],
 ) -> bool:
     """Запускает одного или нескольких Telegram-ботов.
 
     Args:
-        api_tokens (Union[str, List[str]]): API-токен бота или список токенов.
+        api_tokens (Union[str, list[str]]): API-токен бота или список токенов.
 
     Returns:
         bool: True, если хотя бы один бот успешно запущен, иначе False.
@@ -77,19 +77,19 @@ async def run_bot(
             logger.exception(f"Ошибка при запуске бота {token}: {error}")
             return False
 
-    results: List[bool] = await asyncio.gather(
+    results: list[bool] = await asyncio.gather(
         *(start_single_bot(t) for t in api_tokens)
     )
     return any(results)
 
 
 def stop_bot(
-    api_tokens: Union[str, List[str]],
+    api_tokens: Union[str, list[str]],
 ) -> bool:
     """Останавливает одного или нескольких Telegram-ботов.
 
     Args:
-        api_tokens (Union[str, List[str]]): API-токен бота или список токенов.
+        api_tokens (Union[str, list[str]]): API-токен бота или список токенов.
 
     Returns:
         bool: True, если хотя бы один бот был остановлен, иначе False.

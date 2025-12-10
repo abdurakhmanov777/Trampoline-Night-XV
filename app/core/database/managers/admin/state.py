@@ -5,8 +5,6 @@
 состояний администратора.
 """
 
-from typing import List, Optional
-
 from ...models import Admin
 from .crud import AdminCRUD
 
@@ -31,7 +29,7 @@ class AdminState(AdminCRUD):
         Returns:
             bool: True, если состояние добавлено, иначе False.
         """
-        admin: Optional[Admin] = await self.get(
+        admin: Admin | None = await self.get(
             tg_id=tg_id,
             bot_id=bot_id
         )
@@ -39,7 +37,7 @@ class AdminState(AdminCRUD):
             # Администратор не найден
             return False
 
-        stack: List[str] = admin.state.split(",") if admin.state else []
+        stack: list[str] = admin.state.split(",") if admin.state else []
         stack.append(new_state)
         admin.state = ",".join(stack)
 
@@ -51,7 +49,7 @@ class AdminState(AdminCRUD):
         self,
         tg_id: int,
         bot_id: int,
-    ) -> Optional[str]:
+    ) -> str | None:
         """
         Удалить последнее состояние из стека администратора.
 
@@ -60,17 +58,17 @@ class AdminState(AdminCRUD):
             bot_id (int): ID бота.
 
         Returns:
-            Optional[str]: Удалённое состояние или None, если
+            str | None: Удалённое состояние или None, если
                 стек пуст или администратор не найден.
         """
-        admin: Optional[Admin] = await self.get(
+        admin: Admin | None = await self.get(
             tg_id=tg_id,
             bot_id=bot_id,
         )
         if not admin:
             return None
 
-        stack: List[str] = admin.state.split(",") if admin.state else []
+        stack: list[str] = admin.state.split(",") if admin.state else []
         if not stack:
             # Стек пуст
             return None
@@ -84,7 +82,7 @@ class AdminState(AdminCRUD):
         self,
         tg_id: int,
         bot_id: int,
-    ) -> Optional[str]:
+    ) -> str | None:
         """
         Получить текущее состояние без удаления.
 
@@ -93,15 +91,15 @@ class AdminState(AdminCRUD):
             bot_id (int): ID бота.
 
         Returns:
-            Optional[str]: Последнее состояние в стеке или None,
+            str | None: Последнее состояние в стеке или None,
                 если стек пуст или администратор не найден.
         """
-        admin: Optional[Admin] = await self.get(
+        admin: Admin | None = await self.get(
             tg_id=tg_id,
             bot_id=bot_id,
         )
         if not admin:
             return None
 
-        stack: List[str] = admin.state.split(",") if admin.state else []
+        stack: list[str] = admin.state.split(",") if admin.state else []
         return stack[-1] if stack else None

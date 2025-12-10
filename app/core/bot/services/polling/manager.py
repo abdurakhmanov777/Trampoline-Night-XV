@@ -7,7 +7,7 @@
 
 import asyncio
 from asyncio import Task
-from typing import Any, Awaitable, Callable, Dict, List, Optional
+from typing import Any, Awaitable, Callable
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
@@ -23,8 +23,8 @@ class PollingManager:
 
     def __init__(self) -> None:
         """Инициализация менеджера с пустыми словарями задач и ботов."""
-        self.tasks: Dict[str, Task] = {}
-        self.api_to_bot_id: Dict[str, int] = {}
+        self.tasks: dict[str, Task] = {}
+        self.api_to_bot_id: dict[str, int] = {}
 
     def active_bots_count(self) -> int:
         """
@@ -37,13 +37,13 @@ class PollingManager:
         """
         return len(self.tasks)
 
-    def active_api_tokens(self) -> List[str]:
+    def active_api_tokens(self) -> list[str]:
         """
         Возвращает список токенов API активных ботов.
 
         Returns
         -------
-        List[str]
+        list[str]
             Список токенов API.
         """
         return list(self.tasks.keys())
@@ -55,9 +55,9 @@ class PollingManager:
         polling_timeout: int = 10,
         handle_as_tasks: bool = True,
         backoff_config: BackoffConfig = DEFAULT_BACKOFF_CONFIG,
-        allowed_updates: Optional[List[str]] = None,
-        on_bot_startup: Optional[Callable[[], Awaitable[Any]]] = None,
-        on_bot_shutdown: Optional[Callable[[], Awaitable[Any]]] = None,
+        allowed_updates: list[str] | None = None,
+        on_bot_startup: Callable[[], Awaitable[Any]] | None = None,
+        on_bot_shutdown: Callable[[], Awaitable[Any]] | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -109,9 +109,9 @@ class PollingManager:
         polling_timeout: int,
         handle_as_tasks: bool,
         backoff_config: BackoffConfig,
-        allowed_updates: Optional[List[str]],
-        on_bot_startup: Optional[Callable[[], Awaitable[Any]]] = None,
-        on_bot_shutdown: Optional[Callable[[], Awaitable[Any]]] = None,
+        allowed_updates: list[str] | None,
+        on_bot_startup: Callable[[], Awaitable[Any]] | None = None,
+        on_bot_shutdown: Callable[[], Awaitable[Any]] | None = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -185,7 +185,7 @@ class PollingManager:
         api_token : str
             Токен API бота.
         """
-        task: Optional[Task[Any]] = self.tasks.get(api_token)
+        task: Task[Any] | None = self.tasks.get(api_token)
         if task and not task.done():
             task.cancel()
 
@@ -203,5 +203,5 @@ class PollingManager:
         bool
             True, если бот запущен, иначе False.
         """
-        task: Optional[Task[Any]] = self.tasks.get(api_token)
+        task: Task[Any] | None = self.tasks.get(api_token)
         return task is not None and not task.done()

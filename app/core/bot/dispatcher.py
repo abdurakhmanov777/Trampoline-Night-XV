@@ -3,8 +3,6 @@
 с соответствующими middleware.
 """
 
-from typing import List, Tuple
-
 from aiogram import Dispatcher, Router
 from aiogram.dispatcher.event.telegram import TelegramEventObserver
 from aiogram.fsm.storage.memory import MemoryStorage, SimpleEventIsolation
@@ -41,7 +39,7 @@ async def setup_dispatcher() -> Dispatcher:
     intercept_handler: Router = routers.get_router_intercept()
 
     # Настройка middleware
-    middleware_map: List[Tuple[TelegramEventObserver, MwBase]] = [
+    middleware_map: list[tuple[TelegramEventObserver, MwBase]] = [
         # Middleware для админов
         (routers.admin_callback.callback_query, mw.MwAdminCallback()),
         (routers.admin_command.message, mw.MwAdminMessage()),

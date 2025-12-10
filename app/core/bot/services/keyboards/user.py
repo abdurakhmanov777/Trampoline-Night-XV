@@ -5,7 +5,7 @@
 и выбора из списка опций различной длины.
 """
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from aiogram import types
 
@@ -34,7 +34,7 @@ def kb_dynamic(
     Returns:
         types.InlineKeyboardMarkup: Сформированная клавиатура.
     """
-    rows: List[List[Tuple[str, str]]] = [[
+    rows: list[list[tuple[str, str]]] = [[
         *([(buttons.back, "userback")] if backstate != "2" else []),
         *([(buttons.next, f"user{SYMB}{state}")] if show_next else []),
     ]]
@@ -53,7 +53,7 @@ def kb_start(
     Returns:
         types.InlineKeyboardMarkup: Клавиатура с кнопкой согласия.
     """
-    rows: List[List[Tuple[str, str]]] = [[(buttons.consent, f"user{SYMB}2")]]
+    rows: list[list[tuple[str, str]]] = [[(buttons.consent, f"user{SYMB}2")]]
     return build_keyboard(rows)
 
 
@@ -73,14 +73,14 @@ def kb_submit(
         "Назад".
     """
     text: str = f"user{SYMB}99" if payment else f"user{SYMB}100"
-    rows: List[List[Tuple[str, str]]] = [[(buttons.back, "userback"),
+    rows: list[list[tuple[str, str]]] = [[(buttons.back, "userback"),
                                          (buttons.next, text)]]
     return build_keyboard(rows)
 
 
 def kb_select(
     name: str,
-    options: List[Dict[str, Any]],
+    options: list[dict[str, Any]],
     buttons: Any
 ) -> types.InlineKeyboardMarkup:
     """
@@ -88,7 +88,7 @@ def kb_select(
 
     Args:
         name (str): Имя группы опций.
-        options (List[Dict[str, Any]]): Список словарей с полями "text",
+        options (list[dict[str, Any]]): Список словарей с полями "text",
             "next" и опциональным "save".
         buttons (Any): Объект с локализованными текстами кнопок.
 
@@ -97,8 +97,8 @@ def kb_select(
         кнопкой "Назад".
     """
     back_text: str = buttons.back
-    rows: List[List[Tuple[str, str]]] = []
-    current_row: List[Tuple[str, str]] = []
+    rows: list[list[tuple[str, str]]] = []
+    current_row: list[tuple[str, str]] = []
     current_length: int = 0
     max_length_per_row: int = 25
 
@@ -145,7 +145,7 @@ def kb_delete(
     Returns:
         types.InlineKeyboardMarkup: Клавиатура с кнопкой закрытия.
     """
-    rows: List[List[Tuple[str, str]]] = [[(buttons.delete, "delete")]]
+    rows: list[list[tuple[str, str]]] = [[(buttons.delete, "delete")]]
     return build_keyboard(rows)
 
 
@@ -161,7 +161,7 @@ def kb_cancel_confirm(
     Returns:
         types.InlineKeyboardMarkup: Клавиатура с кнопками "Да" и "Нет".
     """
-    rows: List[List[Tuple[str, str]]] = [[
+    rows: list[list[tuple[str, str]]] = [[
         (buttons.no, "delete"),
         (buttons.yes, "cancel_reg_confirm")
     ]]
@@ -184,14 +184,14 @@ def kb_success(
         или "Отменить регистрацию".
     """
     if payment:
-        # rows: List[List[Tuple[str, str]]] = [[
+        # rows: list[list[tuple[str, str]]] = [[
         #     (buttons.payment_status, "payment_status")
         # ]]
-        rows: List[List[Tuple[str, str]]] = [[
+        rows: list[list[tuple[str, str]]] = [[
             (buttons.cancel_reg, "cancel_reg")
         ]]
     else:
-        rows: List[List[Tuple[str, str]]] = [[
+        rows: list[list[tuple[str, str]]] = [[
             (buttons.cancel_reg, "cancel_reg")
         ]]
 
@@ -210,7 +210,7 @@ def kb_payment(
     Returns:
         types.InlineKeyboardMarkup: Клавиатура с кнопками оплаты.
     """
-    rows: List[List[Tuple[str, str]]] = [[
+    rows: list[list[tuple[str, str]]] = [[
         (buttons.back, "userback"),
         (buttons.payment, "payment")
     ]]

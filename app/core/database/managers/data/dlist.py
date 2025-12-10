@@ -5,7 +5,7 @@ CRUD-операции для работы с таблицей Data.
 ключ–значение конкретного пользователя по его Telegram ID (tg_id).
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from loguru import logger
 from sqlalchemy import Update, delete, insert, select, update
@@ -23,7 +23,7 @@ class DataList(DataManagerBase):
         self,
         tg_id: int,
         bot_id: int,
-    ) -> Optional[User]:
+    ) -> User | None:
         """Получает объект пользователя по его Telegram ID.
 
         Args:
@@ -31,7 +31,7 @@ class DataList(DataManagerBase):
             bot_id (int): ID бота.
 
         Returns:
-            Optional[User]: Объект User или None, если пользователь не найден.
+            User | None: Объект User или None, если пользователь не найден.
         """
         try:
             result: SAResult[tuple[User]] = await self.session.execute(
@@ -49,7 +49,7 @@ class DataList(DataManagerBase):
         self,
         tg_id: int,
         bot_id: int,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Получает все пары ключ–значение пользователя в виде словаря.
 
         Args:
@@ -57,9 +57,9 @@ class DataList(DataManagerBase):
             bot_id (int): ID бота.
 
         Returns:
-            Dict[str, Any]: Словарь ключ–значение для пользователя.
+            dict[str, Any]: Словарь ключ–значение для пользователя.
         """
-        user: Optional[User] = await self._get_user(
+        user: User | None = await self._get_user(
             tg_id=tg_id,
             bot_id=bot_id,
         )
@@ -89,7 +89,7 @@ class DataList(DataManagerBase):
         Returns:
             bool: True, если удаление прошло успешно, иначе False.
         """
-        user: Optional[User] = await self._get_user(
+        user: User | None = await self._get_user(
             tg_id=tg_id,
             bot_id=bot_id,
         )
@@ -124,7 +124,7 @@ class DataList(DataManagerBase):
         Returns:
             bool: True, если удаление прошло успешно, иначе False.
         """
-        user: Optional[User] = await self._get_user(
+        user: User | None = await self._get_user(
             tg_id=tg_id,
             bot_id=bot_id,
         )
@@ -151,9 +151,9 @@ class DataList(DataManagerBase):
         self,
         tg_id: int,
         bot_id: int,
-        new_data: Dict[str, Any]
+        new_data: dict[str, Any]
     ) -> bool:
-        user: Optional[User] = await self._get_user(
+        user: User | None = await self._get_user(
             tg_id=tg_id,
             bot_id=bot_id,
         )

@@ -7,7 +7,7 @@
 
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 from aiogram import types
 from aiogram.enums import ChatAction
@@ -23,7 +23,7 @@ from ..context import MultiContext
 
 async def handler_final(
     ctx: MultiContext,
-) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+) -> tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
     Обрабатывает состояние отправки финального сообщения с изображением.
 
@@ -38,22 +38,21 @@ async def handler_final(
 
     Returns
     -------
-    Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]
+    tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]
         Кортеж с идентификатором сообщения (пустая строка),
         разметкой клавиатуры и опциями предпросмотра ссылок.
     """
 
-    # Универсальное извлечение сообщения
-    message: Optional[types.MaybeInaccessibleMessageUnion]
     event: types.CallbackQuery | types.Message | None = ctx.event
     loc: Any = ctx.loc
 
-    user_data: Dict[str, Any] = await ctx.state.get_data()
+    user_data: dict[str, Any] = await ctx.state.get_data()
     user: list[str] = user_data["user_db"]
-    if isinstance(event, types.CallbackQuery):
-        message = event.message
-    else:
+    message: types.Message | None
+    if isinstance(event, types.Message):
         message = event
+    else:
+        message = getattr(event, "message", None)
 
     if not message or not message.bot or not isinstance(user, User):
         return "", InlineKeyboardMarkup(
@@ -61,7 +60,7 @@ async def handler_final(
         ), LinkPreviewOptions()
 
     # Генерация кода
-    code: Optional[int] = generate_code(
+    code: int | None = generate_code(
         user_id=user.id,
         num_digits=3,
     )
@@ -138,7 +137,7 @@ async def handler_final(
         pass
 
     # return sent_message.message_id
-    user_data: Dict[str, Any] = await ctx.state.get_data()
+    user_data: dict[str, Any] = await ctx.state.get_data()
     user_db: Any = user_data.get("user_db")
     msg_id_old: int = user_db.msg_id
     user_db.msg_id = sent_message.message_id

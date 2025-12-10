@@ -6,7 +6,7 @@
 клавиатуры завершения.
 """
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from aiogram.types import InlineKeyboardMarkup, LinkPreviewOptions
 
@@ -17,7 +17,7 @@ from ..context import MultiContext
 
 async def handler_submit(
     ctx: MultiContext,
-) -> Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+) -> tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
     """
     Формирует Сообщение пользователя по завершении сценария.
 
@@ -30,10 +30,10 @@ async def handler_submit(
             локализацию, ID пользователя и связанные данные.
 
     Returns:
-        Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
+        tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]:
             Сообщение, клавиатура и настройки предпросмотра.
     """
-    user_data: Dict[str, Any] = await ctx.state.get_data()
+    user_data: dict[str, Any] = await ctx.state.get_data()
     states: list[str] = user_data["user_db"].state
 
     if not isinstance(states, list):
@@ -44,7 +44,7 @@ async def handler_submit(
     loc: Any = ctx.loc
 
     # Собираем список ключей данных, подлежащих выводу
-    keep_keys: List[str] = [
+    keep_keys: list[str] = [
         step_data.text
         for state in states
         if (step_data := getattr(loc.steps, state, None)) is not None
@@ -53,10 +53,10 @@ async def handler_submit(
     ]
 
     # Загружаем данные пользователя, фильтруя только нужные поля
-    user_data: Dict[str, Any] = await ctx.state.get_data()
+    user_data: dict[str, Any] = await ctx.state.get_data()
     data_list: Any = user_data.get("data_db")
 
-    keys_to_remove: List[Any] = [k for k in data_list if k not in keep_keys]
+    keys_to_remove: list[Any] = [k for k in data_list if k not in keep_keys]
     for k in keys_to_remove:
         del data_list[k]
 

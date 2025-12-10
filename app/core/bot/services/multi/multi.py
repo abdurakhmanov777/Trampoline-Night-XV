@@ -7,7 +7,7 @@
 которые требуется отправить пользователю в Telegram.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable
 
 from aiogram import types
 from aiogram.fsm.context import FSMContext
@@ -22,14 +22,14 @@ from .handlers.submit import handler_submit
 from .handlers.text import handler_text
 
 # Таблица стандартных обработчиков.
-HANDLERS: Dict[str, Callable[[MultiContext], Any]] = {
+HANDLERS: dict[str, Callable[[MultiContext], Any]] = {
     "input": handler_input,
     "select": handler_select,
     "text": handler_text,
 }
 
 # Таблица обработчиков для специальных состояний.
-SPECIAL_HANDLERS: Dict[str, Callable[[MultiContext], Any]] = {
+SPECIAL_HANDLERS: dict[str, Callable[[MultiContext], Any]] = {
     "1": handler_start,
     "98": handler_submit,
     "99": handler_payment,
@@ -41,10 +41,10 @@ async def multi(
     state: FSMContext,
     value: str,
     tg_id: int,
-    data: Optional[str] = None,
-    data_select: Optional[List[str]] = None,
-    event: Optional[Union[types.CallbackQuery, types.Message]] = None,
-) -> Tuple[
+    data: str | None = None,
+    data_select: list[str] | None = None,
+    event: types.CallbackQuery | types.Message | None = None,
+) -> tuple[
     str,
     types.InlineKeyboardMarkup,
     types.LinkPreviewOptions
@@ -64,26 +64,26 @@ async def multi(
         Текущее значение состояния.
     tg_id : int
         Telegram ID пользователя.
-    data : Optional[str]
+    data : str | None
         Дополнительные данные, переданные пользователем.
-    data_select : Optional[List[str]]
+    data_select : list[str] | None
         Пара ключ–значение для сохранения в хранилище.
-    event : Optional[Union[types.CallbackQuery, types.Message]]
+    event : types.CallbackQuery | types.Message | None
         Telegram событие (сообщение или callback).
 
     Returns
     -------
-    Tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]
+    tuple[str, InlineKeyboardMarkup, LinkPreviewOptions]
         Текст сообщения, клавиатура и параметры предпросмотра ссылок.
     """
-    user_data: Dict[str, Any] = await state.get_data()
+    user_data: dict[str, Any] = await state.get_data()
     loc: Any = user_data.get("loc_user")
     # Определяем обработчик для специальных состояний, если они есть.
-    handler: Optional[Callable[[MultiContext], Any]] = (
+    handler: Callable[[MultiContext], Any] | None = (
         SPECIAL_HANDLERS.get(value)
     )
 
-    loc_state: Optional[Any] = None
+    loc_state: Any | None = None
 
     if handler is None:
         # Если состояние не специальное, определяем его по локализации.
@@ -113,7 +113,7 @@ async def multi(
         key: str
         value_to_store: str
         key, value_to_store = data_select[:2]
-        user_data: Dict[str, Any] = await state.get_data()
+        user_data: dict[str, Any] = await state.get_data()
         data_db: Any = user_data.get("data_db")
         data_db[key] = value_to_store
 

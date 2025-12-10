@@ -5,8 +5,6 @@ CRUD-операции для таблицы Flag.
 удаления флагов.
 """
 
-from typing import Optional, Tuple
-
 from loguru import logger
 from sqlalchemy import Result, select
 from sqlalchemy.exc import SQLAlchemyError
@@ -21,7 +19,7 @@ class FlagCRUD(FlagManagerBase):
     async def get(
         self,
         name: str,
-    ) -> Optional[Flag]:
+    ) -> Flag | None:
         """
         Получить флаг по имени.
 
@@ -29,11 +27,11 @@ class FlagCRUD(FlagManagerBase):
             name (str): Имя флага.
 
         Returns:
-            Optional[Flag]: Объект Flag или None, если флаг
+            Flag | None: Объект Flag или None, если флаг
                 не найден.
         """
         try:
-            result: Result[Tuple[Flag]] = await self.session.execute(
+            result: Result[tuple[Flag]] = await self.session.execute(
                 select(Flag).where(Flag.name == name)
             )
             return result.scalar_one_or_none()
@@ -80,7 +78,7 @@ class FlagCRUD(FlagManagerBase):
         Returns:
             bool: True, если обновление прошло успешно, иначе False.
         """
-        flag: Optional[Flag] = await self.get(name)
+        flag: Flag | None = await self.get(name)
         if not flag:
             # Флаг не найден
             return False
@@ -102,7 +100,7 @@ class FlagCRUD(FlagManagerBase):
         Returns:
             bool: True, если удаление прошло успешно, иначе False.
         """
-        flag: Optional[Flag] = await self.get(name)
+        flag: Flag | None = await self.get(name)
         if not flag:
             # Флаг не найден
             return False
