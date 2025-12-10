@@ -78,13 +78,12 @@ class MwBase(BaseMiddleware):
         data.update(self.extra_data)
 
         user: Optional[User] = None
-        admin: Optional[Admin] = None
         db: Optional[Dict[str, str]] = None
         msg_id: int = 0
 
         if self.role == "user":
             user, db, msg_id = await user_before(data, event)
-            
+
         else:
             # Логика для админов будет добавлена позже
             pass
